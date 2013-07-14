@@ -8,5 +8,9 @@
     "user": <couchdb username>,
     "pass": <couchdb password>,
     "name": "pssst"
-  }
+  },
+  "names": [
+  	".*admin.*",
+  	".*pssst.*"
+  ]
 }
