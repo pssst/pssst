@@ -1,0 +1,12 @@
+// Please remove the first line and rename this file to 'config.json'
+{
+  "debug": 0,
+  "port": <pssst port>,
+  "db": {
+    "host": <couchdb host>,
+    "port": <couchdb port>,
+    "user": <couchdb username>,
+    "pass": <couchdb password>,
+    "name": "pssst"
+  }
+}
