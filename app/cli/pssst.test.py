@@ -20,16 +20,17 @@ from pssst import Pssst
 
 os.chdir(os.path.split(os.path.abspath(sys.argv[0]))[0])
 
-if not os.name in ["posix"]:
-    sys.exit("System not supported")
-
 if os.path.exists(".pssst"):
     host = open(".pssst", "r").read().strip()
 else:
     host = ""
 
-if "localhost" in host:
-    os.system("node ../../server/server.js & sleep 1")
+local = host.startswith("localhost")
+
+if local and not os.name in ["posix"]:
+    sys.exit("System not supported")
+
+if local: os.system("node ../../server/server.js & sleep 1")
 
 try:
     name = "pssst.%s" % int(round(time.time()))
@@ -50,5 +51,4 @@ try:
             print "failed"
 
 finally:
-    if "localhost" in host:
-        os.system("killall node")
+    if local: os.system("killall node")

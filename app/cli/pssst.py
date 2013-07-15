@@ -122,7 +122,7 @@ class Pssst:
         name = User.simple(name)
 
         if not name:
-            raise Exception("User name invalid. Please use alphanumericals")
+            raise Exception("User name invalid.")
 
         found, data = self.find(name)
 
@@ -213,6 +213,8 @@ def main(script, command="--help", user=None, receiver=None, *message):
     -h --help        Shows this text.
     -l --license     Shows license.
     -v --version     Shows version.
+
+    User name format: pssst.[a-z0-9]
     """
     try:
         if command in ("-v", "--version"):
