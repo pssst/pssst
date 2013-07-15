@@ -214,7 +214,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
     -l --license     Shows license.
     -v --version     Shows version.
 
-    User name format: pssst.[a-z0-9]
+    Name format: pssst.[a-z0-9]
     """
     try:
         if command in ("-v", "--version"):
