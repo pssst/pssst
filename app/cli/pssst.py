@@ -47,16 +47,20 @@ class PKCS5:
 
 class Key:
     def __init__(self, data=None, size=2048):
-        if data:
-            self.key = RSA.importKey(data)
-        else:
-            self.key = RSA.generate(size)
+        try:
+            if data:
+                self.key = RSA.importKey(*data)
+            else:
+                self.key = RSA.generate(size)
 
-    def export(self, private=False):
+        except (ValueError, IndexError, TypeError):
+            raise Exception("Passphrase wrong")
+
+    def export(self, private=False, passphrase=None):
         if not private:
-            return self.key.publickey().exportKey()
+            return self.key.publickey().exportKey("PEM")
         else:
-            return self.key.exportKey()
+            return self.key.exportKey("PEM", passphrase)
 
     def cipher(self, key, iv="0123456789ABCDEF"):
         return AES.new(key, AES.MODE_CBC, iv)
@@ -79,18 +83,18 @@ class Key:
 
 
 class User:
-    def __init__(self, name):
+    def __init__(self, name, passphrase):
         create = not User.exists(name)
 
         self.file = ZipFile(".pssst.%s" % name, "a")
         self.name = name
 
         if not create:
-            self.key = Key(self.load(name + ".private"))
+            self.key = Key((self.load(".private"), passphrase))
         else:
             self.key = Key()
 
-            self.save(name + ".private", self.key.export(True))
+            self.save(".private", self.key.export(True, passphrase))
             self.save(name, self.key.export())
 
     @staticmethod
@@ -113,7 +117,7 @@ class User:
 
 
 class Pssst:
-    def __init__(self, name):
+    def __init__(self, name, passphrase=None):
         if os.path.exists(".pssst"):
             self.host = open(".pssst", "r").read().strip()
         else:
@@ -129,7 +133,7 @@ class Pssst:
         if User.exists(name) != found:
             raise Exception("User doesn't exist")
 
-        self.user = User(name)
+        self.user = User(name, passphrase)
 
         if not found:
             created, data = self.create(self.user)
@@ -205,7 +209,7 @@ class Pssst:
 
 def main(script, command="--help", user=None, receiver=None, *message):
     """
-    Usage: %s COMMAND [USER] [RECEIVER] [MESSAGE]
+    Usage: %s COMMAND USER[:PASSPHRASE] RECEIVER MESSAGE
 
     -c --create      Creates the user (local and remote).
     -d --decrypt     Decrypts a message by the user.
@@ -217,8 +221,13 @@ def main(script, command="--help", user=None, receiver=None, *message):
     Name format: pssst.[a-z0-9]
     """
     try:
+        if ":" in user:
+            name, passphrase = user.split(":", 1)
+        else:
+            name, passphrase = user, None
+
         if command in ("-v", "--version"):
-            return "Pssst! cli 0.1.0"
+            return "Pssst! cli 0.2.0"
 
         if command in ("-l", "--license"):
             return __doc__.strip()
@@ -230,18 +239,18 @@ def main(script, command="--help", user=None, receiver=None, *message):
             return "Please specify the user."
 
         if command in ("-c", "--create"):
-            Pssst(user)
+            Pssst(name, passphrase)
             return "User created: %s" % user
 
         if command in ("-d", "--decrypt"):
-            name, message = Pssst(user).pull()
+            name, message = Pssst(name, passphrase).pull()
             return "Message pulled: %s - pssst.%s" % (message, name)
 
         if not receiver:
             return "Please specify the receiver."
 
         if command in ("-e", "--encrypt"):
-            Pssst(user).push([receiver], " ".join(message))
+            Pssst(name, passphrase).push([receiver], " ".join(message))
             return "Message pushed"
 
         print "Unknown command:", command
