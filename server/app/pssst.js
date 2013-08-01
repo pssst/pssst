@@ -1,5 +1,5 @@
 /*
-  Pssst! Einfach. Sicher.
+  Pssst!
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -12,84 +12,200 @@
   Christian Uhsat <christian@uhsat.de>
 */
 
-// Get User
-function user(req, res, fn) {
-  db.get(req.params.id, function(err, doc) {
-    if (!err) {
-      fn(doc);
-    } else {
-      res.send(404, 'User doesn\'t exist');
-    }
-  });
-}
+module.exports = function(config) {
 
-// Get Box
-function box(req, res, user, fn) {
-  if (req.params.box == null) {
-    req.params.box = 'all';
-  }
+  var fs = require('fs');
+  var mime = require('mime');
 
-  if (req.params.box in user.boxes) {
-    fn(user.boxes[req.params.box]);
-  } else {
-    res.send(404, 'Box doesn\'t exist');
-  }
-}
+  // DB module
+  var mod = require('../config/db.js');
+  var db = mod(config);
 
-module.exports = function pssst(config, db) {
+  // Crypto module
+  var mod = require('../config/crypto.js')
+  var crypto = mod(config);
+
+  var enc = 'utf8';
+  var dir = __dirname + '/../static/';
+
+  // Setup mimetype
+  mime.default_type = 'text/plain';
+
+  // Pssst object
   return {
-    create: function create(req, res) {
-      if (!new RegExp('^[a-z0-9]{2,63}$').test(req.params.id)) {
-        return res.send(400, 'User name invalid');
-      }
 
-      for (i=0; i<config.names.length; i++) {
-        if (new RegExp(config.names[i]).test(req.params.id)) {
-          return res.send(400, 'User name restricted');
-        }
-      }
+    // Static files
+    static: function(req, res) {
+      extend(req, res);
 
-      db.get(req.params.id, function(err, doc) {
+      fs.readFile(dir + req.params.file, enc, function (err, data) {
         if (!err) {
-          return res.send(409, 'User already exists');
+          res.setHeader('content-type', mime.lookup(req.params.file));
+          res.sign(200, data);
+        } else {
+          res.sign(404, 'File not found');
         }
-      })
-
-      db.save(req.params.id, {
-          'boxes': {'all': []},
-          'key': req.body.key
-        }, function(err, doc) {
-          if (err) {
-            console.error(err);
-            res.send(500, err);
-          } else {
-            res.send(201);
-          }
       });
     },
 
-    find: function find(req, res) {
-      user(req, res, function(user) {
-        res.json(200, user.key);
+    // Create user
+    create: function(req, res) {
+      extend(req, res);
+
+      // Test user name
+      if (new RegExp(config.name).test(req.params.user)) {
+        return res.sign(400, 'User name restricted');
+      }
+
+      // Find user
+      findUser(req, res, db, function(user) {
+        res.sign(409, 'User already exists');
+      }, function(name) {
+        req.verify(req.body.key, function() {
+
+          // Create user object
+          db.save(name, {
+            'key': req.body.key,
+            'boxes': {
+              'all': []
+            }
+          }, function(err, doc) {
+            if (!err) {
+              res.sign(201, 'User created');
+            } else {
+              res.sign(500, err);
+            }
+          });
+
+        });
       });
     },
 
-    push: function push(req, res) {
-      user(req, res, function(user) {
-        box(req, res, user, function(box) {
-          box.push(req.body);
-          res.send(201);
-        })
+    // Find user key
+    find: function(req, res) {
+      extend(req, res);
+
+      findUser(req, res, db, function(user) {
+        res.sign(200, user.key);
       });
     },
 
-    pull: function pull(req, res) {
-      user(req, res, function(user) {
-        box(req, res, user, function(box) {
-          var body = box.shift();
-          res.json(200, body);
-        })
+    // Push message into box
+    push: function(req, res) {
+      extend(req, res);
+
+      findUser(req, res, db, function(user) {
+        findBox(req, res, user, function(box) {
+          req.verify(req.body.meta.from, function() {
+            box.push(req.body);
+            res.sign(201, 'Message created');
+          });
+        });
+      });
+    },
+
+    // Pull message from box
+    pull: function(req, res) {
+      extend(req, res);
+
+      findUser(req, res, db, function(user) {
+        findBox(req, res, user, function(box) {
+          req.verify(req.params.user, function() {
+            var body = box.pull();
+
+            if (body != undefined) {
+              res.sign(200, body);
+            } else {
+              res.sign(204);
+            }
+          });
+        });
       });
     }
   };
+
+  // Extend express objects
+  function extend(req, res) {
+
+    // Sign response
+    res.sign = function(status, body) {
+      if (body == undefined) {
+        body = '';
+      }
+
+      var sig = crypto.sign(body);
+
+      res.setHeader('content-hash', sig.sec + '; ' + sig.sig);
+      res.send(status, body);
+    };
+
+    // Verify request
+    req.verify = function(pem, fn) {
+      if (pem[0] != '-') {
+        db.get(pem, function(err, user) {
+          pem = err ? null : user.key;
+        });
+      }
+
+      var sig = req.headers['content-hash'];
+
+      if (new RegExp('^[0-9]+; ?[A-Za-z0-9\+/]+=*$').test(sig)) {
+        var sig = sig.split(';', 2);
+
+        if (pem && crypto.verify(req.body, sig[0], sig[1], pem)) {
+          fn();
+        } else {
+          res.sign(403, 'Forbidden');
+        }
+      } else {
+        res.sign(400, 'Bad Request');
+      }
+    };
+  }
+
+  // Find user
+  function findUser(req, res, db, success, failure) {
+    if (!new RegExp('^[a-z0-9]{2,63}$').test(req.params.user)) {
+      res.sign(400, 'User name invalid');
+    } else {
+      db.get(req.params.user, function(err, user) {
+        if (err) {
+          if (failure != undefined) {
+            failure(req.params.user);
+          } else {
+            res.sign(404, 'User not found');
+          }
+        } else {
+          success(user);
+        }
+      });
+    }
+  }
+
+  // Find box
+  function findBox(req, res, user, success) {
+    if (req.params.box != null) {
+      var name = req.params.box;
+    } else {
+      var name = "all";
+    }
+
+    if (name in user.boxes) {
+      success({
+
+        // Save message
+        push: function(data) {
+          user.boxes[name].push(data);
+        },
+
+        // Load message
+        pull: function() {
+          return user.boxes[name].shift();
+        }
+
+      });
+    } else {
+      res.sign(404, 'Box not found');
+    }
+  }
 }

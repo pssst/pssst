@@ -2,15 +2,14 @@
 {
   "debug": 0,
   "port": <pssst port>,
+  "name": "!?name",
   "db": {
     "host": <couchdb host>,
     "port": <couchdb port>,
-    "user": <couchdb username>,
-    "pass": <couchdb password>,
-    "name": "pssst"
-  },
-  "names": [
-  	".*admin.*",
-  	".*pssst.*"
-  ]
+    "name": "pssst",
+    "auth": {
+      "username": <couchdb username>,
+      "password": <couchdb password>
+    }
+  }
 }

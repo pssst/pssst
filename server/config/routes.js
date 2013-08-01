@@ -1,5 +1,5 @@
 /*
-  Pssst! Einfach. Sicher.
+  Pssst!
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -12,29 +12,25 @@
   Christian Uhsat <christian@uhsat.de>
 */
 
-module.exports = function register(app, pssst) {
+module.exports = function(app, pssst) {
 
   // Pssst! create user
-  app.post('/user/:id', pssst.create);
+  app.post('/user/:user', pssst.create);
 
   // Pssst! find user
-  app.get('/user/:id/key', pssst.find);
+  app.get('/user/:user/key', pssst.find);
 
   // Pssst! push message
-  app.put('/user/:id/:box?*', pssst.push);
+  app.put('/user/:user/:box?*', pssst.push);
 
   // Pssst! pull message
-  app.get('/user/:id/:box?*', pssst.pull);
+  app.get('/user/:user/:box?*', pssst.pull);
 
-  // Public directory
-  app.get('/:file', function public(req, res) {
-    res.sendfile(req.params.file, {'root': 'public'}, function() {
-      res.send(404);
-    });
-  });
+  // Pssst! static files
+  app.get('/:file', pssst.static);
 
   // All other
   app.get('*', function route(req, res) {
-    res.send(404, 'You messed something up, right?');
+    res.send(404);
   });
 }

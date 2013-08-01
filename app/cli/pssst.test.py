@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Pssst! Einfach. Sicher.
+Pssst!
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,7 +30,8 @@ local = host.startswith("localhost")
 if local and not os.name in ["posix"]:
     sys.exit("System not supported")
 
-if local: os.system("node ../../server/server.js & sleep 1")
+if local:
+    os.system("node ../../server/server.js & sleep 1")
 
 try:
     name = "pssst.%s" % int(round(time.time()))
@@ -45,10 +46,11 @@ try:
         message = os.urandom(size)
         pssst.push([name], message)
 
-        if pssst.pull()[1] == message:
+        if pssst.pull()[0] == message:
             print size
         else:
             print "failed"
 
 finally:
-    if local: os.system("killall node")
+    if local:
+        os.system("killall node")
