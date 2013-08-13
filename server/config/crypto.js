@@ -9,10 +9,10 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see http://www.gnu.org/licenses/.
 
-  Christian Uhsat <christian@uhsat.de>
+  Christian & Christian <pssst@pssst.name>
 */
 
-module.exports = function(config) {
+module.exports = function() {
 
   var fs = require('fs');
   var ursa = require('ursa');
@@ -70,6 +70,7 @@ module.exports = function(config) {
 
     return {sec: sec, mac: mac.digest('base64')};
   }
+
 
   // Crypto object
   return {

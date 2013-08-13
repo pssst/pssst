@@ -10,23 +10,23 @@ the Free Software Foundation, either version 3 of the License, or
 You should have received a copy of the GNU General Public License
 along with this program. If not, see http://www.gnu.org/licenses/.
 
-Christian Uhsat <christian@uhsat.de>
+Christian & Christian <pssst@pssst.name>
 """
 import json
 import os
 import re
 import sys
 import time
+import urllib
+
 
 from httplib import HTTPConnection
 from zipfile import ZipFile
 
 
-# The Python Cryptography Toolkit
-
 try:
     from Crypto import Random
-    from Crypto.Cipher import AES
+    from Crypto.Cipher import AES, PKCS1_OAEP
     from Crypto.Hash import HMAC, SHA256
     from Crypto.Protocol.KDF import PBKDF2
     from Crypto.PublicKey import RSA
@@ -81,29 +81,29 @@ class Key:
         except (ValueError, IndexError, TypeError) as ex:
             raise Exception("Password wrong")
 
+    def _cipher(self, seed):
+        key = PBKDF2(seed[:32], seed[32:], 32 + 16, 1000)
+        aes = AES.new(key[:32], AES.MODE_CBC, key[32:])
+
+        return aes
+
     def export(self, private=False, password=None):
         if not private:
             return self.key.publickey().exportKey("PEM")
         else:
             return self.key.exportKey("PEM", password)
 
-    def cipher(self, seed):
-        sha = lambda p, s: HMAC.new(p, s, SHA256).digest()
-        key = PBKDF2(seed[:32], seed[32:], 32 + 16, 1000, sha)
-
-        return AES.new(key[:32], AES.MODE_CBC, key[32:])
-
     def encrypt(self, data):
         seed = Random.get_random_bytes(64)
         data = PKCS5.pad(data)
-        data = self.cipher(seed).encrypt(data)
-        code = self.key.encrypt(seed, 32)[0]
+        data = self._cipher(seed).encrypt(data)
+        code = PKCS1_OAEP.new(self.key).encrypt(seed)
 
         return (data, code)
 
     def decrypt(self, data, code):
-        seed = self.key.decrypt(code)
-        data = self.cipher(seed).decrypt(data)
+        seed = PKCS1_OAEP.new(self.key).decrypt(code)
+        data = self._cipher(seed).decrypt(data)
         data = PKCS5.cut(data)
 
         return data
@@ -144,23 +144,40 @@ class User:
             self.save(".private", self.key.export(True, password))
             self.save(name, self.key.export())
 
+    def list(self):
+        return self.file.namelist()
+
+    def load(self, key):
+        return self.file.read(key)
+
+    def save(self, key, value):
+        self.file.writestr(key, value)
+
     @staticmethod
     def exists(name):
         return os.path.exists(".pssst.%s" % name)
 
     @staticmethod
-    def simple(name):
-        if re.match("^pssst\.[a-z0-9]{2,63}$", name):
-            return name[6:].lower()
+    def delete(name):
+        if User.exists(name):
+            os.remove(".pssst.%s" % name)
 
-    def list(self):
-        return self.file.namelist()
 
-    def load(self, name):
-        return self.file.read(name)
+class Name:
 
-    def save(self, name, value):
-        self.file.writestr(name, value)
+    @staticmethod
+    def expand(name):
+        if re.match("^pssst(\.[a-z0-9]{2,63}){1,2}$", name.lower()):
+            name = name.replace("pssst.", "", 1)
+            return name.split(".", 1) if "." in name else (name, None)
+        else:
+            return (None, None)
+
+    @staticmethod
+    def collapse(user, box, extern=False):
+        format = "pssst.%s/%s" if extern else "%s/%s"
+
+        return format % (user, box) if box else user
 
 
 class Pssst:
@@ -171,26 +188,15 @@ class Pssst:
         else:
             self.host = "api.pssst.name"
 
-        name = User.simple(name)
+        user, box = Name.expand(name)
 
-        if not name:
-            raise Exception("User name invalid.")
+        if not user:
+            raise Exception("User name invalid")
 
-        found, data = self.find(name)
+        self.user = User(user, password)
+        self.user.save("pssst", self._static("key"))
 
-        if User.exists(name) != found:
-            raise Exception("User doesn't exist")
-
-        self.user = User(name, password)
-        self.user.save("pssst", self.static("key"))
-
-        if not found:
-            created, data = self.create(self.user)
-
-            if not created:
-                raise Exception(data)
-
-    def request(self, method, url, body={}):
+    def _request(self, method, url, body={}):
         body = str(json.dumps(body, separators=(",", ":")))
 
         if hasattr(self, "user"):
@@ -199,7 +205,7 @@ class Pssst:
             sec, sig = 0, ""
 
         server = HTTPConnection(self.host)
-        server.request(method.upper(), "/user/%s" % url, body, {
+        server.request(method.upper(), "/user/%s" % urllib.quote(url), body, {
             "content-type": "application/json" if body else "text/plain",
             "content-hash": "%s; %s" % (sec, Base64.encode(sig))
         })
@@ -225,37 +231,48 @@ class Pssst:
         if body and mime.startswith("application/json"):
             body = json.loads(body)
 
-        return (response.status in [200, 201, 204], body)
+        if response.status not in [200, 201, 204]:
+            raise Exception(body)
 
-    def static(self, file):
+        return body
+
+    def _static(self, file):
         server = HTTPConnection(self.host)
         server.request("GET", "/%s" % file)
 
-        return server.getresponse().read()
+        response = server.getresponse()
 
-    def create(self, user):
-        return self.request("post", user.name, {"key": user.key.export()})
+        if response.status == 404:
+            raise Exception("File not found")
 
-    def find(self, name):
-        return self.request("get", "%s/key" % name)
+        return response.read()
+
+    def create(self, box=None):
+        body = {} if box else {"key": self.user.key.export()}
+
+        self._request("post", Name.collapse(self.user.name, box), body)
+
+    def delete(self, box=None):
+        self._request("delete", Name.collapse(self.user.name, box))
+
+        if not box:
+            User.delete(self.user.name)
+
+    def find(self, user):
+        return self._request("get", "%s/key" % user)
 
     def push(self, names, message):
-        for name in [User.simple(name) for name in names]:
+        for user, box in [Name.expand(name) for name in names]:
 
-            if not name:
+            if not user:
                 raise Exception("User name invalid")
 
-            if name not in self.user.list():
-                found, data = self.find(name)
+            if user not in self.user.list():
+                self.user.save(user, self.find(user))
 
-                if found:
-                    self.user.save(name, data)
-                else:
-                    raise Exception(data)
+            data, code = Key((self.user.load(user),)).encrypt(message)
 
-            data, code = Key((self.user.load(name),)).encrypt(message)
-
-            self.request("put", name, {
+            self._request("put", Name.collapse(user, box), {
                 "code": Base64.encode(code),
                 "data": Base64.encode(data),
                 "meta": {
@@ -264,61 +281,65 @@ class Pssst:
                 }
             })
 
-    def pull(self):
-        found, data = self.request("get", self.user.name)
+    def pull(self, box=None):
+        data = self._request("get", Name.collapse(self.user.name, box))
 
-        if found:
-            if data:
-                return (
-                    self.user.key.decrypt(
-                        Base64.decode(data["data"]),
-                        Base64.decode(data["code"])
-                    ),
-                    data["meta"]
-                )
-            else:
-                return (None, None)
+        if not data:
+            return (None, None)
         else:
-            raise Exception(data)
+            return (self.user.key.decrypt(
+                Base64.decode(data["data"]),
+                Base64.decode(data["code"])
+            ), data["meta"])
 
 
 def main(script, command="--help", user=None, receiver=None, *message):
     """
     Usage: %s COMMAND USER[:PASSWORD] RECEIVER MESSAGE
 
-    -c --create      Creates the user (local and remote)
-    -d --decrypt     Decrypts a message from the user
-    -e --encrypt     Encrypts a message from the user
+    -c --create      Creates an user or a box
+    -x --delete      Deletes an user or a box
+
+    -e --encrypt     Encrypts a message
+    -d --decrypt     Decrypts a message
+
     -h --help        Shows this text
     -l --license     Shows license
     -v --version     Shows version
-
-    Name format: pssst.[a-z0-9]
     """
     try:
-        if user and ":" in user:
-            name, password = user.split(":", 1)
-        else:
-            name, password = user, None
-
-        if command in ("-v", "--version"):
-            return "Pssst! CLI 0.1.0"
+        if command in ("-h", "--help"):
+            return main.__doc__.lstrip() % os.path.basename(script)
 
         if command in ("-l", "--license"):
             return __doc__.strip()
 
-        if command in ("-h", "--help"):
-            return main.__doc__.lstrip() % os.path.basename(script)
+        if command in ("-v", "--version"):
+            return "Pssst! CLI 0.1.0"
 
         if not user:
             return "Please specify the user."
 
+        if user.count(":") > 0:
+            name, password = user.split(":", 1)
+        else:
+            name, password = user, None
+
+        if name.count(".") > 1:
+            user, box = name.rsplit(".", 1)
+        else:
+            user, box = name, None
+
         if command in ("-c", "--create"):
-            Pssst(name, password)
-            return "User created: %s" % user
+            Pssst(user, password).create(box)
+            return "Created: %s" % name
+
+        if command in ("-x", "--delete"):
+            Pssst(user, password).delete(box)
+            return "Deleted: %s" % name
 
         if command in ("-d", "--decrypt"):
-            message, meta = Pssst(name, password).pull()
+            message, meta = Pssst(user, password).pull(box)
 
             if message and meta:
                 return "pssst.%s: %s" % (meta["from"], message)
@@ -329,7 +350,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
             return "Please specify the receiver."
 
         if command in ("-e", "--encrypt"):
-            Pssst(name, password).push([receiver], " ".join(message))
+            Pssst(user, password).push([receiver], " ".join(message))
             return "Message sent"
 
         print "Unknown command:", command
@@ -338,8 +359,8 @@ def main(script, command="--help", user=None, receiver=None, *message):
     except KeyboardInterrupt:
         print "Exit"
 
-    except Exception, cause:
-        return "Error: " + str(cause)
+    except Exception, ex:
+        return "Error: %s" % ex
 
 
 if __name__ == "__main__":

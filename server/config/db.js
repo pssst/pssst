@@ -9,7 +9,7 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see http://www.gnu.org/licenses/.
 
-  Christian Uhsat <christian@uhsat.de>
+  Christian & Christian <pssst@pssst.name>
 */
 
 module.exports = function(config) {
@@ -36,11 +36,35 @@ module.exports = function(config) {
   });
 
   // Test db
-  db.save('.log', [], function(err, doc) {
+  db.save('_touch', [], function(err, doc) {
     if (err) {
       throw err.reason;
     }
   });
 
-  return db;
+  return {
+    load: function(id) {
+      var ret = null;
+
+      db.get(id, function(err, doc) {
+        if (!err) {
+          ret = doc;
+        }
+      });
+
+      return ret;
+    },
+
+    save: function(id, val) {
+      var ret = null;
+
+      db.save(id, val, function(err, doc) {
+        if (err) {
+          ret = err;
+        }
+      });
+
+      return ret;
+    }
+  }
 }

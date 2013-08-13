@@ -9,203 +9,175 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see http://www.gnu.org/licenses/.
 
-  Christian Uhsat <christian@uhsat.de>
+  Christian & Christian <pssst@pssst.name>
 */
 
-module.exports = function(config) {
+module.exports = function(app) {
 
-  var fs = require('fs');
-  var mime = require('mime');
+  var User = require('./pssst.user.js');
+  var Box  = require('./pssst.box.js');
 
-  // DB module
-  var mod = require('../config/db.js');
-  var db = mod(config);
+  var db = app.get('db');
 
-  // Crypto module
-  var mod = require('../config/crypto.js')
-  var crypto = mod(config);
+  var block = app.get('config').name;
 
-  var enc = 'utf8';
-  var dir = __dirname + '/../static/';
+  // Return user
+  User.get = function(req, res, ignore) {
+    var name = req.params.user;
 
-  // Setup mimetype
-  mime.default_type = 'text/plain';
+    if (!new RegExp('^[a-z0-9]{2,63}$').test(name)) {
+      throw {status: 400, message: 'User name invalid'};
+    }
 
-  // Pssst object
+    var user = db.load(name);
+
+    if (user && User.deleted(user)) {
+      throw {status: 410, message: 'User was deleted'};
+    }
+
+    if (!user && !ignore) {
+      throw {status: 404, message: 'User not found'};
+    }
+
+    return user;
+  }
+
+  // Return box
+  Box.get = function(req, res, ignore) {
+    var name = req.params.box || 'all';
+
+    if (!new RegExp('^[a-z0-9]{2,63}$').test(name)) {
+      throw {status: 400, message: 'Box name invalid'};
+    }
+
+    var user = User.get(req, res);
+
+    if (User.deleted(user)) {
+      throw {status: 410, message: 'User was deleted'};
+    }
+
+    var box = Box.find(user, name);
+
+    if (!box && !ignore) {
+      throw {status: 404, message: 'Box not found'};
+    }
+
+    return box;
+  }
+
+  // End request
+  function end(req, res, user, dat) {
+    var name = req.params.user;
+
+    if (db.save(name, user)) {
+      throw {status: 500, message: 'Request failed'};
+    }
+
+    if (dat instanceof String) {
+      res.sign(201, dat);
+    } else if (dat) {
+      res.sign(200, dat);
+    } else {
+      res.sign(204);
+    }
+  }
+
+  // Route facades
   return {
 
-    // Static files
-    static: function(req, res) {
-      extend(req, res);
 
-      fs.readFile(dir + req.params.file, enc, function (err, data) {
-        if (!err) {
-          res.setHeader('content-type', mime.lookup(req.params.file));
-          res.sign(200, data);
-        } else {
-          res.sign(404, 'File not found');
-        }
-      });
-    },
+    // User routes
+    user: {
 
-    // Create user
-    create: function(req, res) {
-      extend(req, res);
+      // Create new user document
+      create: function(req, res) {
+        req.verify(req.body.key);
 
-      // Test user name
-      if (new RegExp(config.name).test(req.params.user)) {
-        return res.sign(400, 'User name restricted');
-      }
-
-      // Find user
-      findUser(req, res, db, function(user) {
-        res.sign(409, 'User already exists');
-      }, function(name) {
-        req.verify(req.body.key, function() {
-
-          // Create user object
-          db.save(name, {
-            'key': req.body.key,
-            'boxes': {
-              'all': []
-            }
-          }, function(err, doc) {
-            if (!err) {
-              res.sign(201, 'User created');
-            } else {
-              res.sign(500, err);
-            }
-          });
-
-        });
-      });
-    },
-
-    // Find user key
-    find: function(req, res) {
-      extend(req, res);
-
-      findUser(req, res, db, function(user) {
-        res.sign(200, user.key);
-      });
-    },
-
-    // Push message into box
-    push: function(req, res) {
-      extend(req, res);
-
-      findUser(req, res, db, function(user) {
-        findBox(req, res, user, function(box) {
-          req.verify(req.body.meta.from, function() {
-            box.push(req.body);
-            res.sign(201, 'Message created');
-          });
-        });
-      });
-    },
-
-    // Pull message from box
-    pull: function(req, res) {
-      extend(req, res);
-
-      findUser(req, res, db, function(user) {
-        findBox(req, res, user, function(box) {
-          req.verify(req.params.user, function() {
-            var body = box.pull();
-
-            if (body != undefined) {
-              res.sign(200, body);
-            } else {
-              res.sign(204);
-            }
-          });
-        });
-      });
-    }
-  };
-
-  // Extend express objects
-  function extend(req, res) {
-
-    // Sign response
-    res.sign = function(status, body) {
-      if (body == undefined) {
-        body = '';
-      }
-
-      var sig = crypto.sign(body);
-
-      res.setHeader('content-hash', sig.sec + '; ' + sig.sig);
-      res.send(status, body);
-    };
-
-    // Verify request
-    req.verify = function(pem, fn) {
-      if (pem[0] != '-') {
-        db.get(pem, function(err, user) {
-          pem = err ? null : user.key;
-        });
-      }
-
-      var sig = req.headers['content-hash'];
-
-      if (new RegExp('^[0-9]+; ?[A-Za-z0-9\+/]+=*$').test(sig)) {
-        var sig = sig.split(';', 2);
-
-        if (pem && crypto.verify(req.body, sig[0], sig[1], pem)) {
-          fn();
-        } else {
-          res.sign(403, 'Forbidden');
-        }
-      } else {
-        res.sign(400, 'Bad Request');
-      }
-    };
-  }
-
-  // Find user
-  function findUser(req, res, db, success, failure) {
-    if (!new RegExp('^[a-z0-9]{2,63}$').test(req.params.user)) {
-      res.sign(400, 'User name invalid');
-    } else {
-      db.get(req.params.user, function(err, user) {
-        if (err) {
-          if (failure != undefined) {
-            failure(req.params.user);
-          } else {
-            res.sign(404, 'User not found');
-          }
-        } else {
-          success(user);
-        }
-      });
-    }
-  }
-
-  // Find box
-  function findBox(req, res, user, success) {
-    if (req.params.box != null) {
-      var name = req.params.box;
-    } else {
-      var name = "all";
-    }
-
-    if (name in user.boxes) {
-      success({
-
-        // Save message
-        push: function(data) {
-          user.boxes[name].push(data);
-        },
-
-        // Load message
-        pull: function() {
-          return user.boxes[name].shift();
+        if (User.blocked(block, req.params.user)) {
+          throw {status: 403, message: 'User name restricted'};
         }
 
-      });
-    } else {
-      res.sign(404, 'Box not found');
+        if (User.get(req, res, true)) {
+          throw {status: 409, message: 'User already exists'};
+        }
+
+        end(req, res, User.create(req.body.key), 'User created');
+      },
+
+      // Delete user
+      delete: function(req, res) {
+        req.verify(req.params.user);
+
+        var user = User.get(req, res);
+
+        User.delete(user);
+
+        end(req, res, user, 'User deleted');
+      },
+
+      // Return user key
+      find: function(req, res) {
+        res.sign(200, User.get(req, res).key);
+      }
+    },
+
+
+    // Box routes
+    box: {
+
+      // Create user box
+      create: function(req, res) {
+        req.verify(req.params.user);
+
+        var user = User.get(req, res);
+
+        if (Box.blocked(req.params.box)) {
+          throw {status: 403, message: 'Box name restricted'};
+        }
+
+        if (Box.get(req, res, true)) {
+          throw {status: 409, message: 'Box already exists'};
+        }
+
+        Box.create(user, req.params.box);
+
+        end(req, res, user, 'Box created');
+      },
+
+      // Delete user box
+      delete: function(req, res) {
+        req.verify(req.params.user);
+
+        var user = User.get(req, res);
+
+        if (Box.blocked(req.params.box)) {
+          throw {status: 403, message: 'Box name restricted'};
+        }
+
+        Box.delete(user, req.params.box);
+
+        end(req, res, user, 'Box deleted');
+      },
+
+      // Push message into box
+      push: function(req, res) {
+        req.verify(req.body.meta.from);
+
+        var box = Box.get(req, res);
+        box.push(req.body);
+
+        end(req, res, box.user, 'Message sent');
+      },
+
+      // Pull message from box
+      pull: function(req, res) {
+        req.verify(req.params.user);
+
+        var box = Box.get(req, res);
+        var body = box.pull();
+
+        end(req, res, box.user, body);
+      }
     }
   }
 }

@@ -10,12 +10,13 @@
   You should have received a copy of the GNU General Public License
   along with this program. If not, see http://www.gnu.org/licenses/.
 
-  Christian Uhsat <christian@uhsat.de>
+  Christian & Christian <pssst@pssst.name>
 */
 
 var express = require('express');
 var config  = require('./config/config.json');
 var routes  = require('./config/routes.js');
+var db      = require('./config/db.js');
 var pssst   = require('./app/pssst.js');
 
 function main(argv, fn) {
@@ -29,6 +30,8 @@ function main(argv, fn) {
     // Load app
     app = express();
     app.set('json spaces', 0);
+    app.set('config', config);
+    app.set('db', db(config));
     app.use(express.bodyParser());
 
     // Debug handling
@@ -59,7 +62,7 @@ function main(argv, fn) {
     });
 
     // Set routes and app
-    routes(app, pssst(config));
+    routes(app, pssst(app));
 
     // Up and running...
     app.listen(config.port, fn(null));
@@ -73,7 +76,7 @@ main(process.argv, function(err) {
   if (!err) {
     console.log('Pssst! Server (localhost:' + config.port + ')');
   } else {
-    console.error(err);
+    console.error(err.stack == undefined ? err : err.stack);
     process.exit(1);
   }
 });
