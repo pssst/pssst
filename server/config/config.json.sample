@@ -1,15 +1,9 @@
-// Please remove the first line and rename this file to 'config.json'
+// Please remove this line and rename the file to 'config.json'
 {
   "debug": 0,
   "port": <pssst port>,
-  "name": "!?name",
   "db": {
-    "host": <couchdb host>,
-    "port": <couchdb port>,
-    "name": "pssst",
-    "auth": {
-      "username": <couchdb username>,
-      "password": <couchdb password>
-    }
+    "socket": "<socket path>",
+    "number": 0
   }
 }

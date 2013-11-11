@@ -1,23 +1,18 @@
 {
   "name": "Pssst",
-  "version": "0.1.0",
-
-  "description": "Pssst! Server",
-  "homepage": "pssst.name",
   "license": "GPLv3",
+  "version": "0.2.0",
+  "homepage": "http://pssst.name",
   "bugs": "http://github.com/pssst/pssst/issues",
-
   "repository": {
     "type": "git",
     "url": "https://github.com/pssst/pssst.git"
   },
-
   "dependencies": {
     "express": "*",
-    "cradle": "*",
+    "redis": "*",
     "mime": "*",
     "ursa": "*"
   },
-
   "private": true
 }
