@@ -178,6 +178,7 @@ class TestUser:
     * User create failed, name restricted
     * User create failed, already exists
     * User delete
+    * User delete, user was deleted
     * User find
     * User find failed, user was deleted
     * User find failed, user not found
@@ -194,6 +195,8 @@ class TestUser:
         Tests if an user already exists.
     test_delete_user()
         Tests if an user can be deleted.
+    test_delete_user_was_deleted()
+        Tests if an user was deleted.
     test_find_user()
         Tests if an user public can be found.
     test_find_user_was_deleted()
@@ -244,6 +247,18 @@ class TestUser:
         pssst = Pssst(createUserName())
         pssst.create()
         pssst.delete()
+
+    def test_delete_user(self):
+        """
+        Tests if an user was deleted.
+        """
+        with pytest.raises(Exception) as ex:
+            pssst = Pssst(createUserName())
+            pssst.create()
+            pssst.delete()
+            pssst.pull()
+
+        assert ex.value.message == "User was deleted"
 
     def test_find_user(self):
         """

@@ -1,53 +1,58 @@
-pssst
-=====
-
 Pssst! Einfach. Sicher.
+=======================
 
-Pssst is a simple and secure messaging client and server created and maintained by [Christian] and [Christian].
+What is it?
+-----------
 
-To get started, checkout [http://]!
+Pssst is a simple and secure service for exchanging messages.
+Created and maintained by Christian and Christian only for the joy of it
+(and hopefully for the joy of others too). Its design is based upon open
+standards and the current state of cryptography.
 
-##Versioning
+The Latest Version
+------------------
 
-For transparency and insight into our release cycle, and for striving to maintain backward compatibility, pssst will be maintained under the Semantic Versioning guidelines as much as possible.
+Details of the latest version can be found on the Pssst website under
+http://www.pssst.name/.
 
-Releases will be numbered with the following format:
+Documentation
+-------------
 
-`<major>.<minor>.<patch>`
+The most up-to-date documentation can be found at the Pssst wiki
+on GitHub under https://github.com/pssst/pssst/wiki/.
 
-And constructed with the following guidelines:
+Versioning
+----------
+For transparency and insight into our release cycle, and for striving to
+maintain backward compatibility, Pssst will be maintained under the
+Semantic Versioning guidelines as much as possible.
 
-* Breaking backward compatibility bumps the major (and resets the minor and patch)
-* New additions without breaking backward compatibility bumps the minor (and resets the patch)
-* Bug fixes and misc changes bumps the patch
+For more information on SemVer, please visit http://semver.org/.
 
-For more information on SemVer, please visit [http://semver.org/](http://semver.org/).
+Licensing
+---------
 
-##Authors
+Please see the file called LICENSE.
 
-**Christian Schneider**
+Authors
+-------
 
-+ [https://github.com/7-bit]
+Please see the file called AUTHORS.
 
-**Christian Uhsat**
+Contacts
+--------
 
-+ [https://github.com/cuhsat]
+* If you want to be informed about new releases, general news
+  and information about Pssst, please visit our website under:
+  http://www.pssst.name
 
-## Copyright and license
+* If you want to be informed about code updates, bug fixes and
+  security fixes of Pssst, please visit our project on GitHub:
+  https://github.com/pssst/pssst/
 
-pssst - a simple and secure messaging client / server
+* If you have a concrete bug report for Pssst please go to the
+  Pssst issue tracker on GitHub and submit your report:
+  https://github.com/pssst/pssst/issues
 
-Copyright (C) 2013  Christian & Christian
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Christian & Christian  <pssst@pssst.name>

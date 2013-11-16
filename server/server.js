@@ -17,17 +17,43 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Pssst server. Usage: node server.js [option]
+ * Pssst server. Usage: node server.js [-l|-v]
  *
  *   -l --license   print license
  *   -v --version   print version
  *
- * Available debug levels:
- *
- *   0 = off
- *   1 = print request method and url
- *   2 = print request headers also
- *   3 = print request body also
+ * @param {Object} list of arguments
+ */
+function usage(argv) {
+  var license = require('./package.json')['license'];
+  var version = require('./package.json')['version'];
+
+  var config = require('./config/config.json');
+  var option = argv[2];
+
+  if (argv.length <= 2) {
+    return console.log('Pssst! %s (Port %s)', version, config['port']);
+  } else {
+
+    // Print license
+    if (option === '-l' || option === '--license') {
+      console.log('Licensed under', license);
+      process.exit();
+    }
+
+    // Print version
+    if (option === '-v' || option === '--version') {
+      console.log('Pssst! Server', version);
+      process.exit();
+    }
+    
+    console.log('Usage: node server.js [-l|-v]');
+    process.exit(1);
+  }
+}
+
+/**
+ * Starts the server.
  *
  * @param {Function} callback
  */
@@ -39,6 +65,7 @@ function start(ready) {
   var Router  = require('./config/router.js');
 
   // Required modules
+  var debug = require('./modules/debug.js');
   var Redis = require('./modules/redis.js');
   var App   = require('./app/app.js');
 
@@ -49,29 +76,13 @@ function start(ready) {
   app.use(express.bodyParser());
 
   // Error hook
-  app.use(function error(err, req, res, next) {
+  app.use(function hook(err, req, res, next) {
     res.sendError(err);
   });
 
   // Debug hook
-  app.use(function debug(req, res, next) {
-
-    // Level 1
-    if (config.debug > 0) {
-      console.log('Pssst!', req.method, req.url);
-    }
-
-    // Level 2
-    if (config.debug > 1) {
-      console.log('Pssst!', req.headers);
-    }
-
-    // Level 3
-    if (config.debug > 2) {
-      console.log('Pssst!', req.body);
-    }
-
-    next();
+  app.use(function hook(req, res, next) {
+    debug(config.debug, req, res, next);
   });
 
   new Redis(config.db, function (err, db) {
@@ -86,7 +97,7 @@ function start(ready) {
  * Ready callback.
  */
 function ready() {
-  console.log('Pssst! is listening...');
+  console.log('Ready');
 }
 
 /**
@@ -96,28 +107,8 @@ function error(err) {
   console.error(err.stack ? err.stack : err);
 }
 
-if (process.argv.length > 2) {
-  var option = process.argv[2];
-  var config = require('./package.json');
-
-  // License option
-  if (option === '-l' || option === '--license') {
-    return console.log('License %s', config['license']);
-  }
-
-  // Version option
-  if (option === '-v' || option === '--version') {
-    return console.log('Version %s', config['version']);
-  }
-
-  // Any other option
-  return console.log('Usage: node server.js [option] \n'
-                   + '                               \n'
-                   + '  -l, --license   Shows license\n'
-                   + '  -v, --version   Shows version\n');
-}
-
 try {
+  usage(process.argv);
   start(ready);
 } catch (err) {
   error(err);

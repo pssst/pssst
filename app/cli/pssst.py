@@ -40,7 +40,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__ = ["Pssst"]
+__all__, __version__ = ["Pssst"], "0.2.1"
 
 
 class Name:
@@ -154,6 +154,9 @@ class Pssst:
 
                 self.save(user + ".private", self.key.private(password))
                 self.save(user, self.key.public())
+
+        def __nonzero__(self):
+            return os.path.exists(self.path)
 
         def delete(self):
             if os.path.exists(self.path):
@@ -315,9 +318,14 @@ class Pssst:
         Raises
         ------
         Exception
+            Because the user was deleted.
+        Exception
             Because the verification is failed.
 
         """
+        if not self.user:
+            raise Exception("User was deleted")
+
         body = str(json.dumps(body, separators=(",", ":")))
 
         timestamp, signature = self.user.key.sign(body)
@@ -409,6 +417,10 @@ class Pssst:
         ----------
         param box : string, optional (default is None)
             Name of the users box.
+
+        Notes
+        -----
+        If the user was deleted, the object can not be used any further.
 
         """
         self.__api("DELETE", Name(self.user.name, box).path)
@@ -503,17 +515,19 @@ class Pssst:
             self.__api("PUT", Name(user, box).path, body)
 
 
-def color(usage):
+def usage(text, *args):
     """
     Prints the usage colored.
 
     Parameters
     ----------
-    param usage : string
-        Plain usage to color.
+    param text : string
+        Usage text to print.
+    param args: list of strings
+        Usage parameters.
 
     """
-    for line in usage.split("\n")[1:-1]:
+    for line in (text % args).split("\n")[1:-1]:
         line = line[4:]
 
         # Color description
@@ -541,7 +555,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
        /  _____/__  /__  /__  /  /_/__/
       /__/    /____/____/____/\___/__/
 
-      CLI version 0.2.0
+      CLI version %s
 
     Usage:
       %s [option|command user:password] [receiver] [message]
@@ -561,40 +575,35 @@ def main(script, command="--help", user=None, receiver=None, *message):
     Report bugs to <pssst@pssst.name>
     """
     try:
+        if user:
+            name = Name(user)
+
         if command in ("-h", "--help"):
-            return color(main.__doc__ % os.path.basename(script))
+            return usage(main.__doc__, __version__, os.path.basename(script))
 
         if command in ("-l", "--license"):
             return __doc__.strip()
 
         if command in ("-v", "--version"):
-            return "Pssst! CLI 0.2.0"
+            return "Pssst! CLI " + __version__
 
-        if not user:
-            return "Please specify the user."
-
-        name = Name(user)
-
-        if command in ("--create", "create"):
+        if command in ("--create", "create") and user:
             Pssst(name.user, name.password).create(name.box)
             return "Created: %s" % name
 
-        if command in ("--delete", "delete"):
+        if command in ("--delete", "delete") and user:
             Pssst(name.user, name.password).delete(name.box)
             return "Deleted: %s" % name
 
-        if command in ("--list", "list"):
+        if command in ("--list", "list") and user:
             boxes = Pssst(name.user, name.password).list()
-            return ", ".join(boxes)
+            return " ".join(boxes)
 
-        if command in ("--pull", "pull"):
+        if command in ("--pull", "pull") and user:
             message = Pssst(name.user, name.password).pull(name.box)
             return message or "No new messages"
 
-        if not receiver:
-            return "Please specify the receiver."
-
-        if command in ("--push", "push"):
+        if command in ("--push", "push") and user and receiver:
             Pssst(name.user, name.password).push([receiver],"".join(message))
             return "Message sent"
 

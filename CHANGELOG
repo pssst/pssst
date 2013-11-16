@@ -1,0 +1,22 @@
+0.2.1
+* Added <.gitignore>
+* Added debug module to server
+* Added check if user was deleted
+* Fixed command line argument handling
+* Changed <README.md>
+* Changed 'list' output
+* Changed server usage
+
+0.2.0
+* Added unit tests
+* Added documentation
+* Added server support for redis database
+* Added support for user box listening
+* Added color to <pssst.py> usage
+* Fixed init bug in <crypto.js>
+* Fixed many bugs
+* Rewrote server code
+* Removed need for metadata
+
+0.1.0
+* Initial commit
