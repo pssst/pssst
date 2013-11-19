@@ -489,6 +489,8 @@ class TestPssst:
         Tests if a message could be pushed to many receivers.
     test_push_user_name_invalid()
         Tests if user name is invalid.
+    test_push_pull_empty()
+        Tests if box is empty.
     test_pull_empty()
         Tests if box is empty.
     test_password_wrong()
@@ -556,6 +558,20 @@ class TestPssst:
             pssst.push(["test !"], "test")
 
         assert ex.value.message == "User name invalid"
+
+    def test_push_pull_empty(self):
+        """
+        Tests if box is empty.
+        """
+        name = createUserName()
+        text = "Hello World !"
+
+        pssst = Pssst(name)
+        pssst.create()
+        pssst.push([name], text)
+
+        assert text == pssst.pull()
+        assert None == pssst.pull()
 
     def test_pull_empty(self):
         """

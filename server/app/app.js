@@ -173,7 +173,7 @@ module.exports = function App(redis) {
        */
       pull: function pull(req, res) {
         pssst.handle(req, res, function handle(user, box) {
-          res.sendSigned(200, box.pull());
+          pssst.respond(req, res, user, box.pull());
         });
       }
     }

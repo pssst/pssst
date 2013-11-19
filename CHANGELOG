@@ -1,3 +1,11 @@
+0.2.2
+* Added secure password input
+* Added box empty unit test
+* Added static user exists method
+* Fixed zipfile flushing
+* Fixed box pulling bug
+* Changed package name
+
 0.2.1
 * Added <.gitignore>
 * Added debug module to server

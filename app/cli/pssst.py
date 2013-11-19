@@ -24,6 +24,7 @@ import time
 import urllib
 
 from base64 import b64encode, b64decode
+from getpass import getpass
 from httplib import HTTPConnection
 from zipfile import ZipFile
 
@@ -40,7 +41,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.1"
+__all__, __version__ = ["Pssst"], "0.2.2"
 
 
 class Name:
@@ -124,6 +125,8 @@ class Pssst:
 
         Methods
         -------
+        exists()
+            Returns if user exists.
         delete()
             Deletes the user file.
         list()
@@ -139,15 +142,10 @@ class Pssst:
 
         """
         def __init__(self, user, password):
-            path = ".pssst." + user
-
-            exists = os.path.exists(path)
-
-            self.file = ZipFile(path, "a")
-            self.path = path
+            self.path = ".pssst." + user
             self.name = user
 
-            if exists:
+            if os.path.exists(self.path):
                 self.key = Pssst.Key(self.load(user + ".private"), password)
             else:
                 self.key = Pssst.Key()
@@ -158,18 +156,25 @@ class Pssst:
         def __nonzero__(self):
             return os.path.exists(self.path)
 
+        @staticmethod
+        def exists(user):
+            return os.path.exists(".pssst." + user)
+
         def delete(self):
             if os.path.exists(self.path):
                 os.remove(self.path)
 
         def list(self):
-            return self.file.namelist()
+            with ZipFile(self.path, "r") as file:
+                return file.namelist()
 
         def load(self, user):
-            return self.file.read(user)
+            with ZipFile(self.path, "r") as file:
+                return file.read(user)
 
         def save(self, user, key):
-            self.file.writestr(user, key)
+            with ZipFile(self.path, "a") as file:
+                file.writestr(user, key)
 
 
     class Key:
@@ -577,6 +582,9 @@ def main(script, command="--help", user=None, receiver=None, *message):
     try:
         if user:
             name = Name(user)
+
+        if user and not name.password:
+            name.password = getpass()
 
         if command in ("-h", "--help"):
             return usage(main.__doc__, __version__, os.path.basename(script))
