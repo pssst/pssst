@@ -67,6 +67,7 @@ function start(ready) {
   // Required modules
   var debug = require('./modules/debug.js');
   var Redis = require('./modules/redis.js');
+  var SSL   = require('./modules/ssl.js');
   var App   = require('./app/app.js');
 
   app = express();
@@ -89,7 +90,8 @@ function start(ready) {
     router = new Router(app, db);
     router.map(new App(db));
 
-    app.listen(config.port, ready);
+    ssl = new SSL(app);
+    ssl.createServer().listen(config.port, ready);
   });
 }
 

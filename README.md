@@ -1,47 +1,321 @@
-Pssst! Einfach. Sicher.
-=======================
+Pssst!
+======
+[Pssst!](http://www.pssst.name) is a secure way for exchanging messages.
 
-What is it?
------------
-
-Pssst is a simple and secure service for exchanging messages.
 Created and maintained by Christian and Christian only for the joy of it
 (and hopefully for the joy of others too). Its design is based upon open
 standards and the current state of cryptography.
 
-The Latest Version
-------------------
+Install
+-------
+Required for the command line interface (CLI):
 
-Details of the latest version can be found on the Pssst website under
-http://www.pssst.name/.
+* Python   `2.7.x`
+* Requests `2.0.x` or newer
+* PyCrypto `2.6.1` or newer
 
-Documentation
--------------
+Required if you want to run your own server:
 
-The most up-to-date documentation can be found at the Pssst wiki
-on GitHub under https://github.com/pssst/pssst/wiki/.
+* Node.js `0.10.x` or newer
+* A Redis database
 
-Versioning
-----------
-For transparency and insight into our release cycle, and for striving to
-maintain backward compatibility, Pssst will be maintained under the
-Semantic Versioning guidelines as much as possible.
+Please refer to the file `server/package.json` for further details on the
+required NPM modules and their version.
 
-For more information on SemVer, please visit http://semver.org/.
+There is no need to install anything, just run the `app/cli/pssst.py` script:
 
-Licensing
----------
+`pssst.py [option|command]`
 
-Please see the file called LICENSE.
+Please use the `--help` option to show further help on the CLI.
+
+Commands
+--------
+Currently these commands are supported by the API:
+
+* `create` an user or a box.
+* `delete` an user or a box.
+* `find` a users public key.
+* `list` all boxes of an user.
+* `pull` pulls a message from a box.
+* `push` pushes a message onto a box.
+
+Examples
+--------
+This full-blown real life example will demonstrate you, how to create the
+user `sender` and `receiver` as well as the receivers box `spam`. Then
+pushing a message from the `sender` to this box and pulling it by the
+`receiver`. And finally deleting the box (because nobody likes spam).
+
+```
+pssst.py create sender
+```
+```
+pssst.py create receiver
+```
+```
+pssst.py create receiver.spam
+```
+```
+pssst.py push sender receiver.spam "Hello World!"
+```
+```
+pssst.py pull receiver.spam
+```
+```
+pssst.py delete receiver.spam
+```
+
+Server
+------
+If you want to use any other than the official server, simply create a file
+named `.pssst` in the directory of the app with the desired server address:
+
+`echo https://localhost:443 > app/cli/.pssst`
+
+To setup your own server, please create a valid configuration file first. A
+sample configuration can be found with `server/config/config.json.sample`.
+When done, execute the following command inside your `server` directory:
+
+`npm install && node server.js`
+
+The server will now start and print `Ready`.
+
+API
+===
+The official address of the Pssst API is:
+
+`http://api.pssst.name` (alias for `2.pssst.name`)
+
+If you want to test your code, please use the addresses below accordingly.
+But we advise you to please setup a local server and database (which
+is _very easy_), and test your apps and/or bug fixes there:
+
+* `http://0.pssst.name` reserved for `develop` branch (and other branches)
+* `http://1.pssst.name` reserved for `release` branch
+* `http://2.pssst.name` reserved for `master` branch
+
+Every branch uses its own redis database. The databases for the `develop` and 
+`release` branch will be reset each day at midnight. Please be warned:
+
+> **WE DO NOT PERSIST AND/OR BACKUP OUR REDIS DATABASES!**
+
+Additional informations about the official Pssst server under can be requested
+under the following addresses below:
+
+* `http://api.pssst.name/key` returns the servers public key in `PEM` format.
+* `http://api.pssst.name/branch` returns the used Git branch.
+* `http://api.pssst.name/version` returns servers version.
+
+Basics
+------
+All data is exchanged in either `JSON` or `plain text` format with HTTP 
+requests/responses. Please refer to the mime type in the HTTP `content-type` 
+header to decide which format is returned. All data is encoded in `UTF-8`. 
+Server errors will always be returned in plain text. Please be aware:
+
+> All messages will be stored protocol agnostic without any metadata.
+
+All clients are requested to send an unique `user-agent` header.
+
+### Encryption
+
+Encryption of the message data is done as follows:
+
+1. Generate cyptographically secure `64` random bytes as the code.
+2. Derive `48` bytes with `PBKDF2` (`1000` rounds) from the code, using the 
+   first `32` bytes as key and the last `32` bytes as salt.
+3. Add a `PKCS#5` padding to the data.
+4. Encrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
+   the derived code as key and the last `16` bytes as IV.
+5. Encrypt the code with `PKCS#1 OAEP` and the receivers public key.
+
+### Decryption
+
+Decryption of the received `data` and `code` is done as follows:
+
+1. Decrypt the received code with `PKCS#1 OAEP` and the receivers private key.
+2. Derive `48` bytes with `PBKDF2` (`1000` rounds) from the code, using the 
+   first `32` bytes as key and the last `32` bytes as salt.
+3. Remove the `PKCS#5` padding from the data.
+4. Decrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
+   the derived code as key and the last `16` bytes as IV.
+
+All encrypted data is exchanged as `JSON` object in the request/response body 
+with `code` and `data` fields, both be encoded in `Base64`.
+
+### Verification
+
+Verification on server and client side is done over the HTTP `content-hash` 
+header. This header must be set for all client API request, except `find`. 
+The format of this header is specified as:
+
+`content-hash: <timestamp>; <signature>`
+
+Where `timestamp` is the `EPOCH` (without decimals) of the request/response 
+and `signature` the calculated and signed hash of the body encoded in 
+`Base64`. Calculation of the hash is done as follows:
+
+1. Create a `SHA256` HMAC of the HTTP body with the timestamp string as key.
+2. Create a `SHA256` hash of the resulting HMAC one more time.
+3. Sign the resulting hash with the senders private key using `PKCS#1 v1.5`.
+
+To verify a request/response, calculate its hash as described above in the 
+steps 1 and 2. And verify it with the senders public key using `PKCS#1 v1.5`.
+
+The default time frame for requests/responses to be verified is `10` seconds. 
+Which derives to `-5` and `+5` seconds from the actual `EPOCH` at the time of 
+processing.
+
+User Actions
+------------
+All user actions must be signed with the senders private key.
+
+### Create
+
+Creates a new user.
+
+**Request**
+
+* Method:  `POST`
+* Address: `http://api.pssst.name/user/<user>`
+* Params:   The `user` name in the address.
+* Params:   An JSON object with a `key` field in the body, which
+            holds the users public key in `PEM` format.
+
+**Response**
+
+* Format: `text/plain`
+* Status: `200`
+* Body:   `User created`
+
+### Delete
+
+Deletes the user. All boxes of the user will also be deleted and all message 
+in there will be lost. The name of this user will be locked and can not be 
+used afterwards for a new user.
+
+**Request**
+
+* Method:  `DELETE`
+* Address: `http://api.pssst.name/user/<user>`
+* Params:   The `user` name in the address.
+
+**Response**
+
+* Format: `text/plain`
+* Status: `200`
+* Body:   `User disabled`
+
+### Find
+
+Returns the users public key.
+
+**Request**
+
+* Method:  `GET`
+* Address: `http://api.pssst.name/user/<user>/key`
+* Params:   The `user` name in the address.
+
+**Response**
+
+* Format: `text/plain`
+* Status: `200`
+* Body:    The users public key in `PEM` format.
+
+### List
+
+Returns a list of the users box names.
+
+**Request**
+
+* Method:  `GET`
+* Address: `http://api.pssst.name/user/<user>/list`
+* Params:   The `user` name in the address.
+
+**Response**
+
+* Format: `application/json`
+* Status: `200`
+* Body:    A list of the users box names as strings.
+
+Box Actions
+-----------
+All box actions must be signed with the senders private key.
+
+### Create
+
+Creates a new empty box for the user.
+
+**Request**
+
+* Method:  `POST`
+* Address: `http://api.pssst.name/user/<user>/<box>`
+* Params:   The `user` and `box` name in the address.
+
+**Response**
+
+* Format: `text/plain`
+* Status: `200`
+* Body:   `Box created`
+
+### Delete
+
+Deletes box of the user. All messages in this box will be lost.
+
+**Request**
+
+* Method:  `DELETE`
+* Address: `http://api.pssst.name/user/<user>/<box>`
+* Params:   The `user` and `box` name in the address.
+
+**Response**
+
+* Format: `text/plain`
+* Status: `200`
+* Body:   `Box deleted`
+
+### Pull
+
+Returns the next message from the users box. Messages will be pulled in order 
+from first to last. If no box is specified, the default box `all` is used.
+
+**Request**
+
+* Method:  `GET`
+* Address: `http://api.pssst.name/user/<user>/<box>/`
+* Params:   The `user` and `box` name in the address.
+
+**Response**
+
+* Format: `application/json`
+* Status: `200`
+* Body:    An JSON object with `code` and `data` fields.
+
+### Push
+
+Pushes a message into an users box. If no box is specified, the default 
+box `all` is used. The `from` field will be deleted from the message, 
+after the sender validation on the server is processed.
+
+**Request**
+
+* Method:  `PUT`
+* Address: `http://api.pssst.name/user/<user>/<box>/`
+* Params:   The `user` and `box` name in the address.
+* Params:   An JSON object with `from`, `code` and `data` fields in the body.
+
+**Response**
+
+* Format: `text/plain`
+* Status: `200`
+* Body:   `Message pushed`
 
 Authors
 -------
+Please see the file called `AUTHORS` for more details.
 
-Please see the file called AUTHORS.
-
-Contacts
---------
-
+Contact
+-------
 * If you want to be informed about new releases, general news
   and information about Pssst, please visit our website under:
   http://www.pssst.name
@@ -54,5 +328,11 @@ Contacts
   Pssst issue tracker on GitHub and submit your report:
   https://github.com/pssst/pssst/issues
 
+License
+-------
+Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
 
-Christian & Christian  <pssst@pssst.name>
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.

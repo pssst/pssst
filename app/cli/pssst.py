@@ -25,8 +25,14 @@ import urllib
 
 from base64 import b64encode, b64decode
 from getpass import getpass
-from httplib import HTTPConnection
 from zipfile import ZipFile
+
+
+try:
+    import requests
+
+except ImportError:
+    sys.exit("Requires Requests (https://github.com/kennethreitz/requests)")
 
 
 try:
@@ -41,7 +47,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.2"
+__all__, __version__ = ["Pssst"], "0.2.3"
 
 
 class Name:
@@ -206,7 +212,7 @@ class Pssst:
                 if key:
                     self.key = RSA.importKey(key, password)
                 else:
-                    self.key = RSA.generate(2048)
+                    self.key = RSA.generate(4096)
 
             except (IndexError, TypeError, ValueError) as ex:
                 raise Exception("Password wrong")
@@ -291,13 +297,13 @@ class Pssst:
         -----
         If a file in the current directory with the name '.pssst' exists, the
         content of this file is parsed and used as the API server address and
-        port.
+        port. In this case, the servers SSL certificate will not be verified.
 
         """
         if os.path.exists(".pssst"):
             self.api = open(".pssst", "r").read().strip()
         else:
-            self.api = "api.pssst.name"
+            self.api = "http://api.pssst.name"
 
         self.user = Pssst.User(Name(name).user, password)
         self.user.save("pssst", self.__file("key"))
@@ -335,17 +341,20 @@ class Pssst:
 
         timestamp, signature = self.user.key.sign(body)
 
-        server = HTTPConnection(self.api)
-        server.request(method, "/user/" + urllib.quote(url), body, {
-            "content-type": "application/json" if body else "text/plain",
-            "content-hash": "%s; %s" % (timestamp, b64encode(signature))
-        })
-
-        response = server.getresponse()
-
-        mime = response.getheader("content-type", "text/plain")
-        head = response.getheader("content-hash")
-        body = response.read()
+        response = requests.request(
+            method,
+            "%s/user/%s" % (self.api, urllib.quote(url)),
+            headers={
+                "user-agent": "Pssst! CLI " + __version__,
+                "content-type": "application/json" if body else "text/plain",
+                "content-hash": "%s; %s" % (timestamp, b64encode(signature))
+            },
+            data=body
+        )
+        
+        mime = response.headers.get("content-type", "text/plain")
+        head = response.headers.get("content-hash")
+        body = response.text
 
         if not re.match("^[0-9]+; ?[A-Za-z0-9\+/]+=*$", head):
             raise Exception("Verification failed")
@@ -358,11 +367,11 @@ class Pssst:
         if not pssst.verify(body, timestamp, signature):
             raise Exception("Verification failed")
 
-        if body and mime.startswith("application/json"):
-            body = json.loads(body)
-
-        if response.status not in [200, 204]:
+        if response.status_code not in [200, 204]:
             raise Exception(body)
+
+        if mime.startswith("application/json"):
+            body = response.json()
 
         return body
 
@@ -387,15 +396,15 @@ class Pssst:
             Because the file was not found.
 
         """
-        server = HTTPConnection(self.api)
-        server.request("GET", "/" + file)
+        response = requests.get(
+            "%s/%s" % (self.api, file),
+            headers={"user-agent": "Pssst! CLI " + __version__},
+        )
 
-        response = server.getresponse()
-
-        if response.status == 404:
+        if response.status_code == 404:
             raise Exception("File not found")
 
-        return response.read()
+        return response.text
 
     def create(self, box=None):
         """

@@ -32,6 +32,38 @@ except ImportError:
     sys.exit("Requires py.test (http://pytest.org)")
 
 
+def setup_module(module):
+    """
+    Setup file list for tests.
+
+    Parameters
+    ----------
+    param module : string
+        The module name.
+
+    """
+    global files
+
+    files = [".pssst.name"] # Fix invalid name
+
+
+def teardown_module(module):
+    """
+    Remove all files generated from tests.
+
+    Parameters
+    ----------
+    param module : string
+        The module name.
+
+    """
+    global files
+
+    for file in files:
+        if os.path.exists(file):
+                os.remove(file)
+
+
 def createUserName(length=16):
     """
     Returns a random user name.
@@ -47,10 +79,13 @@ def createUserName(length=16):
         A random user name.
 
     """
-    pool = string.ascii_lowercase + string.digits
-    chars = [random.choice(pool) for x in range(length)]
+    global files
 
-    return "".join(chars)
+    pool = string.ascii_lowercase + string.digits
+    name = "".join([random.choice(pool) for x in range(length)])
+    files.append(".pssst." + name)
+
+    return name
 
 
 class TestName:

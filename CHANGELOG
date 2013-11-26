@@ -1,3 +1,11 @@
+0.2.3
+* Added HTTPS support
+* Added THANKS file
+* Added API documentation to README.md
+* Added cleanup after unit tests
+* Changed RSA key size to 4096
+* Branched html and windows app
+
 0.2.2
 * Added secure password input
 * Added box empty unit test
@@ -7,11 +15,11 @@
 * Changed package name
 
 0.2.1
-* Added <.gitignore>
+* Added .gitignore file
 * Added debug module to server
 * Added check if user was deleted
 * Fixed command line argument handling
-* Changed <README.md>
+* Changed README.md
 * Changed 'list' output
 * Changed server usage
 
@@ -20,8 +28,8 @@
 * Added documentation
 * Added server support for redis database
 * Added support for user box listening
-* Added color to <pssst.py> usage
-* Fixed init bug in <crypto.js>
+* Added color to pssst.py usage
+* Fixed init bug in crypto.js
 * Fixed many bugs
 * Rewrote server code
 * Removed need for metadata

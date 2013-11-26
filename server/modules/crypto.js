@@ -26,12 +26,12 @@ module.exports = function Crypto() {
   var crypto = require('crypto');
 
   // Required constants
-  var KEYSIZE  = 2048;
+  var KEYSIZE  = 4096;
   var TIMESPAN = 10;
   var ENCODING = 'utf8';
   var HASH     = 'sha256';
 
-  var prv = __dirname + '/../config/key';
+  var prv = __dirname + '/../config/pssst.key';
   var pub = __dirname + '/../public/key';
 
   if (!fs.existsSync(prv) || !fs.existsSync(pub)) {
