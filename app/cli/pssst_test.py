@@ -29,7 +29,7 @@ try:
     import pytest
 
 except ImportError:
-    sys.exit("Requires py.test (http://pytest.org)")
+    sys.exit("Requires py.test (https://pytest.org)")
 
 
 def setup_module(module):

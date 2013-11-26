@@ -1,6 +1,6 @@
 Pssst!
 ======
-[Pssst!](http://www.pssst.name) is a secure way for exchanging messages.
+[Pssst!](https://www.pssst.name) is a secure way for exchanging messages.
 
 Created and maintained by Christian and Christian only for the joy of it
 (and hopefully for the joy of others too). Its design is based upon open
@@ -10,13 +10,13 @@ Install
 -------
 Required for the command line interface (CLI):
 
-* Python   `2.7.x`
-* Requests `2.0.x` or newer
+* Python   `2.7.3` or newer
+* Requests `2.0.1` or newer
 * PyCrypto `2.6.1` or newer
 
 Required if you want to run your own server:
 
-* Node.js `0.10.x` or newer
+* Node.js `0.10.12` or newer
 * A Redis database
 
 Please refer to the file `server/package.json` for further details on the
@@ -44,7 +44,7 @@ Examples
 This full-blown real life example will demonstrate you, how to create the
 user `sender` and `receiver` as well as the receivers box `spam`. Then
 pushing a message from the `sender` to this box and pulling it by the
-`receiver`. And finally deleting the box (because nobody likes spam).
+`receiver`. And finally deleting the box (_because nobody likes spam_).
 
 ```
 pssst.py create sender
@@ -84,15 +84,15 @@ API
 ===
 The official address of the Pssst API is:
 
-`http://api.pssst.name` (alias for `2.pssst.name`)
+`https://api.pssst.name` (alias for `2.pssst.name`)
 
 If you want to test your code, please use the addresses below accordingly.
 But we advise you to please setup a local server and database (which
 is _very easy_), and test your apps and/or bug fixes there:
 
-* `http://0.pssst.name` reserved for `develop` branch (and other branches)
-* `http://1.pssst.name` reserved for `release` branch
-* `http://2.pssst.name` reserved for `master` branch
+* `https://0.pssst.name` reserved for `develop` branch (and other branches)
+* `https://1.pssst.name` reserved for `release` branch
+* `https://2.pssst.name` reserved for `master` branch
 
 Every branch uses its own redis database. The databases for the `develop` and 
 `release` branch will be reset each day at midnight. Please be warned:
@@ -102,13 +102,13 @@ Every branch uses its own redis database. The databases for the `develop` and
 Additional informations about the official Pssst server under can be requested
 under the following addresses below:
 
-* `http://api.pssst.name/key` returns the servers public key in `PEM` format.
-* `http://api.pssst.name/branch` returns the used Git branch.
-* `http://api.pssst.name/version` returns servers version.
+* `https://api.pssst.name/key` returns the servers public key in `PEM` format.
+* `https://api.pssst.name/branch` returns the used Git branch.
+* `https://api.pssst.name/version` returns servers version.
 
 Basics
 ------
-All data is exchanged in either `JSON` or `plain text` format with HTTP 
+All data is exchanged in either `JSON` or `plain text` format with HTTPS 
 requests/responses. Please refer to the mime type in the HTTP `content-type` 
 header to decide which format is returned. All data is encoded in `UTF-8`. 
 Server errors will always be returned in plain text. Please be aware:
@@ -177,7 +177,7 @@ Creates a new user.
 **Request**
 
 * Method:  `POST`
-* Address: `http://api.pssst.name/user/<user>`
+* Address: `https://api.pssst.name/user/<user>`
 * Params:   The `user` name in the address.
 * Params:   An JSON object with a `key` field in the body, which
             holds the users public key in `PEM` format.
@@ -197,7 +197,7 @@ used afterwards for a new user.
 **Request**
 
 * Method:  `DELETE`
-* Address: `http://api.pssst.name/user/<user>`
+* Address: `https://api.pssst.name/user/<user>`
 * Params:   The `user` name in the address.
 
 **Response**
@@ -213,7 +213,7 @@ Returns the users public key.
 **Request**
 
 * Method:  `GET`
-* Address: `http://api.pssst.name/user/<user>/key`
+* Address: `https://api.pssst.name/user/<user>/key`
 * Params:   The `user` name in the address.
 
 **Response**
@@ -229,7 +229,7 @@ Returns a list of the users box names.
 **Request**
 
 * Method:  `GET`
-* Address: `http://api.pssst.name/user/<user>/list`
+* Address: `https://api.pssst.name/user/<user>/list`
 * Params:   The `user` name in the address.
 
 **Response**
@@ -249,7 +249,7 @@ Creates a new empty box for the user.
 **Request**
 
 * Method:  `POST`
-* Address: `http://api.pssst.name/user/<user>/<box>`
+* Address: `https://api.pssst.name/user/<user>/<box>`
 * Params:   The `user` and `box` name in the address.
 
 **Response**
@@ -265,7 +265,7 @@ Deletes box of the user. All messages in this box will be lost.
 **Request**
 
 * Method:  `DELETE`
-* Address: `http://api.pssst.name/user/<user>/<box>`
+* Address: `https://api.pssst.name/user/<user>/<box>`
 * Params:   The `user` and `box` name in the address.
 
 **Response**
@@ -282,7 +282,7 @@ from first to last. If no box is specified, the default box `all` is used.
 **Request**
 
 * Method:  `GET`
-* Address: `http://api.pssst.name/user/<user>/<box>/`
+* Address: `https://api.pssst.name/user/<user>/<box>/`
 * Params:   The `user` and `box` name in the address.
 
 **Response**
@@ -300,7 +300,7 @@ after the sender validation on the server is processed.
 **Request**
 
 * Method:  `PUT`
-* Address: `http://api.pssst.name/user/<user>/<box>/`
+* Address: `https://api.pssst.name/user/<user>/<box>/`
 * Params:   The `user` and `box` name in the address.
 * Params:   An JSON object with `from`, `code` and `data` fields in the body.
 
@@ -318,7 +318,7 @@ Contact
 -------
 * If you want to be informed about new releases, general news
   and information about Pssst, please visit our website under:
-  http://www.pssst.name
+  https://www.pssst.name
 
 * If you want to be informed about code updates, bug fixes and
   security fixes of Pssst, please visit our project on GitHub:

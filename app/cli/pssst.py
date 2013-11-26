@@ -297,13 +297,19 @@ class Pssst:
         -----
         If a file in the current directory with the name '.pssst' exists, the
         content of this file is parsed and used as the API server address and
-        port. In this case, the servers SSL certificate will not be verified.
+        port. In this case, the servers SSL certificate will be verified.
+
+        Because Requests uses a different CA store, which does not has our CA
+        stored, the server will not be verified if the official API address is
+        used. This is also not necessary, because all server responses will be
+        signed and verified in the HTTP 'content-hash' header with the servers
+        private key.
 
         """
         if os.path.exists(".pssst"):
-            self.api = open(".pssst", "r").read().strip()
+            self.verify, self.api = True, open(".pssst", "r").read().strip()
         else:
-            self.api = "http://api.pssst.name"
+            self.verify, self.api = False, "https://api.pssst.name"
 
         self.user = Pssst.User(Name(name).user, password)
         self.user.save("pssst", self.__file("key"))
@@ -349,7 +355,8 @@ class Pssst:
                 "content-type": "application/json" if body else "text/plain",
                 "content-hash": "%s; %s" % (timestamp, b64encode(signature))
             },
-            data=body
+            data=body,
+            verify=self.verify
         )
         
         mime = response.headers.get("content-type", "text/plain")
@@ -399,6 +406,7 @@ class Pssst:
         response = requests.get(
             "%s/%s" % (self.api, file),
             headers={"user-agent": "Pssst! CLI " + __version__},
+            verify=self.verify
         )
 
         if response.status_code == 404:
