@@ -1,8 +1,8 @@
 {
   "name": "pssst",
   "license": "GPLv3",
-  "version": "0.2.3",
-  "homepage": "http://pssst.name",
+  "version": "0.2.4",
+  "homepage": "https://www.pssst.name",
   "bugs": "https://github.com/pssst/pssst/issues",
   "repository": {
     "type": "git",

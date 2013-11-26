@@ -1,9 +1,11 @@
+0.2.4
+* Changed defaults to HTTPS
+
 0.2.3
 * Added THANKS file
 * Added HTTPS support
 * Added API documentation to README.md
 * Added cleanup after unit tests
-* Changed defaults to HTTPS
 * Changed RSA key size to 4096
 * Branched html and windows app
 
