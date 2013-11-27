@@ -548,23 +548,29 @@ def usage(text, *args):
     param args: list of strings
         Usage parameters.
 
+    Notes
+    -----
+    Color is only used on POSIX compatible systems.
+
     """
     for line in (text % args).split("\n")[1:-1]:
         line = line[4:]
 
-        # Color description
-        if re.match("^  CLI", line):
-            line = line.replace("version", "version\x1B[34;1m")
-            line = "\x1B[39;1m%s\x1B[0m" % line
+        if os.name in ["posix"]:
 
-        # Color list titles
-        elif re.match("^[A-Za-z ]+:$", line):
-            line = "\x1B[34m%s\x1B[0m" % line
+            # Color description
+            if re.match("^  CLI", line):
+                line = line.replace("version", "version\x1B[34;1m")
+                line = "\x1B[39;1m%s\x1B[0m" % line
 
-        # Color list points
-        elif re.match("^  (-.|[a-z]+)", line):
-            line = line.replace("   ", "   \x1B[37;0m")
-            line = "\x1B[34;1m%s\x1B[0m" % line
+            # Color list titles
+            elif re.match("^[A-Za-z ]+:$", line):
+                line = "\x1B[34m%s\x1B[0m" % line
+
+            # Color list points
+            elif re.match("^  (-.|[a-z]+)", line):
+                line = line.replace("   ", "   \x1B[37;0m")
+                line = "\x1B[34;1m%s\x1B[0m" % line
 
         print line
 

@@ -1,3 +1,6 @@
+0.2.5
+* Fixed usage on non POSIX systems
+
 0.2.4
 * Changed defaults to HTTPS
 
