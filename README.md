@@ -26,7 +26,9 @@ There is no need to install anything, just run the `app/cli/pssst.py` script:
 
 `pssst.py [option|command]`
 
-Please use the `--help` option to show further help on the CLI.
+Please use the `--help` option to show further help on the CLI. All user 
+specific data will be stored as zip files named `.pssst.<username>` in 
+the current directory.
 
 Commands
 --------

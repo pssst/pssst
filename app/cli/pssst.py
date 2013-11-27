@@ -312,7 +312,9 @@ class Pssst:
             self.verify, self.api = False, "https://api.pssst.name"
 
         self.user = Pssst.User(Name(name).user, password)
-        self.user.save("pssst", self.__file("key"))
+
+        if "pssst" not in self.user.list():
+            self.user.save("pssst", self.__file("key")) # Add public key
 
     def __api(self, method, url, body={}):
         """

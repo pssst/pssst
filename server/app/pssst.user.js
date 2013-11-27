@@ -51,7 +51,7 @@ exports.disable = function disable(user) {
  * @return {Boolean} true if blocked
  */
 exports.isBlocked = function isBlocked(name) {
-  return new RegExp('!?(name)').test(name);
+  return new RegExp('!?(^pssst$)').test(name);
 };
 
 /**
