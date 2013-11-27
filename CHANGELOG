@@ -1,9 +1,9 @@
-Develop
+0.2.5
+* Added user files to README.md
+* Added unit test for server public key bug
 * Fixed usage on non POSIX systems
 * Fixed server public key bug
 * Fixed restricted name bug
-* Added user files to README.md
-* Added unit test for server public key bug
 * Changed server key storage name
 
 0.2.4
