@@ -297,7 +297,7 @@ class Pssst:
         -----
         If a file in the current directory with the name '.pssst' exists, the
         content of this file is parsed and used as the API server address and
-        port. In this case, the servers SSL certificate will be verified.
+        port. In this case, the servers SSL certificate will not be verified.
 
         Because Requests uses a different CA store, which does not has our CA
         stored, the server will not be verified if the official API address is
@@ -307,14 +307,14 @@ class Pssst:
 
         """
         if os.path.exists(".pssst"):
-            self.verify, self.api = True, open(".pssst", "r").read().strip()
+            self.verify, self.api = False, open(".pssst", "r").read().strip()
         else:
             self.verify, self.api = False, "https://api.pssst.name"
 
         self.user = Pssst.User(Name(name).user, password)
 
-        if "pssst" not in self.user.list():
-            self.user.save("pssst", self.__file("key")) # Add public key
+        if self.api not in self.user.list():
+            self.user.save(self.api, self.__file("key")) # Add public key
 
     def __api(self, method, url, body={}):
         """
@@ -371,7 +371,7 @@ class Pssst:
         timestamp, signature = head.split(";", 1)
         timestamp, signature = int(timestamp), b64decode(signature)
 
-        pssst = Pssst.Key(self.user.load("pssst"))
+        pssst = Pssst.Key(self.user.load(self.api))
 
         if not pssst.verify(body, timestamp, signature):
             raise Exception("Verification failed")

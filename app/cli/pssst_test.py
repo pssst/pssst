@@ -44,7 +44,7 @@ def setup_module(module):
     """
     global files
 
-    files = [".pssst.name"] # Fix invalid name
+    files = [".pssst.pssst"] # Fix invalid name
 
 
 def teardown_module(module):
@@ -140,6 +140,38 @@ class TestName:
             Name("Invalid user.name !")
 
         assert ex.value.message == "User name invalid"
+
+
+class TestFile:
+    """
+    Tests user file with the test cases:
+
+    * User list
+
+    Methods
+    -------
+    test_file_user_list()
+        Tests if file is created correctly.
+
+    """
+    def test_file_user_list(self):
+        """
+        Tests if file is created correctly.
+        """
+        name1 = createUserName()
+        name2 = createUserName()
+
+        pssst1 = Pssst(name1)
+        pssst1.create()
+
+        pssst2 = Pssst(name2)
+        pssst2.create()
+
+        pssst1.push([name2], "Hello World !")
+
+        list = [pssst1.api, name1 + ".private", name1, name2]
+
+        assert sorted(pssst1.user.list()) == sorted(list)
 
 
 class TestCrypto:
@@ -255,11 +287,8 @@ class TestUser:
         """
         Tests if an user name is restricted.
         """
-        if os.path.exists(".pssst.name"):
-            os.remove(".pssst.name")
-
         with pytest.raises(Exception) as ex:
-            pssst = Pssst("name")
+            pssst = Pssst("pssst")
             pssst.create()
 
         assert ex.value.message == "User name restricted"
