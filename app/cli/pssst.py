@@ -47,7 +47,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.4"
+__all__, __version__ = ["Pssst"], "0.2.5"
 
 
 class Name:

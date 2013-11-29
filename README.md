@@ -24,7 +24,7 @@ required NPM modules and their version.
 
 There is no need to install anything, just run the `app/cli/pssst.py` script:
 
-`pssst.py [option|command]`
+`$ pssst.py [option|command]`
 
 Please use the `--help` option to show further help on the CLI. All user 
 specific data will be stored as zip files named `.pssst.<username>` in 
@@ -49,22 +49,22 @@ pushing a message from the `sender` to this box and pulling it by the
 `receiver`. And finally deleting the box (_because nobody likes spam_).
 
 ```
-pssst.py create sender
+$ pssst.py create sender
 ```
 ```
-pssst.py create receiver
+$ pssst.py create receiver
 ```
 ```
-pssst.py create receiver.spam
+$ pssst.py create receiver.spam
 ```
 ```
-pssst.py push sender receiver.spam "Hello World!"
+$ pssst.py push sender receiver.spam "Hello World!"
 ```
 ```
-pssst.py pull receiver.spam
+$ pssst.py pull receiver.spam
 ```
 ```
-pssst.py delete receiver.spam
+$ pssst.py delete receiver.spam
 ```
 
 Server
@@ -72,13 +72,13 @@ Server
 If you want to use any other than the official server, simply create a file
 named `.pssst` in the directory of the app with the desired server address:
 
-`echo https://localhost:443 > app/cli/.pssst`
+`$ echo https://localhost:443 > app/cli/.pssst`
 
 To setup your own server, please create a valid configuration file first. A
 sample configuration can be found with `server/config/config.json.sample`.
 When done, execute the following command inside your `server` directory:
 
-`npm install && node server.js`
+`$ npm install && node server.js`
 
 The server will now start and print `Ready`.
 
