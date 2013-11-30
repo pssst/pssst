@@ -1,3 +1,6 @@
+Develop
+* Changed text output if no new message
+
 0.2.5
 * Added user files to README.md
 * Added unit test for server public key bug

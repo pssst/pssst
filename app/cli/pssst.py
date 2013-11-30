@@ -634,7 +634,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
 
         if command in ("--pull", "pull") and user:
             message = Pssst(name.user, name.password).pull(name.box)
-            return message or "No new messages"
+            return message or None
 
         if command in ("--push", "push") and user and receiver:
             Pssst(name.user, name.password).push([receiver],"".join(message))
