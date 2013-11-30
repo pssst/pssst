@@ -566,7 +566,7 @@ class TestPssst:
         Tests if a message could be pushed to sender.
         """
         name = createUserName()
-        text = "Hello World !"
+        text = "Echo"
 
         pssst = Pssst(name)
         pssst.create()

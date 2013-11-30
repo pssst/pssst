@@ -1,4 +1,5 @@
 Develop
+* Added support for file sending to CLI
 * Changed text output if no new message
 
 0.2.5

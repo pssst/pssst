@@ -307,7 +307,7 @@ class Pssst:
 
         """
         if os.path.exists(".pssst"):
-            self.verify, self.api = False, open(".pssst", "r").read().strip()
+            self.verify, self.api = False, open(".pssst").read().strip()
         else:
             self.verify, self.api = False, "https://api.pssst.name"
 
@@ -588,7 +588,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
       CLI version %s
 
     Usage:
-      %s [option|command user:password] [receiver] [message]
+      %s [option|command user:password] [receiver] [message|filename]
 
     Options:
       -h --help      Shows this text
@@ -637,7 +637,12 @@ def main(script, command="--help", user=None, receiver=None, *message):
             return message or None
 
         if command in ("--push", "push") and user and receiver:
-            Pssst(name.user, name.password).push([receiver],"".join(message))
+            data = "".join(message)
+
+            if os.path.exists(data):
+                data = open(data, "rb").read()
+
+            Pssst(name.user, name.password).push([receiver], data)
             return "Message sent"
 
         print "Unknown command:", command
