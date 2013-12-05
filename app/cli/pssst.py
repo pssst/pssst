@@ -38,7 +38,7 @@ except ImportError:
 try:
     from Crypto import Random
     from Crypto.Cipher import AES, PKCS1_OAEP
-    from Crypto.Hash import HMAC, SHA256
+    from Crypto.Hash import HMAC, SHA512
     from Crypto.Protocol.KDF import PBKDF2
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
@@ -47,7 +47,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.5"
+__all__, __version__ = ["Pssst"], "0.2.6"
 
 
 class Name:
@@ -261,8 +261,8 @@ class Pssst:
         def verify(self, data, timestamp, signature):
             actual = int(round(time.time()))
 
-            hmac = HMAC.new(str(timestamp), data, SHA256)
-            hmac = SHA256.new(hmac.digest())
+            hmac = HMAC.new(str(timestamp), data, SHA512)
+            hmac = SHA512.new(hmac.digest())
 
             if (actual -5) < timestamp < (actual +5):
                 verified = PKCS1_v1_5.new(self.key).verify(hmac, signature)
@@ -274,8 +274,8 @@ class Pssst:
         def sign(self, data):
             timestamp = int(round(time.time()))
 
-            hmac = HMAC.new(str(timestamp), data, SHA256)
-            hmac = SHA256.new(hmac.digest())
+            hmac = HMAC.new(str(timestamp), data, SHA512)
+            hmac = SHA512.new(hmac.digest())
 
             signature = PKCS1_v1_5.new(self.key).sign(hmac)
 

@@ -29,7 +29,7 @@ module.exports = function Crypto() {
   var KEYSIZE  = 4096;
   var TIMESPAN = 10;
   var ENCODING = 'utf8';
-  var HASH     = 'sha256';
+  var HASH     = 'sha512';
 
   var prv = __dirname + '/../config/pssst.key';
   var pub = __dirname + '/../public/key';

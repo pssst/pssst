@@ -157,8 +157,8 @@ Where `timestamp` is the `EPOCH` (without decimals) of the request/response
 and `signature` the calculated and signed hash of the body encoded in 
 `Base64`. Calculation of the hash is done as follows:
 
-1. Create a `SHA256` HMAC of the HTTP body with the timestamp string as key.
-2. Create a `SHA256` hash of the resulting HMAC one more time.
+1. Create a `SHA512` HMAC of the HTTP body with the timestamp string as key.
+2. Create a `SHA512` hash of the resulting HMAC one more time.
 3. Sign the resulting hash with the senders private key using `PKCS#1 v1.5`.
 
 To verify a request/response, calculate its hash as described above in the 

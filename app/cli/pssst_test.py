@@ -44,7 +44,7 @@ def setup_module(module):
     """
     global files
 
-    files = [".pssst.pssst"] # Fix invalid name
+    files = [".pssst.name"] # Fix invalid name
 
 
 def teardown_module(module):
@@ -288,7 +288,7 @@ class TestUser:
         Tests if an user name is restricted.
         """
         with pytest.raises(Exception) as ex:
-            pssst = Pssst("pssst")
+            pssst = Pssst("name")
             pssst.create()
 
         assert ex.value.message == "User name restricted"
