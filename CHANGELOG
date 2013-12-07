@@ -1,5 +1,6 @@
 Develop
 * Added support for file sending to CLI
+* Fixed wrong cli usage text
 * Changed text output if no new message
 * Changed fuzzy test sizes
 * Changed hash to SHA512

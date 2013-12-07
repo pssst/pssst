@@ -585,7 +585,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
       CLI version %s
 
     Usage:
-      %s [option|command user:password] [receiver] [message|filename]
+      %s [option|command] [user:password] [receiver] [message|filename]
 
     Options:
       -h --help      Shows this text
