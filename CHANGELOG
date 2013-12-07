@@ -1,6 +1,9 @@
 Develop
 * Added support for file sending to CLI
 * Changed text output if no new message
+* Changed fuzzy test sizes
+* Changed hash to SHA512
+* Removed unnecessary PBKDF2
 
 0.2.5
 * Added user files to README.md

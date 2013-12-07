@@ -39,7 +39,6 @@ try:
     from Crypto import Random
     from Crypto.Cipher import AES, PKCS1_OAEP
     from Crypto.Hash import HMAC, SHA512
-    from Crypto.Protocol.KDF import PBKDF2
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
 
@@ -219,10 +218,8 @@ class Pssst:
 
         @staticmethod
         def __cipher(code, size=32):
-            data = PBKDF2(code[:size], code[size:], size + 16)
-
-            key = data[:size] # 32 bytes for key
-            iv  = data[size:] # 16 bytes for IV
+            key = code[:size] # 32 bytes for key
+            iv  = code[size:] # 16 bytes for IV
 
             return AES.new(key, AES.MODE_CBC, iv)
 
@@ -231,7 +228,7 @@ class Pssst:
             return data + (size-len(data) % size) * chr(size-len(data) % size)
 
         @staticmethod # PKCS5
-        def __cut(data):
+        def __trim(data):
             return data[0:-ord(data[-1])]
 
         def private(self, password=None):
@@ -241,7 +238,7 @@ class Pssst:
             return self.key.publickey().exportKey("PEM")
 
         def encrypt(self, data):
-            code = Random.get_random_bytes(64)
+            code = Random.get_random_bytes(48)
 
             data = Pssst.Key.__pad(data)
             data = Pssst.Key.__cipher(code).encrypt(data)
@@ -254,7 +251,7 @@ class Pssst:
             code = PKCS1_OAEP.new(self.key).decrypt(code)
 
             data = Pssst.Key.__cipher(code).decrypt(data)
-            data = Pssst.Key.__cut(data)
+            data = Pssst.Key.__trim(data)
 
             return data
 

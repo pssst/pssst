@@ -672,12 +672,13 @@ class TestFuzzy:
         """
         Tests if fuzzy data is returned correctly.
 
-        * Test 1K random data
-        * Test 2K random data
-        * Test 4K random data
-        * Test 8K random data
+        Notes
+        -----
+        The data will be generated with random content in sizes from zero
+        bytes up to 8 kilobytes.
+
         """
-        for size in [2 ** n for n in range(10, 13)]:
+        for size in [2 ** n for n in range(0, 13)]:
             blob = os.urandom(size)
             name = createUserName()
             pssst = Pssst(name)

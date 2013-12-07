@@ -123,23 +123,19 @@ All clients are requested to send an unique `user-agent` header.
 
 Encryption of the message data is done as follows:
 
-1. Generate cyptographically secure `64` random bytes as the code.
-2. Derive `48` bytes with `PBKDF2` (`1000` rounds) from the code, using the 
-   first `32` bytes as key and the last `32` bytes as salt.
-3. Add a `PKCS#5` padding to the data.
-4. Encrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
-   the derived code as key and the last `16` bytes as IV.
-5. Encrypt the code with `PKCS#1 OAEP` and the receivers public key.
+1. Generate cyptographically secure `48` random bytes as the code.
+2. Add a `PKCS#5` padding to the data.
+3. Encrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
+   the code as key and the last `16` bytes as IV.
+4. Encrypt the code with `PKCS#1 OAEP` and the receivers public key.
 
 ### Decryption
 
 Decryption of the received `data` and `code` is done as follows:
 
 1. Decrypt the received code with `PKCS#1 OAEP` and the receivers private key.
-2. Derive `48` bytes with `PBKDF2` (`1000` rounds) from the code, using the 
-   first `32` bytes as key and the last `32` bytes as salt.
-3. Remove the `PKCS#5` padding from the data.
-4. Decrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
+2. Remove the `PKCS#5` padding from the data.
+3. Decrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
    the derived code as key and the last `16` bytes as IV.
 
 All encrypted data is exchanged as `JSON` object in the request/response body 
