@@ -97,5 +97,5 @@ exports.find = function find(user, box) {
  * @return {Boolean} true if blocked
  */
 exports.isBlocked = function isBlocked(box) {
-  return new RegExp('^(all)|(key)|(list)$').test(box);
+  return new RegExp('^(box)|(key)|(list)$').test(box);
 };

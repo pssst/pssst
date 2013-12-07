@@ -3,6 +3,8 @@ Develop
 * Changed text output if no new message
 * Changed fuzzy test sizes
 * Changed hash to SHA512
+* Changed default box name to "box"
+* Changed package modules versions
 * Removed unnecessary PBKDF2
 
 0.2.5

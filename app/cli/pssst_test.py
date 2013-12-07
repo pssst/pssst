@@ -364,9 +364,9 @@ class TestUser:
         """
         pssst = Pssst(createUserName())
         pssst.create()
-        pssst.create("xyz")
+        pssst.create("test")
 
-        assert pssst.list() == ["all", "xyz"]
+        assert pssst.list() == ["box", "test"]
 
     def test_user_name_invalid(self):
         """
@@ -433,7 +433,7 @@ class TestBox:
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.create()
-            pssst.create("all")
+            pssst.create("box")
 
         assert ex.value.message == "Box name restricted"
 
@@ -465,7 +465,7 @@ class TestBox:
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.create()
-            pssst.delete("all")
+            pssst.delete("box")
 
         assert ex.value.message == "Box name restricted"
 

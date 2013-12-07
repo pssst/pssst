@@ -120,7 +120,7 @@ module.exports = function Pssst(redis) {
       return res.sendSigned(400, 'User name invalid');
     }
 
-    var boxname = req.params.box || 'all'; // Default box
+    var boxname = req.params.box || 'box'; // Default box
 
     // Assert valid box name
     if (!new RegExp('^[a-z0-9]{2,63}$').test(boxname)) {

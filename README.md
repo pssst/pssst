@@ -275,7 +275,7 @@ Deletes box of the user. All messages in this box will be lost.
 ### Pull
 
 Returns the next message from the users box. Messages will be pulled in order 
-from first to last. If no box is specified, the default box `all` is used.
+from first to last. If no box is specified, the default box `box` is used.
 
 **Request**
 
@@ -292,7 +292,7 @@ from first to last. If no box is specified, the default box `all` is used.
 ### Push
 
 Pushes a message into an users box. If no box is specified, the default 
-box `all` is used. The `from` field will be deleted from the message, 
+box `box` is used. The `from` field will be deleted from the message, 
 after the sender validation on the server is processed.
 
 **Request**

@@ -29,7 +29,7 @@ exports.create = function create(key) {
   return {
     key: key,
     box: {
-      all: [] // default box
+      box: [] // default box
     }
   };
 };
