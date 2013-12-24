@@ -357,7 +357,7 @@ class Pssst:
             data=body,
             verify=self.verify
         )
-        
+
         mime = response.headers.get("content-type", "text/plain")
         head = response.headers.get("content-hash")
         body = response.text
@@ -648,7 +648,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
     except KeyboardInterrupt:
         print "Exit"
 
-    except Exception, ex:
+    except Exception as ex:
         return "Error: %s" % ex
 
 

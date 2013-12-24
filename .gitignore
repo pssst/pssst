@@ -1,4 +1,5 @@
 *.crt
+*.iso
 *.key
 *.log
 *.pyc
@@ -9,6 +10,7 @@
 .pssst.*
 config.json
 env
+iso
 key
 node_modules
 npm-debug.log
