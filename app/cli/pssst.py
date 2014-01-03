@@ -16,21 +16,27 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+import base64
+import io
 import json
 import os
 import re
 import sys
 import time
-import urllib
 
-from base64 import b64encode, b64decode
 from getpass import getpass
 from zipfile import ZipFile
+
+# For compatibility with Python 3
+
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib import quote
 
 
 try:
     import requests
-
 except ImportError:
     sys.exit("Requires Requests (https://github.com/kennethreitz/requests)")
 
@@ -41,12 +47,27 @@ try:
     from Crypto.Hash import HMAC, SHA512
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
-
 except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.6"
+__all__, __version__ = ["Pssst", "Name"], "0.2.6"
+
+
+def _encode64(data):
+    """
+    Utility function for base64 encoding.  
+
+    """
+    return base64.b64encode(data).decode("ascii")
+
+
+def _decode64(data):
+    """
+    Utility function for base64 decoding.
+
+    """
+    return base64.b64decode(data.encode("ascii"))
 
 
 class Name:
@@ -130,8 +151,6 @@ class Pssst:
 
         Methods
         -------
-        exists()
-            Returns if user exists.
         delete()
             Deletes the user file.
         list()
@@ -158,12 +177,11 @@ class Pssst:
                 self.save(user + ".private", self.key.private(password))
                 self.save(user, self.key.public())
 
+        def __bool__(self):
+            return self.__nonzero__()
+
         def __nonzero__(self):
             return os.path.exists(self.path)
-
-        @staticmethod
-        def exists(user):
-            return os.path.exists(".pssst." + user)
 
         def delete(self):
             if os.path.exists(self.path):
@@ -184,7 +202,7 @@ class Pssst:
 
     class Key:
         """
-        Class for providing cryptographical methods.
+        Class for providing cryptographic methods.
 
         Methods
         -------
@@ -216,67 +234,46 @@ class Pssst:
             except (IndexError, TypeError, ValueError) as ex:
                 raise Exception("Password wrong")
 
-        @staticmethod
-        def __cipher(code, size=32):
-            key = code[:size] # 32 bytes for key
-            iv  = code[size:] # 16 bytes for IV
-
-            return AES.new(key, AES.MODE_CBC, iv)
-
-        @staticmethod # PKCS5
-        def __pad(data, size=AES.block_size):
-            return data + (size-len(data) % size) * chr(size-len(data) % size)
-
-        @staticmethod # PKCS5
-        def __trim(data):
-            return data[0:-ord(data[-1])]
-
         def private(self, password=None):
-            return self.key.exportKey("PEM", password)
+            return self.key.exportKey("PEM", password).decode("ascii")
 
         def public(self):
-            return self.key.publickey().exportKey("PEM")
+            return self.key.publickey().exportKey("PEM").decode("ascii")
 
         def encrypt(self, data):
             code = Random.get_random_bytes(48)
 
-            data = Pssst.Key.__pad(data)
-            data = Pssst.Key.__cipher(code).encrypt(data)
-
+            data = AES.new(code[:32], AES.MODE_CFB, code[32:]).encrypt(data)
             code = PKCS1_OAEP.new(self.key).encrypt(code)
 
             return (data, code)
 
         def decrypt(self, data, code):
             code = PKCS1_OAEP.new(self.key).decrypt(code)
-
-            data = Pssst.Key.__cipher(code).decrypt(data)
-            data = Pssst.Key.__trim(data)
+            data = AES.new(code[:32], AES.MODE_CFB, code[32:]).decrypt(data)
 
             return data
 
         def verify(self, data, timestamp, signature):
-            actual = int(round(time.time()))
+            current, data = int(round(time.time())), data.encode("ascii")
 
-            hmac = HMAC.new(str(timestamp), data, SHA512)
+            hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
 
-            if (actual -5) < timestamp < (actual +5):
-                verified = PKCS1_v1_5.new(self.key).verify(hmac, signature)
+            if (current -5) < timestamp < (current +5):
+                return PKCS1_v1_5.new(self.key).verify(hmac, signature)
             else:
-                verified = False
-
-            return verified
+                return False
 
         def sign(self, data):
-            timestamp = int(round(time.time()))
+            current, data = int(round(time.time())), data.encode("ascii")
 
-            hmac = HMAC.new(str(timestamp), data, SHA512)
+            hmac = HMAC.new(str(current).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
 
             signature = PKCS1_v1_5.new(self.key).sign(hmac)
 
-            return (timestamp, signature)
+            return (current, signature)
 
 
     def __init__(self, name, password=None):
@@ -304,7 +301,7 @@ class Pssst:
 
         """
         if os.path.exists(".pssst"):
-            self.verify, self.api = False, open(".pssst").read().strip()
+            self.verify, self.api = False, io.open(".pssst").read().strip()
         else:
             self.verify, self.api = False, "https://api.pssst.name"
 
@@ -348,13 +345,11 @@ class Pssst:
 
         response = requests.request(
             method,
-            "%s/user/%s" % (self.api, urllib.quote(url)),
-            headers={
-                "user-agent": "Pssst! CLI " + __version__,
+            "%s/user/%s" % (self.api, quote(url)), data=body, headers={
+                "content-hash": "%s; %s" % (timestamp, _encode64(signature)),
                 "content-type": "application/json" if body else "text/plain",
-                "content-hash": "%s; %s" % (timestamp, b64encode(signature))
+                "user-agent": "Pssst! CLI " + __version__
             },
-            data=body,
             verify=self.verify
         )
 
@@ -366,7 +361,7 @@ class Pssst:
             raise Exception("Verification failed")
 
         timestamp, signature = head.split(";", 1)
-        timestamp, signature = int(timestamp), b64decode(signature)
+        timestamp, signature = int(timestamp), _decode64(signature)
 
         pssst = Pssst.Key(self.user.load(self.api))
 
@@ -394,7 +389,6 @@ class Pssst:
         -------
         string
             The file content.
-
 
         Raises
         ------
@@ -494,7 +488,7 @@ class Pssst:
 
         Returns
         -------
-        string
+        byte string
             The message.
 
         """
@@ -503,8 +497,8 @@ class Pssst:
         if not body:
             return None # Box is empty
 
-        data = b64decode(body["data"])
-        code = b64decode(body["code"])
+        data = _decode64(body["data"])
+        code = _decode64(body["code"])
 
         return self.user.key.decrypt(data, code)
 
@@ -516,7 +510,7 @@ class Pssst:
         ----------
         param names : list of strings
             List of user names.
-        param message : string
+        param message : byte string
             The message.
 
         """
@@ -528,8 +522,8 @@ class Pssst:
             data, code = Pssst.Key(self.user.load(user)).encrypt(message)
 
             body = {
-                "code": b64encode(code),
-                "data": b64encode(data),
+                "code": _encode64(code),
+                "data": _encode64(data),
                 "from": self.user.name
             }
 
@@ -571,7 +565,7 @@ def usage(text, *args):
                 line = line.replace("   ", "   \x1B[37;0m")
                 line = "\x1B[34;1m%s\x1B[0m" % line
 
-        print line
+        print(line)
 
 
 def main(script, command="--help", user=None, receiver=None, *message):
@@ -631,22 +625,22 @@ def main(script, command="--help", user=None, receiver=None, *message):
 
         if command in ("--pull", "pull") and user:
             message = Pssst(name.user, name.password).pull(name.box)
-            return message or None
+            return message
 
         if command in ("--push", "push") and user and receiver:
-            data = "".join(message)
+            data = "".join(message).encode("utf-8")
 
             if os.path.exists(data):
-                data = open(data, "rb").read()
+                data = io.open(data, "rb").read()
 
             Pssst(name.user, name.password).push([receiver], data)
             return "Message sent"
 
-        print "Unknown command:", command
-        print "Please use -h for help on commands."
+        print("Unknown command:", command)
+        print("Please use -h for help on commands.")
 
     except KeyboardInterrupt:
-        print "Exit"
+        print("Exit")
 
     except Exception as ex:
         return "Error: %s" % ex

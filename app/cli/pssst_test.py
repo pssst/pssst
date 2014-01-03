@@ -27,7 +27,6 @@ from pssst import Pssst, Name
 
 try:
     import pytest
-
 except ImportError:
     sys.exit("Requires py.test (https://pytest.org)")
 
@@ -139,7 +138,7 @@ class TestName:
         with pytest.raises(Exception) as ex:
             Name("Invalid user.name !")
 
-        assert ex.value.message == "User name invalid"
+        assert str(ex.value) == "User name invalid"
 
 
 class TestFile:
@@ -169,9 +168,9 @@ class TestFile:
 
         pssst1.push([name2], "Hello World !")
 
-        list = [pssst1.api, name1 + ".private", name1, name2]
+        content = [pssst1.api, name1 + ".private", name1, name2]
 
-        assert sorted(pssst1.user.list()) == sorted(list)
+        assert sorted(pssst1.user.list()) == sorted(content)
 
 
 class TestCrypto:
@@ -200,7 +199,7 @@ class TestCrypto:
             pssst = Pssst(createUserName())
             pssst.pull()
 
-        assert ex.value.message == "Verification failed"
+        assert str(ex.value) == "Verification failed"
 
     def test_request_verify_signature_invalid(self):
         """
@@ -209,7 +208,7 @@ class TestCrypto:
         original = Pssst.Key.sign
 
         with pytest.raises(Exception) as ex:
-            Pssst.Key.sign = lambda self, data: ("!", "!")
+            Pssst.Key.sign = lambda self, data: ("!", b"!")
 
             pssst = Pssst(createUserName())
             pssst.create()
@@ -217,7 +216,7 @@ class TestCrypto:
 
         Pssst.Key.sign = original
 
-        assert ex.value.message == "Verification failed"
+        assert str(ex.value) == "Verification failed"
 
     def test_request_verify_signature_wrong(self):
         """
@@ -226,7 +225,7 @@ class TestCrypto:
         original = Pssst.Key.sign
 
         with pytest.raises(Exception) as ex:
-            Pssst.Key.sign = lambda self, data: original(self, "test")
+            Pssst.Key.sign = lambda self, data: original(self, "Test")
 
             pssst = Pssst(createUserName())
             pssst.create()
@@ -234,7 +233,7 @@ class TestCrypto:
 
         Pssst.Key.sign = original
 
-        assert ex.value.message == "Verification failed"
+        assert str(ex.value) == "Verification failed"
 
 
 class TestUser:
@@ -291,7 +290,7 @@ class TestUser:
             pssst = Pssst("name")
             pssst.create()
 
-        assert ex.value.message == "User name restricted"
+        assert str(ex.value) == "User name restricted"
 
     def test_create_user_already_exists(self):
         """
@@ -302,7 +301,7 @@ class TestUser:
             pssst.create()
             pssst.create()
 
-        assert ex.value.message == "User already exists"
+        assert str(ex.value) == "User already exists"
 
     def test_delete_user(self):
         """
@@ -322,7 +321,7 @@ class TestUser:
             pssst.delete()
             pssst.pull()
 
-        assert ex.value.message == "User was deleted"
+        assert str(ex.value) == "User was deleted"
 
     def test_find_user(self):
         """
@@ -346,7 +345,7 @@ class TestUser:
             pssst = Pssst(createUserName())
             pssst.find(name)
 
-        assert ex.value.message == "User was deleted"
+        assert str(ex.value) == "User was deleted"
 
     def test_find_user_not_found(self):
         """
@@ -356,7 +355,7 @@ class TestUser:
             pssst = Pssst(createUserName())
             pssst.find("usernotfound")
 
-        assert ex.value.message == "User not found"
+        assert str(ex.value) == "User not found"
 
     def test_list(self):
         """
@@ -376,7 +375,7 @@ class TestUser:
             pssst = Pssst(createUserName())
             pssst.find("test !")
 
-        assert ex.value.message == "User name invalid"
+        assert str(ex.value) == "User name invalid"
 
 
 class TestBox:
@@ -435,7 +434,7 @@ class TestBox:
             pssst.create()
             pssst.create("box")
 
-        assert ex.value.message == "Box name restricted"
+        assert str(ex.value) == "Box name restricted"
 
     def test_create_box_already_exists(self):
         """
@@ -447,7 +446,7 @@ class TestBox:
             pssst.create("test")
             pssst.create("test")
 
-        assert ex.value.message == "Box already exists"
+        assert str(ex.value) == "Box already exists"
 
     def test_delete_box(self):
         """
@@ -467,7 +466,7 @@ class TestBox:
             pssst.create()
             pssst.delete("box")
 
-        assert ex.value.message == "Box name restricted"
+        assert str(ex.value) == "Box name restricted"
 
     def test_push_box(self):
         """
@@ -507,7 +506,7 @@ class TestBox:
             pssst2.create()
             pssst2.push([name1], "test")
 
-        assert ex.value.message == "User was deleted"
+        assert str(ex.value) == "User was deleted"
 
     def test_box_not_found(self):
         """
@@ -518,7 +517,7 @@ class TestBox:
             pssst.create()
             pssst.pull("test")
 
-        assert ex.value.message == "Box not found"
+        assert str(ex.value) == "Box not found"
 
     def test_box_name_invalid(self):
         """
@@ -529,7 +528,7 @@ class TestBox:
             pssst.create()
             pssst.pull("test !")
 
-        assert ex.value.message == "Box name invalid"
+        assert str(ex.value) == "Box name invalid"
 
 
 class TestPssst:
@@ -566,7 +565,7 @@ class TestPssst:
         Tests if a message could be pushed to sender.
         """
         name = createUserName()
-        text = "Echo"
+        text = b"Echo"
 
         pssst = Pssst(name)
         pssst.create()
@@ -580,7 +579,7 @@ class TestPssst:
         """
         name1 = createUserName()
         name2 = createUserName()
-        text = "Hello World !"
+        text = b"Hello World !"
 
         pssst1 = Pssst(name1)
         pssst1.create()
@@ -596,7 +595,7 @@ class TestPssst:
         Tests if a message could be pushed to many receivers.
         """
         send = createUserName()
-        text = "Hello World !"
+        text = b"Hello World !"
 
         names = [createUserName() for i in range(5)]
 
@@ -621,14 +620,14 @@ class TestPssst:
             pssst = Pssst(createUserName())
             pssst.push(["test !"], "test")
 
-        assert ex.value.message == "User name invalid"
+        assert str(ex.value) == "User name invalid"
 
     def test_push_pull_empty(self):
         """
         Tests if box is empty.
         """
         name = createUserName()
-        text = "Hello World !"
+        text = b"Hello World !"
 
         pssst = Pssst(name)
         pssst.create()
@@ -655,7 +654,7 @@ class TestPssst:
             Pssst(name, "right")
             Pssst(name, "wrong")
 
-        assert ex.value.message == "Password wrong"
+        assert str(ex.value) == "Password wrong"
 
 
 class TestFuzzy:

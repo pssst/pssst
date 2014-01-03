@@ -1,12 +1,15 @@
 Develop
+* Added support for Python 3 to CLI
 * Added support for file sending to CLI
 * Fixed wrong cli usage text
 * Changed text output if no new message
 * Changed fuzzy test sizes
 * Changed hash to SHA512
+* Changed AES mode to CFB
 * Changed default box name to "box"
 * Changed package modules versions
 * Removed unnecessary PBKDF2
+* Removed unnecessary PKCS#5
 
 0.2.5
 * Added user files to README.md

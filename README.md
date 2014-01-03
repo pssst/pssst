@@ -124,18 +124,16 @@ All clients are requested to send an unique `user-agent` header.
 Encryption of the message data is done as follows:
 
 1. Generate cyptographically secure `48` random bytes as the code.
-2. Add a `PKCS#5` padding to the data.
-3. Encrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
+2. Encrypt the data with `AES 256` (`CFB`) using the first `32` bytes from 
    the code as key and the last `16` bytes as IV.
-4. Encrypt the code with `PKCS#1 OAEP` and the receivers public key.
+3. Encrypt the code with `PKCS#1 OAEP` and the receivers public key.
 
 ### Decryption
 
 Decryption of the received `data` and `code` is done as follows:
 
 1. Decrypt the received code with `PKCS#1 OAEP` and the receivers private key.
-2. Remove the `PKCS#5` padding from the data.
-3. Decrypt the data with `AES 256` (`CBC`) using the first `32` bytes from 
+2. Decrypt the data with `AES 256` (`CFB`) using the first `32` bytes from 
    the derived code as key and the last `16` bytes as IV.
 
 All encrypted data is exchanged as `JSON` object in the request/response body 
