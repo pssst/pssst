@@ -99,14 +99,14 @@ is _very easy_), and test your apps and/or bug fixes there:
 Every branch uses its own redis database. The databases for the `develop` and 
 `release` branch will be reset each day at midnight. Please be warned:
 
-> **WE DO NOT PERSIST AND/OR BACKUP OUR REDIS DATABASES!**
+> **WE DO NOT BACKUP OUR REDIS DATABASES!**
 
 Additional informations about the official Pssst server under can be requested
 under the following addresses below:
 
 * `https://api.pssst.name/key` returns the servers public key in `PEM` format.
 * `https://api.pssst.name/branch` returns the used Git branch.
-* `https://api.pssst.name/version` returns servers version.
+* `https://api.pssst.name/version` returns the servers version.
 
 Basics
 ------
