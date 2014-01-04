@@ -211,9 +211,9 @@ class Pssst:
         public()
             Returns the users public key (PEM format).
         encrypt(data)
-            Returns the data encrypted.
+            Returns the encrypted data and code.
         decrypt(data, code)
-            Returns the data decrypted.
+            Returns the decrypted data.
         verify(data, timestamp, signature)
             Returns if data timestamp and signature could be verified.
         sign(data)
@@ -241,7 +241,7 @@ class Pssst:
             return self.key.publickey().exportKey("PEM").decode("ascii")
 
         def encrypt(self, data):
-            code = Random.get_random_bytes(48)
+            code = Random.get_random_bytes(32 + AES.block_size)
 
             data = AES.new(code[:32], AES.MODE_CFB, code[32:]).encrypt(data)
             code = PKCS1_OAEP.new(self.key).encrypt(code)
@@ -497,8 +497,8 @@ class Pssst:
         if not body:
             return None # Box is empty
 
-        data = _decode64(body["data"])
         code = _decode64(body["code"])
+        data = _decode64(body["data"])
 
         return self.user.key.decrypt(data, code)
 
