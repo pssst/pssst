@@ -1,4 +1,4 @@
-Develop
+0.2.6
 * Added support for Python 3 to CLI
 * Added support for file sending to CLI
 * Fixed wrong cli usage text
