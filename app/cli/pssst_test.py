@@ -45,6 +45,8 @@ def setup_module(module):
 
     files = [".pssst.name"] # Fix invalid name
 
+    Pssst.Key.size = 1024 # Use smaller keys for faster tests
+
 
 def teardown_module(module):
     """

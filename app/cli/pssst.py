@@ -51,12 +51,12 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.6"
+__all__, __version__ = ["Pssst", "Name"], "0.2.7"
 
 
 def _encode64(data):
     """
-    Utility function for base64 encoding.  
+    Utility function for base64 encoding.
 
     """
     return base64.b64encode(data).decode("ascii")
@@ -224,12 +224,14 @@ class Pssst:
         This class is not meant to be called externally.
 
         """
+        size = 4096 # RSA key strengh
+
         def __init__(self, key=None, password=None):
             try:
                 if key:
                     self.key = RSA.importKey(key, password)
                 else:
-                    self.key = RSA.generate(4096)
+                    self.key = RSA.generate(Pssst.Key.size)
 
             except (IndexError, TypeError, ValueError) as ex:
                 raise Exception("Password wrong")
