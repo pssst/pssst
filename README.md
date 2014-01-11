@@ -1,10 +1,13 @@
 Pssst!
 ======
-[Pssst!](https://www.pssst.name) is a secure way for exchanging messages.
+[Pssst!](https://www.pssst.name) is a simple and secure way to communicate.
 
 Created and maintained by Christian and Christian only for the joy of it
 (and hopefully for the joy of others too). Its design is based upon open
 standards and the current state of cryptography.
+
+As this project is under continuous development, we advise you to please use
+this code an run your own server. We may change things, we may break things.
 
 Install
 -------
@@ -99,7 +102,7 @@ is _very easy_), and test your apps and/or bug fixes there:
 Every branch uses its own redis database. The databases for the `develop` and 
 `release` branch will be reset each day at midnight. Please be warned:
 
-> **WE DO NOT BACKUP OUR REDIS DATABASES!**
+> **WE DO PERSIST, BUT WE DO NOT BACKUP OUR REDIS DATABASES!**
 
 Additional informations about the official Pssst server under can be requested
 under the following addresses below:
