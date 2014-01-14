@@ -1,3 +1,6 @@
+0.2.8
+* Added API check to unit tests
+
 0.2.7
 * Changed README.md
 * Changed key size used by unit tests

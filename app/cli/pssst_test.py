@@ -16,6 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+import io
 import os
 import random
 import string
@@ -700,7 +701,22 @@ def main(script, *args):
     param args : tuple of strings, optional
         All remaining arguments.
 
+    Notes
+    -----
+    Unit testing against the official API (master branch) should not be done,
+    because it slows down the server and clutters up the database.
+
     """
+    official = "https://api.pssst.name"
+
+    if os.path.exists(".pssst"):
+        api = io.open(".pssst").read().strip()
+    else:
+        api = official
+
+    if api == official:
+        return "Please do not test against to official API"
+
     pytest.main(["-x", script])
 
 
