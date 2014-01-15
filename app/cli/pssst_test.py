@@ -690,7 +690,7 @@ class TestFuzzy:
             assert blob == pssst.pull()
 
 
-def main(script, *args):
+def main(script, mode=None, *args):
     """
     Starts unit testing.
 
@@ -698,6 +698,8 @@ def main(script, *args):
     ----------
     param script : string
         Full script path.
+    param mode : string
+        Test mode.
     param args : tuple of strings, optional
         All remaining arguments.
 
@@ -707,14 +709,18 @@ def main(script, *args):
     because it slows down the server and clutters up the database.
 
     """
-    official = "https://api.pssst.name"
+    live = "https://api.pssst.name"
+    test = "https://0.pssst.name"
+
+    if mode in ["auto", "travis"]:
+        io.open(".pssst", "wb").write(test)
 
     if os.path.exists(".pssst"):
         api = io.open(".pssst").read().strip()
     else:
-        api = official
+        api = live
 
-    if api == official:
+    if api == live:
         return "Please do not test against to official API"
 
     pytest.main(["-x", script])

@@ -1,4 +1,5 @@
 0.2.8
+* Added Travis CI support
 * Added API check to unit tests
 
 0.2.7
