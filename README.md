@@ -1,4 +1,4 @@
-Pssst!
+Pssst! ![Build Status](https://travis-ci.org/pssst/pssst.png?branch=develop)
 ======
 [Pssst!](https://www.pssst.name) is a simple and secure way to communicate.
 

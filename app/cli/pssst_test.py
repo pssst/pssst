@@ -709,18 +709,20 @@ def main(script, mode=None, *args):
     because it slows down the server and clutters up the database.
 
     """
-    live = "https://api.pssst.name"
-    test = "https://0.pssst.name"
+    master = "https://api.pssst.name"
+    develop = "https://0.pssst.name"
 
+    # Check automatic test
     if mode in ["auto", "travis"]:
-        io.open(".pssst", "wb").write(test)
+        io.open(".pssst", "wt").write(develop)
 
+    # Check test against master
     if os.path.exists(".pssst"):
         api = io.open(".pssst").read().strip()
     else:
-        api = live
+        api = master
 
-    if api == live:
+    if api == master:
         return "Please do not test against to official API"
 
     pytest.main(["-x", script])
