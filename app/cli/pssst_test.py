@@ -690,7 +690,7 @@ class TestFuzzy:
             assert blob == pssst.pull()
 
 
-def main(script, mode=None, *args):
+def main(script, *args):
     """
     Starts unit testing.
 
@@ -698,8 +698,6 @@ def main(script, mode=None, *args):
     ----------
     param script : string
         Full script path.
-    param mode : string
-        Test mode.
     param args : tuple of strings, optional
         All remaining arguments.
 
@@ -710,11 +708,6 @@ def main(script, mode=None, *args):
 
     """
     master = "https://api.pssst.name"
-    develop = "https://0.pssst.name"
-
-    # Check automatic test
-    if mode in ["auto", "travis"]:
-        io.open(".pssst", "wt").write(develop)
 
     # Check test against master
     if os.path.exists(".pssst"):

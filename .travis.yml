@@ -7,5 +7,7 @@ python:
   - "3.3"
 install:
   - "pip install pycrypto requests"
+before_script:
+  - echo https://0.pssst.name > app/cli/.pssst
 script:
   - python app/cli/pssst_test.py auto
