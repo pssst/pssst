@@ -182,9 +182,8 @@ default box named `box`.
 
 **Response**
 
+* Result: `200` `User created`
 * Format: `text/plain`
-* Status: `200`
-* Body:   `User created`
 
 ### Delete
 
