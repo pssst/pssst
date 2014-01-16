@@ -709,7 +709,7 @@ def main(script, *args):
     """
     master = "https://api.pssst.name"
 
-    # Check test against master
+    # Prevent testing against master API
     if os.path.exists(".pssst"):
         api = io.open(".pssst").read().strip()
     else:
@@ -718,7 +718,9 @@ def main(script, *args):
     if api == master:
         return "Please do not test against to official API"
 
-    pytest.main(["-x", script])
+    print("Using API: " + api)
+
+    return pytest.main([script])
 
 
 if __name__ == "__main__":

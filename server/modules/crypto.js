@@ -27,7 +27,7 @@ module.exports = function Crypto() {
 
   // Required constants
   var KEYSIZE  = 4096;
-  var TIMESPAN = 10;
+  var TIMESPAN = 20;
   var ENCODING = 'utf8';
   var HASH     = 'sha512';
 
