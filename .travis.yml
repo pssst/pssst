@@ -14,8 +14,7 @@ install:
 before_script:
   - echo 'http://localhost:62421' > .pssst
   - echo '{"debug":0,"port":62421,"db":{"socket":6379,"number":0}}' > server/config/config.json
-  - cd server
-  - npm install
-  - node server.js &
+  - cd server && npm install && node server.js &
+  - cd ..
 script:
   - python app/cli/pssst_test.py
