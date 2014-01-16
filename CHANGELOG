@@ -2,6 +2,7 @@
 * Added Travis CI support
 * Added API check to unit tests
 * Fixed exit status for unit testing
+* Changed documentation
 
 0.2.7
 * Changed README.md

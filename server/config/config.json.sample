@@ -1,9 +1,9 @@
-// Please remove this line and rename the file to 'config.json'
+// Please remove this line and rename this file to 'config.json'
 {
   "debug": 0,
   "port": <pssst port>,
   "db": {
-    "socket": "<socket path>",
+    "socket": <redis socket or port>,
     "number": 0
   }
 }

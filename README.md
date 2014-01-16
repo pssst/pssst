@@ -7,7 +7,7 @@ Created and maintained by Christian and Christian only for the joy of it
 standards and the current state of cryptography.
 
 As this project is under continuous development, we advise you to please use
-this code an run your own server. We may change things, we may break things.
+this code and run your own server. We may change things, we may break things.
 
 Install
 -------
@@ -41,8 +41,8 @@ Currently these commands are supported by the API:
 * `delete` an user or a box.
 * `find` a users public key.
 * `list` all boxes of an user.
-* `pull` pulls a message from a box.
-* `push` pushes a message onto a box.
+* `pull` a message from a box.
+* `push` a message onto a box.
 
 Examples
 --------
@@ -102,7 +102,7 @@ is _very easy_), and test your apps and/or bug fixes there:
 Every branch uses its own redis database. The databases for the `develop` and 
 `release` branch will be reset each day at midnight. Please be warned:
 
-> **WE DO PERSIST, BUT WE DO NOT BACKUP OUR REDIS DATABASES!**
+> **WE DO NOT BACKUP OUR REDIS DATABASES!**
 
 Additional informations about the official Pssst server under can be requested
 under the following addresses below:
@@ -167,19 +167,18 @@ processing.
 
 User Actions
 ------------
-All user actions must be signed with the senders private key.
+All user actions, except `find`, must be signed with the senders private key.
 
 ### Create
 
-Creates a new user.
+Creates a new user with the given public key. Every user is created with one 
+default box named `box`.
 
 **Request**
 
-* Method:  `POST`
-* Address: `https://api.pssst.name/user/<user>`
-* Params:   The `user` name in the address.
-* Params:   An JSON object with a `key` field in the body, which
-            holds the users public key in `PEM` format.
+* Action: `POST` `https://api.pssst.name/user/<user>`
+* Params: The `<user>` name in the address. An JSON object with a `key` field 
+          in the body, which holds the users public key in `PEM` format.
 
 **Response**
 
@@ -195,15 +194,13 @@ used afterwards for a new user.
 
 **Request**
 
-* Method:  `DELETE`
-* Address: `https://api.pssst.name/user/<user>`
-* Params:   The `user` name in the address.
+* Action: `DELETE` `https://api.pssst.name/user/<user>`
+* Params: The `<user>` name in the address.
 
 **Response**
 
+* Result: `200` `User disabled`
 * Format: `text/plain`
-* Status: `200`
-* Body:   `User disabled`
 
 ### Find
 
@@ -211,31 +208,28 @@ Returns the users public key.
 
 **Request**
 
-* Method:  `GET`
-* Address: `https://api.pssst.name/user/<user>/key`
-* Params:   The `user` name in the address.
+* Action: `GET` `https://api.pssst.name/user/<user>/key`
+* Params: The `<user>` name in the address.
 
 **Response**
 
+* Result: `200` and the users public key in `PEM` format.
 * Format: `text/plain`
-* Status: `200`
-* Body:    The users public key in `PEM` format.
 
 ### List
 
-Returns a list of the users box names.
+Returns a list of the users box names. This list is not accessible 
+for other users.
 
 **Request**
 
-* Method:  `GET`
-* Address: `https://api.pssst.name/user/<user>/list`
-* Params:   The `user` name in the address.
+* Action: `GET` `https://api.pssst.name/user/<user>/list`
+* Params: The `<user>` name in the address.
 
 **Response**
 
+* Result: `200` and a list of the users box names as strings.
 * Format: `application/json`
-* Status: `200`
-* Body:    A list of the users box names as strings.
 
 Box Actions
 -----------
@@ -247,31 +241,27 @@ Creates a new empty box for the user.
 
 **Request**
 
-* Method:  `POST`
-* Address: `https://api.pssst.name/user/<user>/<box>`
-* Params:   The `user` and `box` name in the address.
+* Action: `POST` `https://api.pssst.name/user/<user>/<box>`
+* Params: The `<user>` and `<box>` names in the address.
 
 **Response**
 
+* Result: `200` `Box created`
 * Format: `text/plain`
-* Status: `200`
-* Body:   `Box created`
 
 ### Delete
 
-Deletes box of the user. All messages in this box will be lost.
+Deletes a box of the user. All messages in this box will be lost.
 
 **Request**
 
-* Method:  `DELETE`
-* Address: `https://api.pssst.name/user/<user>/<box>`
-* Params:   The `user` and `box` name in the address.
+* Action: `DELETE` `https://api.pssst.name/user/<user>/<box>`
+* Params: The `<user>` and `<box>` names in the address.
 
 **Response**
 
+* Result: `200` `Box deleted`
 * Format: `text/plain`
-* Status: `200`
-* Body:   `Box deleted`
 
 ### Pull
 
@@ -280,34 +270,30 @@ from first to last. If no box is specified, the default box `box` is used.
 
 **Request**
 
-* Method:  `GET`
-* Address: `https://api.pssst.name/user/<user>/<box>/`
-* Params:   The `user` and `box` name in the address.
+* Action: `GET` `https://api.pssst.name/user/<user>/<box>/`
+* Params: The `<user>` and `<box>` names in the address.
 
 **Response**
 
+* Result: `200` and an JSON object with `code` and `data` fields.
 * Format: `application/json`
-* Status: `200`
-* Body:    An JSON object with `code` and `data` fields.
 
 ### Push
 
 Pushes a message into an users box. If no box is specified, the default 
 box `box` is used. The `from` field will be deleted from the message, 
-after the sender validation on the server is processed.
+after the sender was validated on the server.
 
 **Request**
 
-* Method:  `PUT`
-* Address: `https://api.pssst.name/user/<user>/<box>/`
-* Params:   The `user` and `box` name in the address.
-* Params:   An JSON object with `from`, `code` and `data` fields in the body.
+* Action: `PUT` `https://api.pssst.name/user/<user>/<box>/`
+* Params: The `<user>` and `<box>` names in the address. An JSON object
+          with `from`, `code` and `data` fields in the body.
 
 **Response**
 
+* Result: `200` `Message pushed`
 * Format: `text/plain`
-* Status: `200`
-* Body:   `Message pushed`
 
 Authors
 -------
@@ -329,7 +315,7 @@ Contact
 
 License
 -------
-Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
+Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
