@@ -14,6 +14,7 @@ install:
 before_script:
   - echo 'http://localhost:62421' > .pssst
   - echo '{"debug":0,"port":62421,"db":{"socket":6379,"number":0}}' > server/config/config.json
+  - export PYTHON=`which python2`
   - cd server
   - npm install
   - node server.js &
