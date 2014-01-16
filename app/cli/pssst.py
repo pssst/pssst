@@ -605,41 +605,41 @@ def main(script, command="--help", user=None, receiver=None, *message):
             name.password = getpass()
 
         if command in ("-h", "--help"):
-            return usage(main.__doc__, __version__, os.path.basename(script))
+            usage(main.__doc__, __version__, os.path.basename(script))
 
-        if command in ("-l", "--license"):
-            return __doc__.strip()
+        elif command in ("-l", "--license"):
+            print(__doc__.strip())
 
-        if command in ("-v", "--version"):
-            return "Pssst! CLI " + __version__
+        elif command in ("-v", "--version"):
+            print("Pssst! CLI " + __version__)
 
-        if command in ("--create", "create") and user:
+        elif command in ("--create", "create") and user:
             Pssst(name.user, name.password).create(name.box)
-            return "Created: %s" % name
+            print("Created: %s" % name)
 
-        if command in ("--delete", "delete") and user:
+        elif command in ("--delete", "delete") and user:
             Pssst(name.user, name.password).delete(name.box)
-            return "Deleted: %s" % name
+            print("Deleted: %s" % name)
 
-        if command in ("--list", "list") and user:
-            boxes = Pssst(name.user, name.password).list()
-            return " ".join(boxes)
+        elif command in ("--list", "list") and user:
+            print(" ".join(Pssst(name.user, name.password).list()))
 
-        if command in ("--pull", "pull") and user:
-            message = Pssst(name.user, name.password).pull(name.box)
-            return message
+        elif command in ("--pull", "pull") and user:
+            print(Pssst(name.user, name.password).pull(name.box))
 
-        if command in ("--push", "push") and user and receiver:
+        elif command in ("--push", "push") and user and receiver:
             data = " ".join(message).encode("utf-8")
 
             if os.path.exists(data):
                 data = io.open(data, "rb").read()
 
             Pssst(name.user, name.password).push([receiver], data)
-            return "Message sent"
+            print("Message sent")
 
-        print("Unknown command: " + command)
-        print("Please use -h for help on commands.")
+        else:
+            print("Unknown command: " + command)
+            print("Please use -h for help on commands.")
+            return 2 # Incorrect usage
 
     except KeyboardInterrupt:
         print("Exit")
