@@ -262,7 +262,7 @@ class Pssst:
             hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
 
-            if (current -10) < timestamp < (current +10):
+            if (current -5) < timestamp < (current +5):
                 return PKCS1_v1_5.new(self.key).verify(hmac, signature)
             else:
                 return False

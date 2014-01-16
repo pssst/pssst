@@ -1,7 +1,6 @@
 0.2.8
 * Added Travis CI support
 * Added API check to unit tests
-* Changed time span to 20 seconds
 * Fixed exit status for unit testing
 
 0.2.7
