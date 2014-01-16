@@ -2,12 +2,20 @@ language: python
 branches:
   only:
     - develop
+    - release
+    - master
 python:
   - "2.7"
   - "3.3"
+services:
+  - redis-server
 install:
   - "pip install pycrypto requests"
 before_script:
-  - echo https://0.pssst.name > .pssst
+  - echo 'http://localhost:62421' > .pssst
+  - echo '{"debug":0,"port":62421,"db":{"socket":6379,"number":0}}' > server/config/config.json
+  - cd server
+  - npm install
+  - node server.js &
 script:
-  - python app/cli/pssst_test.py auto
+  - python app/cli/pssst_test.py
