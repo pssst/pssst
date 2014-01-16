@@ -8,6 +8,6 @@ python:
 install:
   - "pip install pycrypto requests"
 before_script:
-  - echo https://0.pssst.name > app/cli/.pssst
+  - echo https://0.pssst.name > .pssst
 script:
   - python app/cli/pssst_test.py auto
