@@ -630,7 +630,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
             return message
 
         if command in ("--push", "push") and user and receiver:
-            data = "".join(message).encode("utf-8")
+            data = " ".join(message).encode("utf-8")
 
             if os.path.exists(data):
                 data = io.open(data, "rb").read()
@@ -638,7 +638,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
             Pssst(name.user, name.password).push([receiver], data)
             return "Message sent"
 
-        print("Unknown command:", command)
+        print("Unknown command: " + command)
         print("Please use -h for help on commands.")
 
     except KeyboardInterrupt:
