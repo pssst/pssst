@@ -30,8 +30,7 @@ module.exports = function Redis(config, callback) {
   // Required imports
   var redis = require('redis');
 
-  // Redis client is bound to socket for security reasons
-  var client = redis.createClient(config.socket);
+  var client = redis.createClient(config.source);
 
   // Error event handler
   client.on('error', function error(err) {

@@ -29,7 +29,6 @@ module.exports = function App(redis) {
   var pssst = new Pssst(redis);
 
   return {
-
     user: {
 
       /**

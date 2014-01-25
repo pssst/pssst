@@ -85,6 +85,12 @@ When done, execute the following command inside your `server` directory:
 
 The server will now start and print `Ready`.
 
+Fingerprint
+-----------
+The public key of the official API has the following `SHA1` fingerprint:
+
+> `5A:74:9F:99:DB:C2:A0:3B:0C:DE:32:7B:AF:CF:9B:D7:DC:61:68:30`
+
 API
 ===
 The official address of the Pssst API is:
@@ -102,7 +108,7 @@ is _very easy_), and test your apps and/or bug fixes there:
 Every branch uses its own redis database. The databases for the `develop` and
 `release` branch will be reset each day at midnight. Please be warned:
 
-> **WE DO NOT BACKUP OUR REDIS DATABASES!**
+> **WE DO NOT BACKUP OUR REDIS DATABASES**
 
 Additional informations about the official Pssst server under can be requested
 under the following addresses below:
@@ -320,7 +326,3 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
-
-Fingerprint
------------
-Master API `5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
