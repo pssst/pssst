@@ -3,6 +3,7 @@
 * Added API check to unit tests
 * Fixed exit status for CLI
 * Fixed exit status for unit testing
+* Changed copyright notice
 * Changed documentation
 
 0.2.7
