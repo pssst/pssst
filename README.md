@@ -29,8 +29,8 @@ There is no need to install anything, just run the `app/cli/pssst.py` script:
 
 `$ pssst.py [option|command]`
 
-Please use the `--help` option to show further help on the CLI. All user 
-specific data will be stored as zip files named `.pssst.<username>` in 
+Please use the `--help` option to show further help on the CLI. All user
+specific data will be stored as zip files named `.pssst.<username>` in
 the current directory.
 
 Commands
@@ -99,7 +99,7 @@ is _very easy_), and test your apps and/or bug fixes there:
 * `https://1.pssst.name` reserved for `release` branch
 * `https://2.pssst.name` reserved for `master` branch
 
-Every branch uses its own redis database. The databases for the `develop` and 
+Every branch uses its own redis database. The databases for the `develop` and
 `release` branch will be reset each day at midnight. Please be warned:
 
 > **WE DO NOT BACKUP OUR REDIS DATABASES!**
@@ -113,9 +113,9 @@ under the following addresses below:
 
 Basics
 ------
-All data is exchanged in either `JSON` or `plain text` format with HTTPS 
-requests/responses. Please refer to the mime type in the HTTP `content-type` 
-header to decide which format is returned. All data is encoded in `UTF-8`. 
+All data is exchanged in either `JSON` or `plain text` format with HTTPS
+requests/responses. Please refer to the mime type in the HTTP `content-type`
+header to decide which format is returned. All data is encoded in `UTF-8`.
 Server errors will always be returned in plain text. Please be aware:
 
 > All messages will be stored protocol agnostic without any metadata.
@@ -127,7 +127,7 @@ All clients are requested to send an unique `user-agent` header.
 Encryption of the message data is done as follows:
 
 1. Generate cyptographically secure `48` random bytes as the code.
-2. Encrypt the data with `AES 256` (`CFB`) using the first `32` bytes from 
+2. Encrypt the data with `AES 256` (`CFB`) using the first `32` bytes from
    the code as key and the last `16` bytes as IV.
 3. Encrypt the code with `PKCS#1 OAEP` and the receivers public key.
 
@@ -136,33 +136,33 @@ Encryption of the message data is done as follows:
 Decryption of the received `data` and `code` is done as follows:
 
 1. Decrypt the received code with `PKCS#1 OAEP` and the receivers private key.
-2. Decrypt the data with `AES 256` (`CFB`) using the first `32` bytes from 
+2. Decrypt the data with `AES 256` (`CFB`) using the first `32` bytes from
    the derived code as key and the last `16` bytes as IV.
 
-All encrypted data is exchanged as `JSON` object in the request/response body 
+All encrypted data is exchanged as `JSON` object in the request/response body
 with `code` and `data` fields, both be encoded in `Base64`.
 
 ### Verification
 
-Verification on server and client side is done over the HTTP `content-hash` 
-header. This header must be set for all client API request, except `find`. 
+Verification on server and client side is done over the HTTP `content-hash`
+header. This header must be set for all client API request, except `find`.
 The format of this header is specified as:
 
 `content-hash: <timestamp>; <signature>`
 
-Where `timestamp` is the `EPOCH` (without decimals) of the request/response 
-and `signature` the calculated and signed hash of the body encoded in 
+Where `timestamp` is the `EPOCH` (without decimals) of the request/response
+and `signature` the calculated and signed hash of the body encoded in
 `Base64`. Calculation of the hash is done as follows:
 
 1. Create a `SHA512` HMAC of the HTTP body with the timestamp string as key.
 2. Create a `SHA512` hash of the resulting HMAC one more time.
 3. Sign the resulting hash with the senders private key using `PKCS#1 v1.5`.
 
-To verify a request/response, calculate its hash as described above in the 
+To verify a request/response, calculate its hash as described above in the
 steps 1 and 2. And verify it with the senders public key using `PKCS#1 v1.5`.
 
-The default time frame for requests/responses to be verified is `10` seconds. 
-Which derives to `-5` and `+5` seconds from the actual `EPOCH` at the time of 
+The default time frame for requests/responses to be verified is `10` seconds.
+Which derives to `-5` and `+5` seconds from the actual `EPOCH` at the time of
 processing.
 
 User Actions
@@ -171,13 +171,13 @@ All user actions, except `find`, must be signed with the senders private key.
 
 ### Create
 
-Creates a new user with the given public key. Every user is created with one 
+Creates a new user with the given public key. Every user is created with one
 default box named `box`.
 
 **Request**
 
 * Action: `POST` `https://api.pssst.name/user/<user>`
-* Params: The `<user>` name in the address. An JSON object with a `key` field 
+* Params: The `<user>` name in the address. An JSON object with a `key` field
           in the body, which holds the users public key in `PEM` format.
 
 **Response**
@@ -187,8 +187,8 @@ default box named `box`.
 
 ### Delete
 
-Deletes the user. All boxes of the user will also be deleted and all message 
-in there will be lost. The name of this user will be locked and can not be 
+Deletes the user. All boxes of the user will also be deleted and all message
+in there will be lost. The name of this user will be locked and can not be
 used afterwards for a new user.
 
 **Request**
@@ -217,7 +217,7 @@ Returns the users public key.
 
 ### List
 
-Returns a list of the users box names. This list is not accessible 
+Returns a list of the users box names. This list is not accessible
 for other users.
 
 **Request**
@@ -264,7 +264,7 @@ Deletes a box of the user. All messages in this box will be lost.
 
 ### Pull
 
-Returns the next message from the users box. Messages will be pulled in order 
+Returns the next message from the users box. Messages will be pulled in order
 from first to last. If no box is specified, the default box `box` is used.
 
 **Request**
@@ -279,8 +279,8 @@ from first to last. If no box is specified, the default box `box` is used.
 
 ### Push
 
-Pushes a message into an users box. If no box is specified, the default 
-box `box` is used. The `from` field will be deleted from the message, 
+Pushes a message into an users box. If no box is specified, the default
+box `box` is used. The `from` field will be deleted from the message,
 after the sender was validated on the server.
 
 **Request**
@@ -320,3 +320,7 @@ This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
+Fingerprint
+-----------
+Master API `5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
