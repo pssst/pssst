@@ -89,7 +89,7 @@ Fingerprint
 -----------
 The public key of the official API has the following `SHA1` fingerprint:
 
-> `5A:74:9F:99:DB:C2:A0:3B:0C:DE:32:7B:AF:CF:9B:D7:DC:61:68:30`
+> `5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
 
 API
 ===

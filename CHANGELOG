@@ -1,6 +1,7 @@
 0.2.8
 * Added Travis CI support
 * Added API check to unit tests
+* Added API fingerprint check
 * Fixed exit status for CLI
 * Fixed exit status for unit testing
 * Changed server config sample

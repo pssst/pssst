@@ -43,7 +43,7 @@ except ImportError:
 try:
     from Crypto import Random
     from Crypto.Cipher import AES, PKCS1_OAEP
-    from Crypto.Hash import HMAC, SHA512
+    from Crypto.Hash import HMAC, SHA, SHA512
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
 except ImportError:
@@ -53,19 +53,11 @@ except ImportError:
 __all__, __version__ = ["Pssst", "Name"], "0.2.8"
 
 
-def _encode64(data):
-    """
-    Utility function for base64 encoding.
-
-    """
+def _encode64(data): # Utility
     return base64.b64encode(data).decode("ascii")
 
 
-def _decode64(data):
-    """
-    Utility function for base64 decoding.
-
-    """
+def _decode64(data): # Utility
     return base64.b64decode(data.encode("ascii"))
 
 
@@ -300,16 +292,26 @@ class Pssst:
         signed and verified in the HTTP 'content-hash' header with the servers
         private key.
 
+        The public key of the official API will be verified against the built-
+        in fingerprint.
+
         """
+        fingerprint = "5a749f99dbc2a03b0cde327bafcf9bd7dc616830"
+
         if os.path.exists(".pssst"):
-            self.verify, self.api = False, io.open(".pssst").read().strip()
+            verify, self.api = False, io.open(".pssst").read().strip()
         else:
-            self.verify, self.api = False, "https://api.pssst.name"
+            verify, self.api = True, "https://api.pssst.name"
+
+        key = self.__file("key")
+
+        if verify and not fingerprint == SHA.new(key).hexdigest():
+            raise Exception("Server is not authenticated")
 
         self.user = Pssst.User(Name(name).user, password)
 
         if self.api not in self.user.list():
-            self.user.save(self.api, self.__file("key")) # Add public key
+            self.user.save(self.api, key)
 
     def __api(self, method, url, body={}):
         """
@@ -351,7 +353,7 @@ class Pssst:
                 "content-type": "application/json" if body else "text/plain",
                 "user-agent": "Pssst! CLI " + __version__
             },
-            verify=self.verify
+            verify=False # Please see __init__ documentation
         )
 
         mime = response.headers.get("content-type", "text/plain")
@@ -400,7 +402,7 @@ class Pssst:
         response = requests.get(
             "%s/%s" % (self.api, file),
             headers={"user-agent": "Pssst! CLI " + __version__},
-            verify=self.verify
+            verify=False # Please see __init__ documentation
         )
 
         if response.status_code == 404:
