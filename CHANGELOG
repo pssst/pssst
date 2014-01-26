@@ -1,7 +1,9 @@
 0.2.8
+* Added Heroku support
 * Added Travis CI support
 * Added API check to unit tests
 * Added API fingerprint check
+* Added API meta data for verification
 * Fixed exit status for CLI
 * Fixed exit status for unit testing
 * Changed server config sample

@@ -28,9 +28,20 @@ module.exports = function Redis(config, callback) {
   var self = this;
 
   // Required imports
+  var url   = require('url');
   var redis = require('redis');
 
-  var client = redis.createClient(config.source);
+  var client;
+
+  // Heroku support
+  if (process.env.REDISCLOUD_URL) {
+    var url = url.parse(process.env.REDISCLOUD_URL);
+
+    client = redis.createClient(url.port, url.hostname);
+    client.auth(url.auth.split(':')[1]);
+  } else {
+    client = redis.createClient(config.source);
+  }
 
   // Error event handler
   client.on('error', function error(err) {

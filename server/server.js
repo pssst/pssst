@@ -27,11 +27,10 @@ function usage(argv) {
   var license = require('./package.json')['license'];
   var version = require('./package.json')['version'];
 
-  var config = require('./config/config.json');
   var option = argv[2];
 
   if (argv.length <= 2) {
-    return console.log('Pssst! %s (Port %s)', version, config['port']);
+    return console.log('Pssst!', version);
   } else {
 
     // Print license
@@ -89,8 +88,10 @@ function start(ready) {
     router = new Router(app, db);
     router.map(new App(db));
 
+    port = Number(process.env.PORT || config.port);
+
     ssl = new SSL(app);
-    ssl.createServer().listen(config.port, ready);
+    ssl.createServer().listen(port, ready);
   });
 }
 
@@ -105,7 +106,7 @@ function ready() {
  * Error callback.
  */
 function error(err) {
-  console.error(err.stack ? err.stack : err);
+  console.error(err.stack || err);
 }
 
 try {

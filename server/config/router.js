@@ -190,7 +190,12 @@ module.exports = function Router(app, redis) {
     // File server
     app.get('/:file', new File('public').serve);
 
-    // File not found
+    // Server index
+    app.get('/', function index(req, res) {
+      res.redirect('https://pssst.name');
+    });
+
+    // Server other
     app.get('*', function other(req, res) {
       res.send(404, 'File not found');
     });

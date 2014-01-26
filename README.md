@@ -81,9 +81,11 @@ To setup your own server, please create a valid configuration file first. A
 sample configuration can be found with `server/config/config.json.sample`.
 When done, execute the following command inside your `server` directory:
 
-`$ npm install && node server.js`
+`$ npm install && npm start`
 
 The server will now start and print `Ready`.
+
+> We also have built-in support for Heroku and the Redis Cloud add-on.
 
 API
 ===
@@ -118,7 +120,7 @@ requests/responses. Please refer to the mime type in the HTTP `content-type`
 header to decide which format is returned. All data is encoded in `UTF-8`.
 Server errors will always be returned in plain text. Please be aware:
 
-> All messages will be stored protocol agnostic without any metadata.
+> All messages will be stored protocol agnostic.
 
 All clients are requested to send an unique `user-agent` header.
 
@@ -169,7 +171,7 @@ processing.
 
 The public key of the official API has the following fingerprint:
 
-> `5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
+`5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
 
 If a client connects to the official API `master` Branch, it is required to
 match the APIs delivered public key against this fingerprint per `SHA1`. If
@@ -284,20 +286,21 @@ from first to last. If no box is specified, the default box `box` is used.
 
 **Response**
 
-* Result: `200` and an JSON object with `code` and `data` fields.
+* Result: `200` and an JSON object with `code`, `data` and `meta` fields.
 * Format: `application/json`
 
 ### Push
 
-Pushes a message into an users box. If no box is specified, the default
-box `box` is used. The `from` field will be deleted from the message,
-after the sender was validated on the server.
+Pushes a message into an users box. If no box is specified, the default box 
+`box` is used. The sender will be verified with the `meta`.`name` field in 
+the body.
 
 **Request**
 
 * Action: `PUT` `https://api.pssst.name/user/<user>/<box>/`
-* Params: The `<user>` and `<box>` names in the address. An JSON object
-          with `from`, `code` and `data` fields in the body.
+* Params: The `<user>` and `<box>` names in the address. An JSON object with 
+          `code`, `data` and `meta` fields in the body. The `meta` field must 
+          contain the sender as `name` field.
 
 **Response**
 

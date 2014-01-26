@@ -573,7 +573,10 @@ class TestPssst:
         pssst.create()
         pssst.push([name], text)
 
-        assert text == pssst.pull()
+        data, meta = pssst.pull(meta=True)
+        
+        assert text == data
+        assert name == meta["name"]
 
     def test_push_single(self):
         """

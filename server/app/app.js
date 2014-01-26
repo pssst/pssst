@@ -152,13 +152,9 @@ module.exports = function App(redis) {
        */
       push: function push(req, res) {
         pssst.handle(req, res, function handle(user, box) {
-
-          // Intentionally forget sender
-          delete req.body.from;
-
           box.push(req.body);
         }, {
-          verify: req.body.from,
+          verify: req.body.meta.name,
           status: 'Message sent'
         });
       },

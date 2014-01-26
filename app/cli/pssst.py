@@ -480,7 +480,7 @@ class Pssst:
         """
         return self.__api("GET", self.user.name + "/list")
 
-    def pull(self, box=None):
+    def pull(self, box=None, meta=False):
         """
         Pulls a message from a box.
 
@@ -488,11 +488,13 @@ class Pssst:
         ----------
         param box : string, optional (default is None)
             Name of the users box.
+        param meta : boolean, optional (default is False)
+            With or without meta data.
 
         Returns
         -------
-        byte string
-            The message.
+        byte string or list
+            The message with or without meta data.
 
         """
         body = self.__api("GET", Name(self.user.name, box).path)
@@ -502,8 +504,10 @@ class Pssst:
 
         code = _decode64(body["code"])
         data = _decode64(body["data"])
+        
+        message = self.user.key.decrypt(data, code)
 
-        return self.user.key.decrypt(data, code)
+        return (message, body["meta"]) if meta else message
 
     def push(self, names, message):
         """
@@ -527,7 +531,7 @@ class Pssst:
             body = {
                 "code": _encode64(code),
                 "data": _encode64(data),
-                "from": self.user.name
+                "meta": dict(name=self.user.name)
             }
 
             self.__api("PUT", Name(user, box).path, body)
