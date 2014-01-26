@@ -87,9 +87,13 @@ The server will now start and print `Ready`.
 
 Fingerprint
 -----------
-The public key of the official API has the following `SHA1` fingerprint:
+The public key of the official API has the following fingerprint:
 
 > `5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
+
+If a client connects to the official API (`master` Branch), it is requested to
+match the APIs delivered public key against this fingerprint (with `SHA1`). If
+they do not match, the client must terminate immediately.
 
 API
 ===
