@@ -105,15 +105,15 @@ class Name:
         else:
             self.path = "%s/" % self.user
 
-    def __str__(self):
+    def __repr__(self):
         """
         Returns the full name in canonical notation.
 
         """
         if self.box:
-            return "pssst.%s.%s" % self.all
+            return str("pssst.%s.%s" % self.all)
         else:
-            return "pssst.%s" % self.user
+            return str("pssst.%s" % self.user)
 
 
 class Pssst:
@@ -494,7 +494,7 @@ class Pssst:
         Returns
         -------
         byte string or list
-            The message with or without meta data.
+            The message with or without meta data, None if empty.
 
         """
         body = self.__api("GET", Name(self.user.name, box).path)
@@ -504,7 +504,7 @@ class Pssst:
 
         code = _decode64(body["code"])
         data = _decode64(body["data"])
-        
+
         message = self.user.key.decrypt(data, code)
 
         return (message, body["meta"]) if meta else message
@@ -529,9 +529,9 @@ class Pssst:
             data, code = Pssst.Key(self.user.load(user)).encrypt(message)
 
             body = {
+                "meta": dict(name=self.user.name),
                 "code": _encode64(code),
-                "data": _encode64(data),
-                "meta": dict(name=self.user.name)
+                "data": _encode64(data)
             }
 
             self.__api("PUT", Name(user, box).path, body)
@@ -607,7 +607,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
             name = Name(user)
 
         if user and not name.password:
-            name.password = getpass()
+            name.password = getpass("Password (will not be shown): ")
 
         if command in ("-h", "--help"):
             usage(main.__doc__, __version__, os.path.basename(script))
@@ -630,16 +630,20 @@ def main(script, command="--help", user=None, receiver=None, *message):
             print(" ".join(Pssst(name.user, name.password).list()))
 
         elif command in ("--pull", "pull") and user:
-            print(Pssst(name.user, name.password).pull(name.box))
+            data = Pssst(name.user, name.password).pull(name.box, True)
+
+            if data:
+                data, meta = data
+                print("%s: %s" % (Name(meta["name"]), data.decode("utf-8")))
 
         elif command in ("--push", "push") and user and receiver:
-            data = " ".join(message).encode("utf-8")
+            data = " ".join(message)
 
             if os.path.exists(data):
                 data = io.open(data, "rb").read()
 
             Pssst(name.user, name.password).push([receiver], data)
-            print("Message sent")
+            print("Message pushed")
 
         else:
             print("Unknown command: " + command)

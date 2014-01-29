@@ -6,6 +6,8 @@
 * Added API meta data for verification
 * Fixed exit status for CLI
 * Fixed exit status for unit testing
+* Changed password prompt
+* Changed command line encoding
 * Changed server config sample
 * Changed copyright notice
 * Changed documentation
