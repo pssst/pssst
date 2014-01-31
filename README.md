@@ -115,14 +115,19 @@ under the following addresses below:
 
 Basics
 ------
-All data is exchanged in either `JSON` or `plain text` format with HTTPS
-requests/responses. Please refer to the mime type in the HTTP `content-type`
-header to decide which format is returned. All data is encoded in `UTF-8`.
-Server errors will always be returned in plain text. Please be aware:
+All data is encoded in `ASCII` and exchanged in either `JSON` or `plain text`
+format with HTTPS requests/responses. Except served static files, which are
+encoded in `UTF-8`. Please refer to the mime type in the HTTP `content-type`
+header to decide which format and encoding is returned. Server errors will
+always be returned in plain text. Please be aware:
 
 > All messages will be stored protocol agnostic.
 
 All clients are requested to send an unique `user-agent` header.
+
+### Keys
+
+All RSA keys have a key size of 4096 bits.
 
 ### Encryption
 
@@ -291,15 +296,15 @@ from first to last. If no box is specified, the default box `box` is used.
 
 ### Push
 
-Pushes a message into an users box. If no box is specified, the default box 
-`box` is used. The sender will be verified with the `meta`.`name` field in 
+Pushes a message into an users box. If no box is specified, the default box
+`box` is used. The sender will be verified with the `meta`.`name` field in
 the body.
 
 **Request**
 
 * Action: `PUT` `https://api.pssst.name/user/<user>/<box>/`
-* Params: The `<user>` and `<box>` names in the address. An JSON object with 
-          `code`, `data` and `meta` fields in the body. The `meta` field must 
+* Params: The `<user>` and `<box>` names in the address. An JSON object with
+          `code`, `data` and `meta` fields in the body. The `meta` field must
           contain the sender as `name` field.
 
 **Response**

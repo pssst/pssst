@@ -620,11 +620,11 @@ def main(script, command="--help", user=None, receiver=None, *message):
 
         elif command in ("--create", "create") and user:
             Pssst(name.user, name.password).create(name.box)
-            print("Created: %s" % name)
+            print("Created %s" % name)
 
         elif command in ("--delete", "delete") and user:
             Pssst(name.user, name.password).delete(name.box)
-            print("Deleted: %s" % name)
+            print("Deleted %s" % name)
 
         elif command in ("--list", "list") and user:
             print(" ".join(Pssst(name.user, name.password).list()))
