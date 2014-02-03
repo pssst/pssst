@@ -20,12 +20,12 @@
  *   status = the status text to respond
  *   verify = what name/key to verify
  *
- * @param {Object} redis wrapper
+ * @param {Object} database wrapper
  */
-module.exports = function Pssst(redis) {
+module.exports = function Pssst(db) {
   var self = this;
 
-  // Required classes
+  // Required static classes
   var User = require('./pssst.user.js');
   var Box  = require('./pssst.box.js');
 
@@ -39,7 +39,7 @@ module.exports = function Pssst(redis) {
    * @param {Boolean} strict handling
    */
   function getUser(req, res, name, callback, strict) {
-    redis.get(name, function get(err, user) {
+    db.get(name, function get(err, user) {
       if (!err) {
 
         // Assert user is not disabled
@@ -89,7 +89,7 @@ module.exports = function Pssst(redis) {
    * @param {String} status text
    */
   this.respond = function respond(req, res, user, status) {
-    redis.set(req.params.user, user, function set(err) {
+    db.set(req.params.user, user, function set(err) {
       if (err) {
         res.sendError(err);
       } else if (status) {
@@ -163,4 +163,6 @@ module.exports = function Pssst(redis) {
       }, strict);
     });
   }
+
+  return this;
 }

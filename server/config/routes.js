@@ -15,12 +15,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Router for extending and app mapping.
+ * Routes for extending and app mapping.
  *
  * @param {Object} express app
  * @param {Object} redis wrapper
  */
-module.exports = function Router(app, redis) {
+module.exports = function Routes(app, redis) {
 
   // Required imports
   var http = require('http');
@@ -175,13 +175,13 @@ module.exports = function Router(app, redis) {
    */
   this.map = function map(pssst) {
 
-    // Pssst.user CRUD
+    // Pssst.User CRUD
     app.post(route.user, pssst.user.create);
     app.get(route.key, pssst.user.key);
     app.get(route.list, pssst.user.list);
     app.delete(route.user, pssst.user.disable);
 
-    // Pssst.box CRUD
+    // Pssst.Box CRUD
     app.post(route.box, pssst.box.create);
     app.get(route.box, pssst.box.pull);
     app.put(route.box, pssst.box.push);
@@ -200,4 +200,6 @@ module.exports = function Router(app, redis) {
       res.send(404, 'File not found');
     });
   };
+
+  return this;
 }

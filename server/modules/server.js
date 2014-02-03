@@ -19,7 +19,7 @@
  *
  * @param {Object} express app
  */
-module.exports = function SSL(app) {
+module.exports = function Server(app) {
 
   // Required imports
   var fs    = require('fs');
@@ -32,17 +32,12 @@ module.exports = function SSL(app) {
   var key = __dirname + '/../config/pssst.key';
   var crt = __dirname + '/../config/pssst.crt';
 
-  /**
-   * Returns a new a HTTPS server with HTTP as fallback.
-   */
-  this.createServer = function createServer() {
-    if (!fs.existsSync(crt)) {
-      return http.createServer(app);
-    } else {
-      return https.createServer({
-        key:  fs.readFileSync(key, ENCODING),
-        cert: fs.readFileSync(crt, ENCODING)
-      }, app);
-    }
-  };
+  if (!fs.existsSync(crt)) {
+    return http.createServer(app);
+  } else {
+    return https.createServer({
+      key:  fs.readFileSync(key, ENCODING),
+      cert: fs.readFileSync(crt, ENCODING)
+    }, app);
+  }
 }

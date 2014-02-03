@@ -1,7 +1,7 @@
 {
   "name": "pssst",
   "license": "GPLv3",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "homepage": "https://www.pssst.name",
   "bugs": "https://github.com/pssst/pssst/issues",
   "repository": {
@@ -18,7 +18,7 @@
     "node": "0.10.x"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node start.js"
   },
   "private": true
 }

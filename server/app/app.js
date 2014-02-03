@@ -21,12 +21,12 @@
  */
 module.exports = function App(redis) {
 
-  // Required classes
+  // Required (static) classes
   var Pssst = require('./pssst.js');
   var User  = require('./pssst.user.js');
   var Box   = require('./pssst.box.js');
 
-  var pssst = new Pssst(redis);
+  var pssst = Pssst(redis);
 
   return {
     user: {

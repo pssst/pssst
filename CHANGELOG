@@ -1,3 +1,6 @@
+0.2.9
+* Refactored server
+
 0.2.8
 * Added Heroku support
 * Added Travis CI support
