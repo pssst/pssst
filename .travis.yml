@@ -17,7 +17,7 @@ before_script:
   - export PYTHON=`which python2`
   - cd server
   - npm install
-  - node server.js &
+  - node start.js &
   - cd ..
   - sleep 10
 script:
