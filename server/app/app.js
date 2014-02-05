@@ -21,12 +21,9 @@
  */
 module.exports = function App(redis) {
 
-  // Required (static) classes
-  var Pssst = require('./pssst.js');
-  var User  = require('./pssst.user.js');
-  var Box   = require('./pssst.box.js');
-
-  var pssst = Pssst(redis);
+  // Required classes
+  var pssst = require('./pssst.js');
+  var pssst = pssst(redis);
 
   return {
     user: {
@@ -41,7 +38,7 @@ module.exports = function App(redis) {
         pssst.handle(req, res, function handle(user, box) {
 
           // Assert user name is allowed
-          if (User.isBlocked(req.params.user)) {
+          if (pssst.user.isBlocked(req.params.user)) {
             return res.sendSigned(403, 'User name restricted');
           }
 
@@ -50,7 +47,9 @@ module.exports = function App(redis) {
             return res.sendSigned(409, 'User already exists');
           }
 
-          pssst.respond(req, res, User.create(req.body.key), 'User created');
+          user = pssst.user.create(req.body.key);
+
+          pssst.respond(req, res, user, 'User created');
         }, {
           verify: req.body.key
         });
@@ -64,7 +63,7 @@ module.exports = function App(redis) {
        */
       disable: function disable(req, res) {
         pssst.handle(req, res, function handle(user, box) {
-          User.disable(user);
+          pssst.user.disable(user);
         }, {
           status: 'User disabled'
         });
@@ -78,7 +77,7 @@ module.exports = function App(redis) {
        */
       list: function list(req, res) {
         pssst.handle(req, res, function handle(user, box) {
-          res.sendSigned(200, Box.list(user));
+          res.sendSigned(200, pssst.box.list(user));
         });
       },
 
@@ -109,7 +108,7 @@ module.exports = function App(redis) {
         pssst.handle(req, res, function handle(user, box) {
 
           // Assert box name is allowed
-          if (Box.isBlocked(req.params.box)) {
+          if (pssst.box.isBlocked(req.params.box)) {
             return res.sendSigned(403, 'Box name restricted');
           }
 
@@ -118,7 +117,7 @@ module.exports = function App(redis) {
             return res.sendSigned(409, 'Box already exists');
           }
 
-          Box.create(user, req.params.box);
+          pssst.box.create(user, req.params.box);
         }, {
           status: 'Box created'
         });
@@ -134,11 +133,11 @@ module.exports = function App(redis) {
         pssst.handle(req, res, function handle(user, box) {
 
           // Assert box name is allowed
-          if (Box.isBlocked(req.params.box)) {
+          if (pssst.box.isBlocked(req.params.box)) {
             return res.sendSigned(403, 'Box name restricted');
           }
 
-          Box.erase(user, req.params.box);
+          pssst.box.erase(user, req.params.box);
         }, {
           status: 'Box deleted'
         });

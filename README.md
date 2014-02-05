@@ -1,13 +1,15 @@
 Pssst! ![Build Status](https://travis-ci.org/pssst/pssst.png)
 ======
-[Pssst!](https://www.pssst.name) is a simple and secure way to communicate.
+[Pssst](https://www.pssst.name) is a simple and secure way to communicate.
 
-Created and maintained by Christian and Christian only for the joy of it
-(and hopefully for the joy of others too). Its design is based upon open
-standards and the current state of cryptography.
+It consists of a server and a command line interface (CLI). We are not a
+service provider, but we provide you with tools to start your own service.
+These tools build upon open standards and strong end-to-end encryption.
 
-As this project is under continuous development, we advise you to please use
-this code and run your own server. We may change things, we may break things.
+As this project is under continuous development, we advise you to not rely
+on our server and run your own. We may change things, we may break things.
+
+Created by Christian & Christian only for the joy of it (and others).
 
 Install
 -------

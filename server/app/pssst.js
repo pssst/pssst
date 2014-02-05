@@ -18,7 +18,7 @@
  * Pssst internal request handling. The available options are:
  *
  *   status = the status text to respond
- *   verify = what name/key to verify
+ *   verify = the name/key to verify
  *
  * @param {Object} database wrapper
  */
@@ -26,8 +26,8 @@ module.exports = function Pssst(db) {
   var self = this;
 
   // Required static classes
-  var User = require('./pssst.user.js');
-  var Box  = require('./pssst.box.js');
+  this.user = require('./pssst.user.js');
+  this.box  = require('./pssst.box.js');
 
   /**
    * Gets the user from the database.
@@ -43,7 +43,7 @@ module.exports = function Pssst(db) {
       if (!err) {
 
         // Assert user is not disabled
-        if (user !== null && User.isDisabled(user)) {
+        if (user !== null && this.user.isDisabled(user)) {
           return res.sendSigned(410, 'User was deleted');
         }
 
@@ -70,7 +70,7 @@ module.exports = function Pssst(db) {
    * @return {Mixed} true if error else found box or null
    */
   function getBox(req, res, user, name, strict) {
-    var box = Box.find(user, name);
+    var box = this.box.find(user, name);
 
     // Assert box exists
     if (box === null && strict) {
