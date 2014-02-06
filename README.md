@@ -178,11 +178,14 @@ processing.
 
 The public key of the official API has the following fingerprint:
 
-`5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
+    47:4c:fa:ac:9f:9d:6d:02:ba:1f:c1:85:cf:41:b4:90
+    7c:18:74:a5:95:53:fd:47:fc:36:42:73:c5:a5:e6:0f
+    33:d3:c1:fe:38:3c:03:03:c5:ae:0d:0c:b3:20:64:a0
+    d6:83:29:dc:cb:80:38:8b:56:97:8e:44:00:0a:32:84
 
 If a client connects to the official API `master` Branch, it is required to
-match the APIs delivered public key against this fingerprint per `SHA1`. If
-they do not match, the client must terminate immediately.
+match the APIs delivered public key against this fingerprint per `SHA512`.
+If they do not match, the client must terminate immediately.
 
 User Actions
 ------------

@@ -1,6 +1,7 @@
 0.2.9
 * Refactored server
 * Changed README.md
+* Changed fingerprint to SHA512
 
 0.2.8
 * Added Heroku support

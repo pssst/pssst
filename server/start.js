@@ -31,8 +31,8 @@ try {
   if (process.argv.length <= 2) {
 
     // Check config
-    if (!fs.existsSync('./config/config.json')) {
-      throw "You have to create 'config.json' first";
+    if (!fs.existsSync(__dirname + '/config/config.json')) {
+      throw "Have you created 'config.json' first?";
     }
 
     // Required imports
