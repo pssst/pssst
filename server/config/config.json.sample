@@ -1,9 +1,9 @@
 // Please remove this line and rename this file to 'config.json'
 {
-  "debug": <level 0-3>,
-  "port": <pssst port>,
+  "debug": <Level 0-3>,
+  "port": <Pssst Port>,
   "db": {
-    "source": <redis socket/port>,
-    "number": <redis database nr>
+    "source": <Redis Port/Socket>,
+    "number": <Redis Database Nr>
   }
 }

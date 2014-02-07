@@ -50,7 +50,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.9", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.10", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
@@ -66,7 +66,7 @@ def _decode64(data): # Utility
 
 class Name:
     """
-    Pssst! class for canonical name parsing.
+    Pssst class for canonical name parsing.
 
     """
     def __init__(self, user, box=None, password=None):
@@ -121,7 +121,7 @@ class Name:
 
 class Pssst:
     """
-    Pssst! class for API communication.
+    Pssst class for API communication.
 
     Methods
     -------
@@ -352,7 +352,7 @@ class Pssst:
             "%s/user/%s" % (self.api, quote(url)), data=body, headers={
                 "content-hash": "%s; %s" % (timestamp, _encode64(signature)),
                 "content-type": "application/json" if body else "text/plain",
-                "user-agent": "Pssst! CLI " + __version__
+                "user-agent": "Pssst CLI " + __version__
             },
             verify=False # Please see __init__ documentation
         )
@@ -402,7 +402,7 @@ class Pssst:
         """
         response = requests.get(
             "%s/%s" % (self.api, file),
-            headers={"user-agent": "Pssst! CLI " + __version__},
+            headers={"user-agent": "Pssst CLI " + __version__},
             verify=False # Please see __init__ documentation
         )
 
@@ -578,11 +578,11 @@ def usage(text, *args):
 
 def main(script, command="--help", user=None, receiver=None, *message):
     """
-          ________               ___  ___
-         /  ___  /______________/  /_/  /
-        /  /__/ / ___/ ___/ ___/  __/  /
-       /  _____/__  /__  /__  /  /_/__/
-      /__/    /____/____/____/\___/__/
+          ________               ___
+         /  ___  /______________/  /_
+        /  /__/ / ___/ ___/ ___/  __/
+       /  _____/__  /__  /__  /  /_
+      /__/    /____/____/____/\___/
 
       CLI version %s
 
@@ -595,8 +595,8 @@ def main(script, command="--help", user=None, receiver=None, *message):
       -v --version   Shows version
 
     Available commands:
-      create   Create an user or box
-      delete   Delete an user or box
+      create   Create an user or a box
+      delete   Delete an user or a box
       list     List all boxes
       pull     Pull a message
       push     Push a message
@@ -617,7 +617,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
             print(__doc__.strip())
 
         elif command in ("-v", "--version"):
-            print("Pssst! CLI " + __version__)
+            print("Pssst CLI " + __version__)
 
         elif command in ("--create", "create") and user:
             Pssst(name.user, name.password).create(name.box)

@@ -70,7 +70,7 @@ try {
 
       server = server(app);
       server.listen(port, function ready() {
-        console.log('Pssst!', npm['version']);
+        console.log('Pssst', npm['version']);
         console.log('Ready');
       });
     });
@@ -86,7 +86,7 @@ try {
       // Print version
       case '-v':
       case '--version':
-        console.log('Pssst! Server', npm['version']);
+        console.log('Pssst Server', npm['version']);
         process.exit(0);
 
       // Print usage

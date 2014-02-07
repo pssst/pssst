@@ -1,15 +1,14 @@
-Pssst! ![Build Status](https://travis-ci.org/pssst/pssst.png)
-======
+Pssst ![Build Status](https://travis-ci.org/pssst/pssst.png)
+=====
 [Pssst](https://www.pssst.name) is a simple and secure way to communicate.
-
-It consists of a server and a command line interface (CLI). We are not a
-service provider, but we provide you with tools to start your own service.
-These tools build upon open standards and strong end-to-end encryption.
+We are not a service provider, but we provide you with the tools to start
+your own service. These tools build upon open source and strong end-to-end
+encryption.
 
 As this project is under continuous development, we advise you to not rely
 on our server and run your own. We may change things, we may break things.
 
-Created by Christian & Christian only for the joy of it (and others).
+Created by Christian & Christian just for the joy of it.
 
 Install
 -------
@@ -54,23 +53,34 @@ pushing a message from the `sender` to this box and pulling it by the
 `receiver`. And finally deleting the box (_because nobody likes spam_).
 
 ```
-$ pssst.py create sender
+$ pssst create sender
 ```
 ```
-$ pssst.py create receiver
+$ pssst create receiver
 ```
 ```
-$ pssst.py create receiver.spam
+$ pssst create receiver.spam
 ```
 ```
-$ pssst.py push sender receiver.spam "Hello World!"
+$ pssst push sender receiver.spam "Hello World!"
 ```
 ```
-$ pssst.py pull receiver.spam
+$ pssst pull receiver.spam
 ```
 ```
-$ pssst.py delete receiver.spam
+$ pssst delete receiver.spam
 ```
+
+Names
+-----
+All Pssst user names are specified by this format:
+
+`pssst.<username>.<boxname>`
+
+All user and box names must be between `2` and `63` characters long and must
+only contain of the lowercase letters `a-z` and numbers. The service prefix
+`pssst` can be omited, but should be specified for clarity reasons. If the
+box name is omited, the users default box `box` is used.
 
 Server
 ------
@@ -87,7 +97,7 @@ When done, execute the following command inside your `server` directory:
 
 The server will now start and print `Ready`.
 
-> We also have built-in support for Heroku and the Redis Cloud add-on.
+> We also have built-in support for Heroku with the Redis Cloud add-on.
 
 API
 ===
@@ -176,15 +186,17 @@ processing.
 
 ### Fingerprint
 
-The public key of the official API has the following fingerprint:
+The public key of the official API has the following `SHA512` fingerprint:
 
-    47:4c:fa:ac:9f:9d:6d:02:ba:1f:c1:85:cf:41:b4:90
-    7c:18:74:a5:95:53:fd:47:fc:36:42:73:c5:a5:e6:0f
-    33:d3:c1:fe:38:3c:03:03:c5:ae:0d:0c:b3:20:64:a0
-    d6:83:29:dc:cb:80:38:8b:56:97:8e:44:00:0a:32:84
+```
+47:4c:fa:ac:9f:9d:6d:02:ba:1f:c1:85:cf:41:b4:90
+7c:18:74:a5:95:53:fd:47:fc:36:42:73:c5:a5:e6:0f
+33:d3:c1:fe:38:3c:03:03:c5:ae:0d:0c:b3:20:64:a0
+d6:83:29:dc:cb:80:38:8b:56:97:8e:44:00:0a:32:84
+```
 
-If a client connects to the official API `master` Branch, it is required to
-match the APIs delivered public key against this fingerprint per `SHA512`.
+If a client connects to the official APIs `master` Branch, it is required to
+match the APIs delivered public key against this fingerprint using `SHA512`.
 If they do not match, the client must terminate immediately.
 
 User Actions
@@ -198,8 +210,8 @@ default box named `box`.
 
 **Request**
 
-* Action: `POST` `https://api.pssst.name/user/<user>`
-* Params: The `<user>` name in the address. An JSON object with a `key` field
+* Action: `POST` `https://api.pssst.name/user/<username>`
+* Params: The `<username>` in the address. An JSON object with a `key` field
           in the body, which holds the users public key in `PEM` format.
 
 **Response**
@@ -215,8 +227,8 @@ used afterwards for a new user.
 
 **Request**
 
-* Action: `DELETE` `https://api.pssst.name/user/<user>`
-* Params: The `<user>` name in the address.
+* Action: `DELETE` `https://api.pssst.name/user/<username>`
+* Params: The `<username>` in the address.
 
 **Response**
 
@@ -229,8 +241,8 @@ Returns the users public key.
 
 **Request**
 
-* Action: `GET` `https://api.pssst.name/user/<user>/key`
-* Params: The `<user>` name in the address.
+* Action: `GET` `https://api.pssst.name/user/<username>/key`
+* Params: The `<username>` in the address.
 
 **Response**
 
@@ -244,8 +256,8 @@ for other users.
 
 **Request**
 
-* Action: `GET` `https://api.pssst.name/user/<user>/list`
-* Params: The `<user>` name in the address.
+* Action: `GET` `https://api.pssst.name/user/<username>/list`
+* Params: The `<username>` in the address.
 
 **Response**
 
@@ -262,8 +274,8 @@ Creates a new empty box for the user.
 
 **Request**
 
-* Action: `POST` `https://api.pssst.name/user/<user>/<box>`
-* Params: The `<user>` and `<box>` names in the address.
+* Action: `POST` `https://api.pssst.name/user/<username>/<boxname>`
+* Params: The `<username>` and `<boxname>` in the address.
 
 **Response**
 
@@ -276,8 +288,8 @@ Deletes a box of the user. All messages in this box will be lost.
 
 **Request**
 
-* Action: `DELETE` `https://api.pssst.name/user/<user>/<box>`
-* Params: The `<user>` and `<box>` names in the address.
+* Action: `DELETE` `https://api.pssst.name/user/<username>/<boxname>`
+* Params: The `<username>` and `<boxname>` in the address.
 
 **Response**
 
@@ -291,8 +303,8 @@ from first to last. If no box is specified, the default box `box` is used.
 
 **Request**
 
-* Action: `GET` `https://api.pssst.name/user/<user>/<box>/`
-* Params: The `<user>` and `<box>` names in the address.
+* Action: `GET` `https://api.pssst.name/user/<username>/<boxname>/`
+* Params: The `<username>` and `<boxname>` in the address.
 
 **Response**
 
@@ -307,8 +319,8 @@ the body.
 
 **Request**
 
-* Action: `PUT` `https://api.pssst.name/user/<user>/<box>/`
-* Params: The `<user>` and `<box>` names in the address. An JSON object with
+* Action: `PUT` `https://api.pssst.name/user/<username>/<boxname>/`
+* Params: The `<username>` and `<boxname>` in the address. An JSON object with
           `code`, `data` and `meta` fields in the body. The `meta` field must
           contain the sender as `name` field.
 
@@ -319,13 +331,13 @@ the body.
 
 Authors
 -------
-Please see the file called `AUTHORS` for more details.
+Please see the files called `AUTHORS` and `THANKS` for more details.
 
 Contact
 -------
 * If you want to be informed about new releases, general news
   and information about Pssst, please visit our website under:
-  https://www.pssst.name
+  https://pssst.name
 
 * If you want to be informed about code updates, bug fixes and
   security fixes of Pssst, please visit our project on GitHub:

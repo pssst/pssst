@@ -36,8 +36,8 @@
  * @param {Object} next handler
  */
 module.exports = function debug(level, req, res, next) {
-  var time = '[' + new Date().getTime().toString().slice(-6) + ']';
-  var name = 'Pssst!';
+  var time = '[' + new Date().getTime().toString() + ']';
+  var name = 'Pssst';
   var end = res.end;
 
   if (level > 0) {
