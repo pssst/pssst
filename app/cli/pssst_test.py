@@ -558,6 +558,8 @@ class TestPssst:
         Tests if box is empty.
     test_pull_empty()
         Tests if box is empty.
+    test_password_weak()
+        Tests if password is weak.
     test_password_wrong()
         Tests if password is wrong.
 
@@ -574,7 +576,7 @@ class TestPssst:
         pssst.push([name], text)
 
         data, meta = pssst.pull(meta=True)
-        
+
         assert text == data
         assert name == meta["name"]
 
@@ -650,14 +652,23 @@ class TestPssst:
 
         assert None == pssst.pull()
 
+    def test_password_weak(self):
+        """
+        Tests if a password is weak.
+        """
+        with pytest.raises(Exception) as ex:
+            pssst = Pssst(createUserName(), "weakpass")
+
+        assert str(ex.value) == "Password weak"
+
     def test_password_wrong(self):
         """
         Tests if password is wrong.
         """
         with pytest.raises(Exception) as ex:
             name = createUserName()
-            Pssst(name, "right")
-            Pssst(name, "wrong")
+            Pssst(name, "Right123")
+            Pssst(name, "Wrong000")
 
         assert str(ex.value) == "Password wrong"
 
@@ -722,7 +733,7 @@ def main(script, *args):
 
     print("Using API: " + api)
 
-    return pytest.main([script])
+    return pytest.main([script] + list(args))
 
 
 if __name__ == "__main__":

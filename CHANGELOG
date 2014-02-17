@@ -1,3 +1,9 @@
+0.2.11
+* Added py.test options to unit tests
+* Added check for weak passwords
+* Added check for signature
+* Changed error handling
+
 0.2.10
 * Changed project name
 * Changed config sample
