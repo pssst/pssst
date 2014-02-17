@@ -224,14 +224,14 @@ class Pssst:
         This class is not meant to be called externally.
 
         """
-        SIZE = 4096 # RSA key strengh
+        size = 4096 # RSA key strengh
 
         def __init__(self, key=None, password=None):
             try:
                 if key:
                     self.key = RSA.importKey(key, password)
                 else:
-                    self.key = RSA.generate(Pssst.Key.SIZE)
+                    self.key = RSA.generate(Pssst.Key.size)
 
             except (IndexError, TypeError, ValueError) as ex:
                 raise Exception("Password wrong")
@@ -360,9 +360,9 @@ class Pssst:
         Exception
             Because the user was deleted.
         Exception
-            Because the signature is missing.
+            Because the verification is missing.
         Exception
-            Because the signature is corrupt.
+            Because the verification is corrupt.
         Exception
             Because the verification is failed.
 
@@ -393,10 +393,10 @@ class Pssst:
         body = response.text
 
         if not head:
-            raise Exception("Signature missing")
+            raise Exception("Verification failed")
 
         if not re.match("^[0-9]+; ?[A-Za-z0-9\+/]+=*$", head):
-            raise Exception("Signature corrupt")
+            raise Exception("Verification failed")
 
         timestamp, signature = head.split(";", 1)
         timestamp, signature = int(timestamp), _decode64(signature)
