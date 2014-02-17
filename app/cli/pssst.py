@@ -392,9 +392,6 @@ class Pssst:
         head = response.headers.get("content-hash")
         body = response.text
 
-        if not head:
-            raise Exception("Verification failed")
-
         if not re.match("^[0-9]+; ?[A-Za-z0-9\+/]+=*$", head):
             raise Exception("Verification failed")
 
