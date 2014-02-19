@@ -1,29 +1,28 @@
-/**
- * Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *
- * A simple Redis wrapper. The Database number is based on the Git branch:
- *
- *   0 = develop
- *   1 = release
- *   2 = master
- *
- * @param {Object} the config
- * @param {Function} callback
- */
+// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+
+// A simple Redis wrapper. The Database number is based on the Git branch:
+//
+//   0 = develop
+//   1 = release
+//   2 = master
+//
+// @param {Object} the config
+// @param {Function} callback
+//
 module.exports = function Redis(config, callback) {
   var self = this;
 
@@ -59,12 +58,11 @@ module.exports = function Redis(config, callback) {
     });
   });
 
-  /**
-   * Gets the value to the key.
-   *
-   * @param {String} the key
-   * @param {Function} callback
-   */
+  // Gets the value to the key.
+  //
+  // @param {String} the key
+  // @param {Function} callback
+  //
   this.get = function get(key, callback) {
     client.get(key, function get(err, val) {
       try {
@@ -75,13 +73,12 @@ module.exports = function Redis(config, callback) {
     });
   };
 
-  /**
-   * Sets the value to the key.
-   *
-   * @param {String} the key
-   * @param {Object} the value
-   * @param {Function} callback
-   */
+  // Sets the value to the key.
+  //
+  // @param {String} the key
+  // @param {Object} the value
+  // @param {Function} callback
+  //
   this.set = function set(key, val, callback) {
     client.set(key, JSON.stringify(val), function set(err) {
       try {

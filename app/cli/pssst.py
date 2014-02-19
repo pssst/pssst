@@ -51,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.11", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.12", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
@@ -309,6 +309,9 @@ class Pssst:
         The public key of the official API will be verified against the built-
         in fingerprint.
 
+        A valid password must consist of upper and lower case letters and also
+        numbers. The required minimum length of a password is 8 characters.
+
         """
         if os.path.exists(".pssst"):
             verify, self.api = False, io.open(".pssst").read().strip()
@@ -515,7 +518,7 @@ class Pssst:
         """
         return self.__api("GET", self.user.name + "/list")
 
-    def pull(self, box=None, meta=False):
+    def pull(self, box=None):
         """
         Pulls a message from a box.
 
@@ -523,13 +526,11 @@ class Pssst:
         ----------
         param box : string, optional (default is None)
             Name of the users box.
-        param meta : boolean, optional (default is False)
-            With or without meta data.
 
         Returns
         -------
-        byte string or list
-            The message with or without meta data, None if empty.
+        tuple or None
+            The name and message, None if empty.
 
         """
         body = self.__api("GET", Name(self.user.name, box).path)
@@ -542,7 +543,7 @@ class Pssst:
 
         message = self.user.key.decrypt(data, code)
 
-        return (message, body["meta"]) if meta else message
+        return (body["name"], message)
 
     def push(self, names, message):
         """
@@ -564,9 +565,9 @@ class Pssst:
             data, code = Pssst.Key(self.user.load(user)).encrypt(message)
 
             body = {
-                "meta": dict(name=self.user.name),
                 "code": _encode64(code),
-                "data": _encode64(data)
+                "data": _encode64(data),
+                "name": self.user.name
             }
 
             self.__api("PUT", Name(user, box).path, body)
@@ -668,8 +669,8 @@ def main(script, command="--help", user=None, receiver=None, *message):
             data = Pssst(name.user, name.password).pull(name.box, True)
 
             if data:
-                data, meta = data
-                print("%s: %s" % (Name(meta["name"]), data.decode("utf-8")))
+                name, message = data
+                print("%s: %s" % (Name(name), message.decode("utf-8")))
 
         elif command in ("--push", "push") and user and receiver:
             data = " ".join(message)

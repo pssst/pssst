@@ -575,10 +575,7 @@ class TestPssst:
         pssst.create()
         pssst.push([name], text)
 
-        data, meta = pssst.pull(meta=True)
-
-        assert text == data
-        assert name == meta["name"]
+        assert pssst.pull() == (name, text)
 
     def test_push_single(self):
         """
@@ -595,7 +592,7 @@ class TestPssst:
         pssst2.create()
         pssst2.push([name1], text)
 
-        assert text == pssst1.pull()
+        assert pssst1.pull() == (name2, text)
 
     def test_push_multi(self):
         """
@@ -617,7 +614,7 @@ class TestPssst:
         for name in names:
             pssst = Pssst(name)
 
-            assert text == pssst.pull()
+            assert pssst.pull() == (send, text)
 
     def test_push_user_name_invalid(self):
         """
@@ -640,8 +637,8 @@ class TestPssst:
         pssst.create()
         pssst.push([name], text)
 
-        assert text == pssst.pull()
-        assert None == pssst.pull()
+        assert pssst.pull() == (name, text)
+        assert pssst.pull() == None
 
     def test_pull_empty(self):
         """
@@ -650,7 +647,7 @@ class TestPssst:
         pssst = Pssst(createUserName())
         pssst.create()
 
-        assert None == pssst.pull()
+        assert pssst.pull() == None
 
     def test_password_weak(self):
         """
@@ -700,7 +697,7 @@ class TestFuzzy:
             pssst.create()
             pssst.push([name], blob)
 
-            assert blob == pssst.pull()
+            assert pssst.pull() == (name, blob)
 
 
 def main(script, *args):

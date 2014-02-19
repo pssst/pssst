@@ -308,21 +308,21 @@ from first to last. If no box is specified, the default box `box` is used.
 
 **Response**
 
-* Result: `200` and an JSON object with `code`, `data` and `meta` fields.
+* Result: `200` and an JSON object with `code`, `data` and `name` fields.
 * Format: `application/json`
 
 ### Push
 
 Pushes a message into an users box. If no box is specified, the default box
-`box` is used. The sender will be verified with the `meta`.`name` field in
+`box` is used. The sender will be verified with the `name` field in
 the body.
 
 **Request**
 
 * Action: `PUT` `https://api.pssst.name/user/<username>/<boxname>/`
 * Params: The `<username>` and `<boxname>` in the address. An JSON object with
-          `code`, `data` and `meta` fields in the body. The `meta` field must
-          contain the sender as `name` field.
+          `code`, `data` and `name` fields in the body. The `name` field must
+          contain the senders name.
 
 **Response**
 

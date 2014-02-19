@@ -1,3 +1,9 @@
+0.2.12
+* Added password requirements comment
+* Changed comment style for server
+* Changed server object creation
+* Reduced use of metadata
+
 0.2.11
 * Added py.test options to unit tests
 * Added check for weak passwords
