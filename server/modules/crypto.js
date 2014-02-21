@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,7 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-// Crypto functions for signing and verifying data.
+/**
+ * Crypto functions for signing and verifying data.
+ */
 module.exports = function Crypto() {
 
   // Required imports
@@ -63,20 +65,22 @@ module.exports = function Crypto() {
     throw new Error('Public/Private key invalid');
   }
 
-  // Returns the current timestamp.
-  //
-  // @return {Number} the timestamp
-  //
+  /**
+   * Returns the current timestamp.
+   *
+   * @return {Number} the timestamp
+   */
   function getTimestamp() {
     return Number((new Date).getTime() / 1000).toFixed(0);
   }
 
-  // Returns the HMAC of the data.
-  //
-  // @param {Object} the data
-  // @param {Number} timestamp
-  // @return {Object} timestamp and HMAC
-  //
+  /**
+   * Returns the HMAC of the data.
+   *
+   * @param {Object} the data
+   * @param {Number} timestamp
+   * @return {Object} timestamp and HMAC
+   */
   function buildHMAC(data, timestamp) {
     timestamp = timestamp || getTimestamp();
 
@@ -89,11 +93,12 @@ module.exports = function Crypto() {
     };
   };
 
-  // Returns the data signature.
-  //
-  // @param {Object} the data
-  // @return {Object} timestamp and signature
-  //
+  /**
+   * Returns the data signature.
+   *
+   * @param {Object} the data
+   * @return {Object} timestamp and signature
+   */
   this.sign = function sign(data) {
     if (data instanceof Object) {
       data = JSON.stringify(data);
@@ -110,13 +115,14 @@ module.exports = function Crypto() {
     };
   };
 
-  // Returns if data could be verified.
-  //
-  // @param {Object} the data
-  // @param {Object} hmac of data
-  // @param {String} user public key
-  // @return {Boolean} true if verified
-  //
+  /**
+   * Returns if data could be verified.
+   *
+   * @param {Object} the data
+   * @param {Object} hmac of data
+   * @param {String} user public key
+   * @return {Boolean} true if verified
+   */
   this.verify = function verify(data, hmac, pub) {
       if (data instanceof Object) {
         data = JSON.stringify(data);

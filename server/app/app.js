@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-// Facade class for easy mapping.
-//
-// @param {Object} redis wrapper
-//
+/**
+ * Facade class for easy mapping.
+ *
+ * @param {Object} redis wrapper
+ */
 module.exports = function App(redis) {
 
   // Required classes
@@ -27,11 +27,12 @@ module.exports = function App(redis) {
   return {
     user: {
 
-      // Creates a new user.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Creates a new user.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       create: function create(req, res) {
         pssst.handle(req, res, function handle(user, box) {
 
@@ -53,11 +54,12 @@ module.exports = function App(redis) {
         });
       },
 
-      // Deletes (disables) an user.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Deletes (disables) an user.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       disable: function disable(req, res) {
         pssst.handle(req, res, function handle(user, box) {
           pssst.user.disable(user);
@@ -66,22 +68,24 @@ module.exports = function App(redis) {
         });
       },
 
-      // Lists all box names.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Lists all box names.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       list: function list(req, res) {
         pssst.handle(req, res, function handle(user, box) {
           res.sendSigned(200, pssst.box.list(user));
         });
       },
 
-      // Gets the public key of the user.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Gets the public key of the user.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       key: function key(req, res) {
         pssst.handle(req, res, function handle(user, box) {
           res.sendSigned(200, user.key);
@@ -93,11 +97,12 @@ module.exports = function App(redis) {
 
     box: {
 
-      // Creates a new box.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Creates a new box.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       create: function create(req, res) {
         pssst.handle(req, res, function handle(user, box) {
 
@@ -117,11 +122,12 @@ module.exports = function App(redis) {
         });
       },
 
-      // Deletes (erases) a box.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Deletes (erases) a box.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       erase: function erase(req, res) {
         pssst.handle(req, res, function handle(user, box) {
 
@@ -136,11 +142,12 @@ module.exports = function App(redis) {
         });
       },
 
-      // Pushes a message to a box.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Pushes a message to a box.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       push: function push(req, res) {
         pssst.handle(req, res, function handle(user, box) {
           box.push(req.body);
@@ -150,11 +157,12 @@ module.exports = function App(redis) {
         });
       },
 
-      // Pulls a message from a box.
-      //
-      // @param {Object} request
-      // @param {Object} response
-      //
+      /**
+       * Pulls a message from a box.
+       *
+       * @param {Object} request
+       * @param {Object} response
+       */
       pull: function pull(req, res) {
         pssst.handle(req, res, function handle(user, box) {
           pssst.respond(req, res, user, box.pull());

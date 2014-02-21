@@ -1,3 +1,7 @@
+0.2.13
+* Changed comment style for server
+* Changed default email address
+
 0.2.12
 * Added password requirements comment
 * Changed comment style for server

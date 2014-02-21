@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-// A simple file server.
-//
-// @param {String} document root
-//
+/**
+ * A simple file server.
+ *
+ * @param {String} document root
+ */
 module.exports = function File(root) {
 
   // Required imports
@@ -32,11 +32,12 @@ module.exports = function File(root) {
   // Default MIME type if unknown
   mime.default_type = MIMETYPE;
 
-  // Serves the requested file including MIME type.
-  //
-  // @param {Object} request
-  // @param {Object} response
-  //
+  /**
+   * Serves the requested file including MIME type.
+   *
+   * @param {Object} request
+   * @param {Object} response
+   */
   this.serve = function serve(req, res) {
     var file = req.params.file;
     var path = util.format('%s/../%s/%s', __dirname, root, file);

@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,46 +13,49 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
+/** Data structure inner workings of an user object. */
 
-// Data structure inner workings of an user object.
-
-// Creates an new user.
-//
-// @param {String} key in PEM format
-// @return {Object} the new user
-//
+/**
+ * Creates an new user.
+ *
+ * @param {String} key in PEM format
+ * @return {Object} the new user
+ */
 exports.create = function create(key) {
   return {
     key: key,
     box: {
-      box: [] // default box
+      box: [] // Default box
     }
   };
 };
 
-// Disables an user.
-//
-// @param {Object} the user
-//
+/**
+ * Disables an user.
+ *
+ * @param {Object} the user
+ */
 exports.disable = function disable(user) {
   user.key = null;
   user.box = null;
 };
 
-// Checks if the user name is blocked.
-//
-// @param {String} the user name
-// @return {Boolean} true if blocked
-//
+/**
+ * Checks if the user name is blocked.
+ *
+ * @param {String} the user name
+ * @return {Boolean} true if blocked
+ */
 exports.isBlocked = function isBlocked(name) {
   return new RegExp('!?(^name$)').test(name);
 };
 
-// Checks if the user is disabled.
-//
-// @param {Object} the user
-// @return {Boolean} true if disabled
-//
+/**
+ * Checks if the user is disabled.
+ *
+ * @param {Object} the user
+ * @return {Boolean} true if disabled
+ */
 exports.isDisabled = function isDisabled(user) {
   return (user.key === null);
 };

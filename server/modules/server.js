@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,11 +13,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-// Server wrapper with SSL support.
-//
-// @param {Object} express app
-//
+/**
+ * Server wrapper with SSL support.
+ *
+ * @param {Object} express app
+ */
 module.exports = function Server(app) {
 
   // Required imports

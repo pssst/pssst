@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,14 +13,14 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-// Pssst internal request handling. The available options are:
-//
-//   status = the status text to respond
-//   verify = the name/key to verify
-//
-// @param {Object} database wrapper
-//
+/**
+ * Pssst internal request handling. The available options are:
+ *
+ *   status = the status text to respond
+ *   verify = the name/key to verify
+ *
+ * @param {Object} database wrapper
+ */
 module.exports = function Pssst(db) {
   var self = this;
 
@@ -28,14 +28,15 @@ module.exports = function Pssst(db) {
   this.user = require('./pssst.user.js');
   this.box  = require('./pssst.box.js');
 
-  // Gets the user from the database.
-  //
-  // @param {Object} request
-  // @param {Object} response
-  // @param {String} the user name
-  // @param {Function} callback
-  // @param {Boolean} strict handling
-  //
+  /**
+   * Gets the user from the database.
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @param {String} the user name
+   * @param {Function} callback
+   * @param {Boolean} strict handling
+   */
   function getUser(req, res, name, callback, strict) {
     db.get(name, function get(err, user) {
       if (!err) {
@@ -57,15 +58,16 @@ module.exports = function Pssst(db) {
     });
   }
 
-  // Gets the box from the user (sync).
-  //
-  // @param {Object} request
-  // @param {Object} response
-  // @param {Object} the user
-  // @param {String} the box name
-  // @param {Boolean} strict handling
-  // @return {Mixed} true if error else found box or null
-  //
+  /**
+   * Gets the box from the user (sync).
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @param {Object} the user
+   * @param {String} the box name
+   * @param {Boolean} strict handling
+   * @return {Mixed} true if error else found box or null
+   */
   function getBox(req, res, user, name, strict) {
     var box = this.box.find(user, name);
 
@@ -77,13 +79,14 @@ module.exports = function Pssst(db) {
     return box;
   }
 
-  // Persists the user and responds request.
-  //
-  // @param {Object} request
-  // @param {Object} response
-  // @param {Object} the user
-  // @param {String} status text
-  //
+  /**
+   * Persists the user and responds request.
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @param {Object} the user
+   * @param {String} status text
+   */
   this.respond = function respond(req, res, user, status) {
     db.set(req.params.user, user, function set(err) {
       if (err) {
@@ -96,14 +99,15 @@ module.exports = function Pssst(db) {
     })
   }
 
-  // Handles a request.
-  //
-  // @param {Object} request
-  // @param {Object} response
-  // @param {Function} callback
-  // @param {Object} handling options
-  // @return {Boolean} true if error
-  //
+  /**
+   * Handles a request.
+   *
+   * @param {Object} request
+   * @param {Object} response
+   * @param {Function} callback
+   * @param {Object} handling options
+   * @return {Boolean} true if error
+   */
   this.handle = function handle(req, res, callback, options) {
     options = options || {};
 

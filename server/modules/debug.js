@@ -1,4 +1,4 @@
-// Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,27 +13,27 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-// Debug middleware. Available debug levels:
-//
-//   Request
-//
-//   0 = off
-//   1 = print request method and url
-//   2 = print request headers also
-//   3 = print request body also
-//
-//   Response
-//
-//   0 = off
-//   1 = print response status code
-//   3 = print response body also
-//
-// @param {Number} debug level
-// @param {Object} request
-// @param {Object} response
-// @param {Object} next handler
-//
+/**
+ * Debug middleware. Available debug levels:
+ *
+ *   Request
+ *
+ *   0 = off
+ *   1 = print request method and url
+ *   2 = print request headers also
+ *   3 = print request body also
+ *
+ *   Response
+ *
+ *   0 = off
+ *   1 = print response status code
+ *   3 = print response body also
+ *
+ * @param {Number} debug level
+ * @param {Object} request
+ * @param {Object} response
+ * @param {Object} next handler
+ */
 module.exports = function debug(level, req, res, next) {
   var time = '[' + new Date().getTime().toString() + ']';
   var name = 'Pssst';
