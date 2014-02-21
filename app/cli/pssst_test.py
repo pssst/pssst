@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -243,7 +243,7 @@ class TestUser:
     Tests user with this test cases:
 
     * User create
-    * User create failed, name restricted
+    * User create failed, name denied
     * User create failed, already exists
     * User delete
     * User delete, user was deleted
@@ -257,8 +257,8 @@ class TestUser:
     -------
     test_create_user()
         Tests if an user can be created.
-    test_create_user_name_restricted()
-        Tests if an user name is restricted.
+    test_create_user_name_denied()
+        Tests if an user name is denied.
     test_create_user_already_exists()
         Tests if an user already exists.
     test_delete_user()
@@ -284,15 +284,15 @@ class TestUser:
         pssst = Pssst(createUserName())
         pssst.create()
 
-    def test_create_user_name_restricted(self):
+    def test_create_user_name_denied(self):
         """
-        Tests if an user name is restricted.
+        Tests if an user name is denied.
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst("name")
             pssst.create()
 
-        assert str(ex.value) == "User name restricted"
+        assert str(ex.value) == "User name denied"
 
     def test_create_user_already_exists(self):
         """
@@ -558,6 +558,8 @@ class TestPssst:
         Tests if box is empty.
     test_pull_empty()
         Tests if box is empty.
+    test_password_weak()
+        Tests if password is weak.
     test_password_wrong()
         Tests if password is wrong.
 
@@ -573,10 +575,7 @@ class TestPssst:
         pssst.create()
         pssst.push([name], text)
 
-        data, meta = pssst.pull(meta=True)
-        
-        assert text == data
-        assert name == meta["name"]
+        assert pssst.pull() == (name, text)
 
     def test_push_single(self):
         """
@@ -593,7 +592,7 @@ class TestPssst:
         pssst2.create()
         pssst2.push([name1], text)
 
-        assert text == pssst1.pull()
+        assert pssst1.pull() == (name2, text)
 
     def test_push_multi(self):
         """
@@ -615,7 +614,7 @@ class TestPssst:
         for name in names:
             pssst = Pssst(name)
 
-            assert text == pssst.pull()
+            assert pssst.pull() == (send, text)
 
     def test_push_user_name_invalid(self):
         """
@@ -638,8 +637,8 @@ class TestPssst:
         pssst.create()
         pssst.push([name], text)
 
-        assert text == pssst.pull()
-        assert None == pssst.pull()
+        assert pssst.pull() == (name, text)
+        assert pssst.pull() == None
 
     def test_pull_empty(self):
         """
@@ -648,7 +647,16 @@ class TestPssst:
         pssst = Pssst(createUserName())
         pssst.create()
 
-        assert None == pssst.pull()
+        assert pssst.pull() == None
+
+    def test_password_weak(self):
+        """
+        Tests if a password is weak.
+        """
+        with pytest.raises(Exception) as ex:
+            pssst = Pssst(createUserName(), "weakpass")
+
+        assert str(ex.value) == "Password weak"
 
     def test_password_wrong(self):
         """
@@ -656,8 +664,8 @@ class TestPssst:
         """
         with pytest.raises(Exception) as ex:
             name = createUserName()
-            Pssst(name, "right")
-            Pssst(name, "wrong")
+            Pssst(name, "Right123")
+            Pssst(name, "Wrong000")
 
         assert str(ex.value) == "Password wrong"
 
@@ -689,7 +697,7 @@ class TestFuzzy:
             pssst.create()
             pssst.push([name], blob)
 
-            assert blob == pssst.pull()
+            assert pssst.pull() == (name, blob)
 
 
 def main(script, *args):
@@ -722,7 +730,7 @@ def main(script, *args):
 
     print("Using API: " + api)
 
-    return pytest.main([script])
+    return pytest.main([script] + list(args))
 
 
 if __name__ == "__main__":

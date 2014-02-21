@@ -1,3 +1,24 @@
+0.2.14
+* Added deny to user creation
+* Changed server config sample
+
+0.2.13
+* Changed documentation
+* Changed default email address
+* Changed comment style for server
+
+0.2.12
+* Added password requirements comment
+* Changed comment style for server
+* Changed server object creation
+* Reduced use of metadata
+
+0.2.11
+* Added py.test options to unit tests
+* Added check for weak passwords
+* Added check for signature
+* Changed error handling
+
 0.2.10
 * Changed project name
 * Changed config sample

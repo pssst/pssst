@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -35,7 +35,8 @@ except ImportError:
 
 
 try:
-    import requests
+    from requests import request
+    from requests.exceptions import RequestException
 except ImportError:
     sys.exit("Requires Requests (https://github.com/kennethreitz/requests)")
 
@@ -50,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.10", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.14", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
@@ -160,10 +161,12 @@ class Pssst:
 
         """
         def __init__(self, user, password):
-            self.path = ".pssst." + user
-            self.name = user
+            self.name, test = user, password or "None2Test"
 
-            if os.path.exists(self.path):
+            if not re.match("^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,})$", test):
+                raise Exception("Password weak")
+
+            if os.path.exists(repr(self)):
                 self.key = Pssst.Key(self.load(user + ".private"), password)
             else:
                 self.key = Pssst.Key()
@@ -171,26 +174,29 @@ class Pssst:
                 self.save(user + ".private", self.key.private(password))
                 self.save(user, self.key.public())
 
+        def __repr__(self):
+            return ".pssst." + self.name
+
         def __bool__(self):
             return self.__nonzero__()
 
         def __nonzero__(self):
-            return os.path.exists(self.path)
+            return os.path.exists(repr(self))
 
         def delete(self):
-            if os.path.exists(self.path):
-                os.remove(self.path)
+            if os.path.exists(repr(self)):
+                os.remove(repr(self))
 
         def list(self):
-            with ZipFile(self.path, "r") as file:
+            with ZipFile(repr(self), "r") as file:
                 return file.namelist()
 
         def load(self, user):
-            with ZipFile(self.path, "r") as file:
+            with ZipFile(repr(self), "r") as file:
                 return file.read(user)
 
         def save(self, user, key):
-            with ZipFile(self.path, "a") as file:
+            with ZipFile(repr(self), "a") as file:
                 file.writestr(user, key)
 
 
@@ -208,7 +214,7 @@ class Pssst:
             Returns the encrypted data and code.
         decrypt(data, code)
             Returns the decrypted data.
-        verify(data, timestamp, signature)
+        verify(data, timestamp, signature, delta=5)
             Returns if data timestamp and signature could be verified.
         sign(data)
             Returns the data timestamp and signature.
@@ -237,7 +243,7 @@ class Pssst:
             return self.key.publickey().exportKey("PEM").decode("ascii")
 
         def encrypt(self, data):
-            code = Random.get_random_bytes(32 + AES.block_size)
+            code = Random.get_random_bytes(32 + AES.block_size) # 256 bit key
 
             data = AES.new(code[:32], AES.MODE_CFB, code[32:]).encrypt(data)
             code = PKCS1_OAEP.new(self.key).encrypt(code)
@@ -250,13 +256,13 @@ class Pssst:
 
             return data
 
-        def verify(self, data, timestamp, signature):
+        def verify(self, data, timestamp, signature, delta=5):
             current, data = int(round(time.time())), data.encode("ascii")
 
             hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
 
-            if (current -5) < timestamp < (current +5):
+            if (current - delta) < timestamp < (current + delta):
                 return PKCS1_v1_5.new(self.key).verify(hmac, signature)
             else:
                 return False
@@ -283,6 +289,11 @@ class Pssst:
         param password : string, optional (default is None)
             User private key password.
 
+        Raises
+        ------
+        Exception
+            Because the server could not be authenticated.
+
         Notes
         -----
         If a file in the current directory with the name '.pssst' exists, the
@@ -298,6 +309,9 @@ class Pssst:
         The public key of the official API will be verified against the built-
         in fingerprint.
 
+        A valid password must consist of upper and lower case letters and also
+        numbers. The required minimum length of a password is 8 characters.
+
         """
         if os.path.exists(".pssst"):
             verify, self.api = False, io.open(".pssst").read().strip()
@@ -307,12 +321,24 @@ class Pssst:
         key, fingerprint = self.__file("key"), "".join(FINGERPRINT.split())
 
         if verify and not fingerprint == SHA512.new(key).hexdigest():
-            raise Exception("Server is not authenticated")
+            raise Exception("Server could not be authenticated")
 
         self.user = Pssst.User(Name(name).user, password)
 
         if self.api not in self.user.list():
             self.user.save(self.api, key)
+
+    def __repr__(self):
+        """
+        Returns the module identifier.
+
+        Returns
+        -------
+        string
+            The module identifier.
+
+        """
+        return "Pssst " + __version__
 
     def __api(self, method, url, body={}):
         """
@@ -337,7 +363,15 @@ class Pssst:
         Exception
             Because the user was deleted.
         Exception
+            Because the verification is missing.
+        Exception
+            Because the verification is corrupt.
+        Exception
             Because the verification is failed.
+
+        Notes
+        -----
+        Please see __init__ method.
 
         """
         if not self.user:
@@ -347,14 +381,14 @@ class Pssst:
 
         timestamp, signature = self.user.key.sign(body)
 
-        response = requests.request(
-            method,
-            "%s/user/%s" % (self.api, quote(url)), data=body, headers={
+        response = request(method, "%s/user/%s" % (self.api, quote(url)),
+            data=body,
+            headers={
                 "content-hash": "%s; %s" % (timestamp, _encode64(signature)),
                 "content-type": "application/json" if body else "text/plain",
-                "user-agent": "Pssst CLI " + __version__
+                "user-agent": repr(self)
             },
-            verify=False # Please see __init__ documentation
+            verify=False
         )
 
         mime = response.headers.get("content-type", "text/plain")
@@ -399,11 +433,14 @@ class Pssst:
         Exception
             Because the file was not found.
 
+        Notes
+        -----
+        Please see __init__ method.
+
         """
-        response = requests.get(
-            "%s/%s" % (self.api, file),
-            headers={"user-agent": "Pssst CLI " + __version__},
-            verify=False # Please see __init__ documentation
+        response = request("GET", "%s/%s" % (self.api, file),
+            headers={"user-agent": repr(self)},
+            verify=False
         )
 
         if response.status_code == 404:
@@ -481,7 +518,7 @@ class Pssst:
         """
         return self.__api("GET", self.user.name + "/list")
 
-    def pull(self, box=None, meta=False):
+    def pull(self, box=None):
         """
         Pulls a message from a box.
 
@@ -489,13 +526,11 @@ class Pssst:
         ----------
         param box : string, optional (default is None)
             Name of the users box.
-        param meta : boolean, optional (default is False)
-            With or without meta data.
 
         Returns
         -------
-        byte string or list
-            The message with or without meta data, None if empty.
+        tuple or None
+            The name and message, None if empty.
 
         """
         body = self.__api("GET", Name(self.user.name, box).path)
@@ -508,7 +543,7 @@ class Pssst:
 
         message = self.user.key.decrypt(data, code)
 
-        return (message, body["meta"]) if meta else message
+        return (body["name"], message)
 
     def push(self, names, message):
         """
@@ -530,9 +565,9 @@ class Pssst:
             data, code = Pssst.Key(self.user.load(user)).encrypt(message)
 
             body = {
-                "meta": dict(name=self.user.name),
                 "code": _encode64(code),
-                "data": _encode64(data)
+                "data": _encode64(data),
+                "name": self.user.name
             }
 
             self.__api("PUT", Name(user, box).path, body)
@@ -601,7 +636,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
       pull     Pull a message
       push     Push a message
 
-    Report bugs to <pssst@pssst.name>
+    Report bugs to <hello@pssst.name>
     """
     try:
         if user:
@@ -628,14 +663,14 @@ def main(script, command="--help", user=None, receiver=None, *message):
             print("Deleted %s" % name)
 
         elif command in ("--list", "list") and user:
-            print(" ".join(Pssst(name.user, name.password).list()))
+            print("\n".join(Pssst(name.user, name.password).list()))
 
         elif command in ("--pull", "pull") and user:
             data = Pssst(name.user, name.password).pull(name.box, True)
 
             if data:
-                data, meta = data
-                print("%s: %s" % (Name(meta["name"]), data.decode("utf-8")))
+                name, message = data
+                print("%s: %s" % (Name(name), message.decode("utf-8")))
 
         elif command in ("--push", "push") and user and receiver:
             data = " ".join(message)
@@ -653,6 +688,9 @@ def main(script, command="--help", user=None, receiver=None, *message):
 
     except KeyboardInterrupt:
         print("Exit")
+
+    except RequestException:
+        return "Error: Network"
 
     except Exception as ex:
         return "Error: %s" % ex

@@ -2,6 +2,7 @@
 *.iso
 *.key
 *.log
+*.pub
 *.pyc
 *.pyd
 *.pyo

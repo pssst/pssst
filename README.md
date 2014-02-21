@@ -1,9 +1,9 @@
-Pssst ![Build Status](https://travis-ci.org/pssst/pssst.png)
+Pssst [![Build](https://travis-ci.org/pssst/pssst.png?branch=master)](https://travis-ci.org/pssst/pssst)
 =====
-[Pssst](https://pssst.name) is a simple and secure way to communicate.
-We are not a service provider, but we provide you with the tools to start
-your own service. These tools are build upon open source software and
-strong end-to-end encryption.
+Pssst is a simple and secure way to communicate. We are not a service
+provider, but we provide you with the tools to start your own service.
+These tools are build upon open source software and strong end-to-end
+encryption.
 
 As this project is under continuous development, we advise you to not rely
 on our server and run your own. We may change things, we may break things.
@@ -308,21 +308,21 @@ from first to last. If no box is specified, the default box `box` is used.
 
 **Response**
 
-* Result: `200` and an JSON object with `code`, `data` and `meta` fields.
+* Result: `200` and an JSON object with `code`, `data` and `name` fields.
 * Format: `application/json`
 
 ### Push
 
 Pushes a message into an users box. If no box is specified, the default box
-`box` is used. The sender will be verified with the `meta`.`name` field in
+`box` is used. The sender will be verified with the `name` field in
 the body.
 
 **Request**
 
 * Action: `PUT` `https://api.pssst.name/user/<username>/<boxname>/`
 * Params: The `<username>` and `<boxname>` in the address. An JSON object with
-          `code`, `data` and `meta` fields in the body. The `meta` field must
-          contain the sender as `name` field.
+          `code`, `data` and `name` fields in the body. The `name` field must
+          contain the senders name.
 
 **Response**
 
@@ -349,7 +349,7 @@ Contact
 
 License
 -------
-Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
+Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

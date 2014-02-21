@@ -1,21 +1,21 @@
 #!/usr/bin/env node
+
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *
  * Usage: node start.js [--license|--version]
  *
  *   -l --license   print license
@@ -46,9 +46,10 @@ try {
     var redis  = require('./modules/redis.js');
     var pssst  = require('./app/app.js');
 
+    global.config = config;
+
     app = express();
     app.set('json spaces', 0);
-    app.set('debug', config.debug);
 
     app.use(express.bodyParser());
 

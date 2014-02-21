@@ -1,20 +1,19 @@
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *
  * Routes for extending and app mapping.
  *
  * @param {Object} express app
@@ -27,15 +26,14 @@ module.exports = function Routes(app, redis) {
   var util = require('util');
 
   // Required modules
-  var File   = require('../modules/file.js');
-  var Crypto = require('../modules/crypto.js');
-  var crypto = new Crypto();
+  var file   = require('../modules/file.js');
+  var crypto = require('../modules/crypto.js')();
 
   // Required constants
   var FORMAT = '^[0-9]+; ?[A-Za-z0-9\+/]+=*$';
   var HEADER = 'content-hash';
 
-  var route = {
+  var routes = {
     user: '/user/:user',
     key:  '/user/:user/key',
     list: '/user/:user/list',
@@ -158,7 +156,7 @@ module.exports = function Routes(app, redis) {
       console.error(err.stack);
 
       // Apply information hiding
-      if (app.get('debug') > 0) {
+      if (config.debug > 0) {
         return res.sendSigned(500, err);
       } else {
         return res.sendSigned(500);
@@ -176,19 +174,19 @@ module.exports = function Routes(app, redis) {
   this.map = function map(pssst) {
 
     // Pssst.User CRUD
-    app.post(route.user, pssst.user.create);
-    app.get(route.key, pssst.user.key);
-    app.get(route.list, pssst.user.list);
-    app.delete(route.user, pssst.user.disable);
+    app.post(routes.user, pssst.user.create);
+    app.get(routes.key, pssst.user.key);
+    app.get(routes.list, pssst.user.list);
+    app.delete(routes.user, pssst.user.disable);
 
     // Pssst.Box CRUD
-    app.post(route.box, pssst.box.create);
-    app.get(route.box, pssst.box.pull);
-    app.put(route.box, pssst.box.push);
-    app.delete(route.box, pssst.box.erase);
+    app.post(routes.box, pssst.box.create);
+    app.get(routes.box, pssst.box.pull);
+    app.put(routes.box, pssst.box.push);
+    app.delete(routes.box, pssst.box.erase);
 
     // File server
-    app.get('/:file', new File('public').serve);
+    app.get('/:file', file('public').serve);
 
     // Server index
     app.get('/', function index(req, res) {

@@ -1,20 +1,19 @@
+// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <pssst@pssst.name>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
- *
  * Facade class for easy mapping.
  *
  * @param {Object} redis wrapper
@@ -38,8 +37,8 @@ module.exports = function App(redis) {
         pssst.handle(req, res, function handle(user, box) {
 
           // Assert user name is allowed
-          if (pssst.user.isBlocked(req.params.user)) {
-            return res.sendSigned(403, 'User name restricted');
+          if (pssst.user.isDenied(req.params.user, config.deny)) {
+            return res.sendSigned(403, 'User name denied');
           }
 
           // Assert user does not exist
@@ -153,7 +152,7 @@ module.exports = function App(redis) {
         pssst.handle(req, res, function handle(user, box) {
           box.push(req.body);
         }, {
-          verify: req.body.meta.name,
+          verify: req.body.name,
           status: 'Message sent'
         });
       },
