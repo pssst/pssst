@@ -41,13 +41,14 @@ exports.disable = function disable(user) {
 };
 
 /**
- * Checks if the user name is blocked.
+ * Checks if the user name is denied.
  *
  * @param {String} the user name
- * @return {Boolean} true if blocked
+ * @param {String} the regular expression
+ * @return {Boolean} true if denied
  */
-exports.isBlocked = function isBlocked(name) {
-  return new RegExp('!?(^name$)').test(name);
+exports.isDenied = function isDenied(name, deny) {
+  return new RegExp(deny || '!?(^name$)').test(name);
 };
 
 /**

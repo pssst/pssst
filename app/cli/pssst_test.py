@@ -243,7 +243,7 @@ class TestUser:
     Tests user with this test cases:
 
     * User create
-    * User create failed, name restricted
+    * User create failed, name denied
     * User create failed, already exists
     * User delete
     * User delete, user was deleted
@@ -257,8 +257,8 @@ class TestUser:
     -------
     test_create_user()
         Tests if an user can be created.
-    test_create_user_name_restricted()
-        Tests if an user name is restricted.
+    test_create_user_name_denied()
+        Tests if an user name is denied.
     test_create_user_already_exists()
         Tests if an user already exists.
     test_delete_user()
@@ -284,15 +284,15 @@ class TestUser:
         pssst = Pssst(createUserName())
         pssst.create()
 
-    def test_create_user_name_restricted(self):
+    def test_create_user_name_denied(self):
         """
-        Tests if an user name is restricted.
+        Tests if an user name is denied.
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst("name")
             pssst.create()
 
-        assert str(ex.value) == "User name restricted"
+        assert str(ex.value) == "User name denied"
 
     def test_create_user_already_exists(self):
         """

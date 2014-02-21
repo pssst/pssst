@@ -1,9 +1,18 @@
-// Please remove this line and rename this file to 'config.json'
+// PLEASE REMOVE THIS BLOCK AND RENAME THIS FILE TO 'config.json'
+//
+// debug = available levels are 0 (none) to 3 (full)
+// deny  = regular expression for denied user names
+// port  = external network port
+//
+// db.source = Redis database port or socket path
+// db.number = Redis database number
+
 {
-  "debug": <Level 0-3>,
-  "port": <Pssst port>,
+  "debug": 0,
+  "deny": null
+  "port": 80,
   "db": {
-    "source": <Redis port/socket>,
-    "number": <Redis database nr>
+    "source": 6379,
+    "number": 0
   }
 }

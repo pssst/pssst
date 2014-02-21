@@ -46,9 +46,10 @@ try {
     var redis  = require('./modules/redis.js');
     var pssst  = require('./app/app.js');
 
+    global.config = config;
+
     app = express();
     app.set('json spaces', 0);
-    app.set('debug', config.debug);
 
     app.use(express.bodyParser());
 

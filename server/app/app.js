@@ -37,8 +37,8 @@ module.exports = function App(redis) {
         pssst.handle(req, res, function handle(user, box) {
 
           // Assert user name is allowed
-          if (pssst.user.isBlocked(req.params.user)) {
-            return res.sendSigned(403, 'User name restricted');
+          if (pssst.user.isDenied(req.params.user, config.deny)) {
+            return res.sendSigned(403, 'User name denied');
           }
 
           // Assert user does not exist

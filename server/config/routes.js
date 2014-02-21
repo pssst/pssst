@@ -156,7 +156,7 @@ module.exports = function Routes(app, redis) {
       console.error(err.stack);
 
       // Apply information hiding
-      if (app.get('debug') > 0) {
+      if (config.debug > 0) {
         return res.sendSigned(500, err);
       } else {
         return res.sendSigned(500);
