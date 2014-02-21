@@ -1,8 +1,5 @@
-Pssst ![Logo](https://pssst.name/readme/pssst.png)
+Pssst [![Build](https://travis-ci.org/pssst/pssst.png?branch=master)](https://travis-ci.org/pssst/pssst)
 =====
-[![Build](https://travis-ci.org/pssst/pssst.png?branch=master)]
-(https://travis-ci.org/pssst/pssst)
-
 Pssst is a simple and secure way to communicate. We are not a service
 provider, but we provide you with the tools to start your own service.
 These tools are build upon open source software and strong end-to-end
