@@ -1,6 +1,7 @@
 0.2.14
 * Added deny to user creation
 * Changed server config sample
+* Fixed pull bug (CLI)
 
 0.2.13
 * Changed documentation
