@@ -666,7 +666,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
             print("\n".join(Pssst(name.user, name.password).list()))
 
         elif command in ("--pull", "pull") and user:
-            data = Pssst(name.user, name.password).pull(name.box, True)
+            data = Pssst(name.user, name.password).pull(name.box)
 
             if data:
                 name, message = data
