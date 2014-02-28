@@ -9,7 +9,7 @@
 
 {
   "debug": 0,
-  "deny": null
+  "deny": null,
   "port": 80,
   "db": {
     "source": 6379,

@@ -23,6 +23,7 @@ import re
 import sys
 import time
 
+from datetime import datetime
 from getpass import getpass
 from zipfile import ZipFile
 
@@ -51,7 +52,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.14", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.15", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
@@ -211,8 +212,8 @@ class Pssst:
         public()
             Returns the users public key (PEM format).
         encrypt(data)
-            Returns the encrypted data and code.
-        decrypt(data, code)
+            Returns the encrypted data and once.
+        decrypt(data, once)
             Returns the decrypted data.
         verify(data, timestamp, signature, delta=5)
             Returns if data timestamp and signature could be verified.
@@ -243,16 +244,16 @@ class Pssst:
             return self.key.publickey().exportKey("PEM").decode("ascii")
 
         def encrypt(self, data):
-            code = Random.get_random_bytes(32 + AES.block_size) # 256 bit key
+            once = Random.get_random_bytes(32 + AES.block_size) # 256 bit key
 
-            data = AES.new(code[:32], AES.MODE_CFB, code[32:]).encrypt(data)
-            code = PKCS1_OAEP.new(self.key).encrypt(code)
+            data = AES.new(once[:32], AES.MODE_CFB, once[32:]).encrypt(data)
+            once = PKCS1_OAEP.new(self.key).encrypt(once)
 
-            return (data, code)
+            return (data, once)
 
-        def decrypt(self, data, code):
-            code = PKCS1_OAEP.new(self.key).decrypt(code)
-            data = AES.new(code[:32], AES.MODE_CFB, code[32:]).decrypt(data)
+        def decrypt(self, data, once):
+            once = PKCS1_OAEP.new(self.key).decrypt(once)
+            data = AES.new(once[:32], AES.MODE_CFB, once[32:]).decrypt(data)
 
             return data
 
@@ -530,7 +531,7 @@ class Pssst:
         Returns
         -------
         tuple or None
-            The name and message, None if empty.
+            The name, time and message, None if empty.
 
         """
         body = self.__api("GET", Name(self.user.name, box).path)
@@ -538,12 +539,17 @@ class Pssst:
         if not body:
             return None # Box is empty
 
-        code = _decode64(body["code"])
+        meta = body["meta"]
+
+        name = str(meta["name"])
+        time = int(meta["time"])
+
         data = _decode64(body["data"])
+        once = _decode64(meta["once"])
 
-        message = self.user.key.decrypt(data, code)
+        message = self.user.key.decrypt(data, once)
 
-        return (body["name"], message)
+        return (name, time, message)
 
     def push(self, names, message):
         """
@@ -562,15 +568,59 @@ class Pssst:
             if user not in self.user.list():
                 self.user.save(user, self.find(user)) # Add public key
 
-            data, code = Pssst.Key(self.user.load(user)).encrypt(message)
+            data, once = Pssst.Key(self.user.load(user)).encrypt(message)
+
+            once = _encode64(once)
+            data = _encode64(data)
+
+            meta = {
+                "name": self.user.name,
+                "once": once
+            }
 
             body = {
-                "code": _encode64(code),
-                "data": _encode64(data),
-                "name": self.user.name
+                "meta": meta,
+                "data": data
             }
 
             self.__api("PUT", Name(user, box).path, body)
+
+
+def human(time):
+    """
+    Returns a human readable timestamp.
+
+    Parameters
+    ----------
+    param time : integer
+        Timestamp to convert.
+
+    Returns
+    -------
+    string
+        The timestamp.
+
+    """
+    diff, intervals = datetime.now() - datetime.fromtimestamp(time), [
+        ("minute", 60),
+        ("hour", 60),
+        ("day", 24),
+        ("week", 7),
+        ("month", 365.242 / 12 / 7),
+        ("year", 12)
+    ]
+
+    unit, value = "second", abs(diff.seconds)
+
+    for next, ratio in intervals:
+        limit = float(value) / ratio
+
+        if limit < 2:
+            break
+
+        unit, value = next, limit
+
+    return "%.0f %s ago" % (value, unit + "s" if int(value) > 1 else unit)
 
 
 def usage(text, *args):
@@ -669,8 +719,9 @@ def main(script, command="--help", user=None, receiver=None, *message):
             data = Pssst(name.user, name.password).pull(name.box)
 
             if data:
-                name, message = data
-                print("%s: %s" % (Name(name), message.decode("utf-8")))
+                name, time, message = data
+                name, time, message = Name(name), human(time), message
+                print("%s - %s, %s" % (message.decode("utf-8"), name, time))
 
         elif command in ("--push", "push") and user and receiver:
             data = " ".join(message)

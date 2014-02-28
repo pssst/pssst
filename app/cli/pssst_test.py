@@ -575,7 +575,10 @@ class TestPssst:
         pssst.create()
         pssst.push([name], text)
 
-        assert pssst.pull() == (name, text)
+        data = pssst.pull()
+
+        assert data[0] == name
+        assert data[2] == text
 
     def test_push_single(self):
         """
@@ -592,7 +595,10 @@ class TestPssst:
         pssst2.create()
         pssst2.push([name1], text)
 
-        assert pssst1.pull() == (name2, text)
+        data = pssst1.pull()
+
+        assert data[0] == name2
+        assert data[2] == text
 
     def test_push_multi(self):
         """
@@ -614,7 +620,10 @@ class TestPssst:
         for name in names:
             pssst = Pssst(name)
 
-            assert pssst.pull() == (send, text)
+            data = pssst.pull()
+
+            assert data[0] == send
+            assert data[2] == text
 
     def test_push_user_name_invalid(self):
         """
@@ -636,8 +645,8 @@ class TestPssst:
         pssst = Pssst(name)
         pssst.create()
         pssst.push([name], text)
+        pssst.pull()
 
-        assert pssst.pull() == (name, text)
         assert pssst.pull() == None
 
     def test_pull_empty(self):
@@ -697,7 +706,7 @@ class TestFuzzy:
             pssst.create()
             pssst.push([name], blob)
 
-            assert pssst.pull() == (name, blob)
+            assert blob == pssst.pull()[2]
 
 
 def main(script, *args):
