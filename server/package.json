@@ -1,7 +1,7 @@
 {
   "name": "pssst",
   "license": "GPLv3",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "homepage": "https://pssst.name",
   "bugs": "https://github.com/pssst/pssst/issues",
   "repository": {
@@ -9,7 +9,7 @@
     "url": "https://github.com/pssst/pssst.git"
   },
   "dependencies": {
-    "express": ">=3.4",
+    "express": "3.x",
     "redis": ">=0.9",
     "mime": ">=1.2",
     "ursa": ">=0.8"

@@ -1,3 +1,8 @@
+0.2.16
+* Fixed express version
+* Changed infrastructure
+* Changed README.md
+
 0.2.15
 * Refactored data exchange format
 * Added time to message metadata

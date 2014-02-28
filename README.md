@@ -103,18 +103,17 @@ API
 ===
 The official address of the Pssst REST API is:
 
-`https://api.pssst.name` (alias for `2.pssst.name`)
+`https://api.pssst.name`
 
 If you want to test your code, please use the addresses below accordingly.
-But we advise you to please setup a local server and database (which
-is _very easy_), and test your apps and/or bug fixes there:
+But we advise you to please setup a local server and database (which is 
+_very easy_), and test your apps and/or bug fixes there:
 
-* `https://0.pssst.name` reserved for `develop` branch (and other branches)
-* `https://1.pssst.name` reserved for `release` branch
-* `https://2.pssst.name` reserved for `master` branch
+* `https://dev.pssst.name` reserved for `develop` branch (and other branches)
+* `https://api.pssst.name` reserved for `master` branch
 
-Every branch uses its own redis database. The databases for the `develop` and
-`release` branch will be reset each day at midnight. Please be warned:
+Every branch uses its own redis server. The database for the `develop` branch
+will be reset each day at midnight and is not persisted. Please be warned:
 
 > **WE DO NOT BACKUP OUR REDIS DATABASES**
 
