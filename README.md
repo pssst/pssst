@@ -1,4 +1,4 @@
-Pssst [![Build](https://travis-ci.org/pssst/pssst.png?branch=master)](https://travis-ci.org/pssst/pssst)
+Pssst ![Build](https://travis-ci.org/pssst/pssst.png?branch=master)
 =====
 Pssst is a simple and secure way to communicate. We are not a service
 provider, but we provide you with the tools to start your own service.
@@ -159,7 +159,7 @@ Decryption of the received `data` and `once` is done as follows:
    the decrypted message code as key and the last `16` bytes as IV.
 
 All encrypted data is exchanged as `JSON` object in the request/response body
-with `meta` and `data` fields. The `data` and `once` fields are both encoded 
+with `meta` and `data` fields. The `data` and `once` fields are both encoded
 in `Base64`. Please be aware:
 
 > The message code is called _once_ for a reason. Never use this code twice.
