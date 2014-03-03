@@ -1,4 +1,4 @@
-Pssst [![Build](https://travis-ci.org/pssst/pssst.png?branch=master)](https://travis-ci.org/pssst/pssst)
+Pssst ![Build](https://travis-ci.org/pssst/pssst.png?branch=master)
 =====
 Pssst is a simple and secure way to communicate. We are not a service
 provider, but we provide you with the tools to start your own service.
@@ -101,7 +101,7 @@ The server will now start and print `Ready`.
 
 API
 ===
-The official address of the Pssst API is:
+The official address of the Pssst REST API is:
 
 `https://api.pssst.name` (alias for `2.pssst.name`)
 
@@ -145,21 +145,24 @@ All RSA keys have a key size of 4096 bits.
 
 Encryption of the message data is done as follows:
 
-1. Generate cyptographically secure `48` random bytes as the code.
+1. Generate cyptographically secure `48` random bytes as message code.
 2. Encrypt the data with `AES 256` (`CFB`) using the first `32` bytes from
-   the code as key and the last `16` bytes as IV.
-3. Encrypt the code with `PKCS#1 OAEP` and the receivers public key.
+   the message code as key and the last `16` bytes as IV.
+3. Encrypt the message code with `PKCS#1 OAEP` and the receivers public key.
 
 ### Decryption
 
-Decryption of the received `data` and `code` is done as follows:
+Decryption of the received `data` and `once` is done as follows:
 
-1. Decrypt the received code with `PKCS#1 OAEP` and the receivers private key.
+1. Decrypt the received once with `PKCS#1 OAEP` and the receivers private key.
 2. Decrypt the data with `AES 256` (`CFB`) using the first `32` bytes from
-   the derived code as key and the last `16` bytes as IV.
+   the decrypted message code as key and the last `16` bytes as IV.
 
 All encrypted data is exchanged as `JSON` object in the request/response body
-with `code` and `data` fields, both be encoded in `Base64`.
+with `meta` and `data` fields. The `data` and `once` fields are both encoded
+in `Base64`. Please be aware:
+
+> The message code is called _once_ for a reason. Never use this code twice.
 
 ### Verification
 
@@ -308,7 +311,7 @@ from first to last. If no box is specified, the default box `box` is used.
 
 **Response**
 
-* Result: `200` and an JSON object with `code`, `data` and `name` fields.
+* Result: `200` and an JSON object with `once`, `data` and `name` fields.
 * Format: `application/json`
 
 ### Push
@@ -321,7 +324,7 @@ the body.
 
 * Action: `PUT` `https://api.pssst.name/user/<username>/<boxname>/`
 * Params: The `<username>` and `<boxname>` in the address. An JSON object with
-          `code`, `data` and `name` fields in the body. The `name` field must
+          `once`, `data` and `name` fields in the body. The `name` field must
           contain the senders name.
 
 **Response**
