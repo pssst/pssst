@@ -106,7 +106,7 @@ The official address of the Pssst REST API is:
 `https://api.pssst.name`
 
 If you want to test your code, please use the addresses below accordingly.
-But we advise you to please setup a local server and database (which is 
+But we advise you to please setup a local server and database (which is
 _very easy_), and test your apps and/or bug fixes there:
 
 * `https://dev.pssst.name` reserved for `develop` branch (and other branches)
@@ -182,8 +182,8 @@ and `signature` the calculated and signed hash of the body encoded in
 To verify a request/response, calculate its hash as described above in the
 steps 1 and 2. And verify it with the senders public key using `PKCS#1 v1.5`.
 
-The default time frame for requests/responses to be verified is `10` seconds.
-Which derives to `-5` and `+5` seconds from the actual `EPOCH` at the time of
+The grace period for requests/responses to be verified is `30` seconds. Which
+derives to `-30` or `+30` seconds from the actual `EPOCH` at the time of
 processing.
 
 ### Fingerprint
