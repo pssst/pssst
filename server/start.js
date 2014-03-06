@@ -51,7 +51,8 @@ try {
     app = express();
     app.set('json spaces', 0);
 
-    app.use(express.bodyParser());
+    app.use(express.urlencoded())
+    app.use(express.json())
 
     // Error hook
     app.use(function hook(err, req, res, next) {

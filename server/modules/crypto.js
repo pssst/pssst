@@ -24,8 +24,8 @@ module.exports = function Crypto() {
   var crypto = require('crypto');
 
   // Required constants
+  var GRACE    = 30;
   var KEYSIZE  = 4096;
-  var TIMESPAN = 10;
   var ENCODING = 'utf8';
   var HASH     = 'sha512';
 
@@ -130,8 +130,8 @@ module.exports = function Crypto() {
 
       // Calculate time window
       var now = getTimestamp();
-      var min = now - (TIMESPAN / 2);
-      var max = now + (TIMESPAN / 2);
+      var min = now - GRACE;
+      var max = now + GRACE;
       var timestamp = parseInt(hmac.timestamp, 10);
 
       if (min > timestamp || max < timestamp) {

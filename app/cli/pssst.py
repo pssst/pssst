@@ -52,7 +52,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.16", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.17", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
@@ -215,7 +215,7 @@ class Pssst:
             Returns the encrypted data and once.
         decrypt(data, once)
             Returns the decrypted data.
-        verify(data, timestamp, signature, delta=5)
+        verify(data, timestamp, signature, grace=30)
             Returns if data timestamp and signature could be verified.
         sign(data)
             Returns the data timestamp and signature.
@@ -257,13 +257,13 @@ class Pssst:
 
             return data
 
-        def verify(self, data, timestamp, signature, delta=5):
+        def verify(self, data, timestamp, signature, grace=30):
             current, data = int(round(time.time())), data.encode("ascii")
 
             hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
 
-            if (current - delta) < timestamp < (current + delta):
+            if (current - grace) < timestamp < (current + grace):
                 return PKCS1_v1_5.new(self.key).verify(hmac, signature)
             else:
                 return False
