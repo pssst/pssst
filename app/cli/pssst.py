@@ -52,7 +52,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.17", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.18", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
@@ -586,43 +586,6 @@ class Pssst:
             self.__api("PUT", Name(user, box).path, body)
 
 
-def human(time):
-    """
-    Returns a human readable timestamp.
-
-    Parameters
-    ----------
-    param time : integer
-        Timestamp to convert.
-
-    Returns
-    -------
-    string
-        The timestamp.
-
-    """
-    diff, intervals = datetime.now() - datetime.fromtimestamp(time), [
-        ("minute", 60),
-        ("hour", 60),
-        ("day", 24),
-        ("week", 7),
-        ("month", 365.242 / 12 / 7),
-        ("year", 12)
-    ]
-
-    unit, value = "second", abs(diff.seconds)
-
-    for next, ratio in intervals:
-        limit = float(value) / ratio
-
-        if limit < 2:
-            break
-
-        unit, value = next, limit
-
-    return "%.0f %s ago" % (value, unit + "s" if int(value) > 1 else unit)
-
-
 def usage(text, *args):
     """
     Prints the usage colored.
@@ -720,8 +683,10 @@ def main(script, command="--help", user=None, receiver=None, *message):
 
             if data:
                 name, time, message = data
-                name, time, message = Name(name), human(time), message
-                print("%s - %s, %s" % (message.decode("utf-8"), name, time))
+                print("%s -- %s, %s" % (
+                    message.decode("utf-8"), Name(name),
+                    datetime.fromtimestamp(time)
+                ))
 
         elif command in ("--push", "push") and user and receiver:
             data = " ".join(message)
