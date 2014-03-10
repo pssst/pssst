@@ -30,6 +30,10 @@ There is no need to install anything, just run the `app/cli/pssst.py` script:
 
 `$ pssst.py [option|command]`
 
+If you wish to install the CLI on a Unix system, just execute:
+
+`$ curl -s https://pssst.name/install | sudo bash`
+
 Please use the `--help` option to show further help on the CLI. All user
 specific data will be stored as zip files named `.pssst.<username>` in
 the current directory.
