@@ -67,7 +67,7 @@ module.exports = function Redis(config, callback) {
   this.get = function get(key, callback) {
     client.get(key, function get(err, val) {
       try {
-        callback(err, JSON.parse(val));
+        callback(err, err ? null : JSON.parse(val));
       } catch (err) {
         callback(err);
       }

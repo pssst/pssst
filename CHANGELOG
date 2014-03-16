@@ -1,3 +1,17 @@
+0.2.19
+* Added sanity check to prevent private keys on server
+* Added check for password if the offical API is used
+* Added different exception handlers to CLI
+* Added time server
+* Fixed bug if server lost connection to redis
+* Fixed bug on server error response
+* Fixed wrong HTTP status codes
+* Changed method name in pssst.py
+* Changed some unit tests
+* Changed some comments
+* Changed some texts
+* Changed README.md
+
 0.2.18
 * Removed human readable verbal time
 

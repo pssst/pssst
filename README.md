@@ -20,11 +20,11 @@ Required for the command line interface (CLI):
 
 Required if you want to run your own server:
 
-* Node.js `0.10.12` or newer
+* Node.js `0.10` or newer
 * A Redis database
 
 Please refer to the file `server/package.json` for further details on the
-required NPM modules and their version.
+required npm modules and their version.
 
 There is no need to install anything, just run the `app/cli/pssst.py` script:
 
@@ -32,7 +32,7 @@ There is no need to install anything, just run the `app/cli/pssst.py` script:
 
 If you wish to install the CLI on a Unix system, just execute:
 
-`$ curl -s https://pssst.name/install | sudo bash`
+`$ curl -s https://pssst.name/install | bash`
 
 Please use the `--help` option to show further help on the CLI. All user
 specific data will be stored as zip files named `.pssst.<username>` in
@@ -121,10 +121,11 @@ will be reset each day at midnight and is not persisted. Please be warned:
 
 > **WE DO NOT BACKUP OUR REDIS DATABASES**
 
-Additional informations about the official Pssst server under can be requested
-under the following addresses below:
+Additional informations about the official Pssst server can be requested under
+the following addresses below:
 
 * `https://api.pssst.name/key` returns the servers public key in `PEM` format.
+* `https://api.pssst.name/time` returns the servers current `EPOCH` time.
 * `https://api.pssst.name/branch` returns the used Git branch.
 * `https://api.pssst.name/version` returns the servers version.
 
@@ -314,7 +315,9 @@ from first to last. If no box is specified, the default box `box` is used.
 
 **Response**
 
-* Result: `200` and an JSON object with `once`, `data` and `name` fields.
+* Result: `200` and an JSON object with `meta` and `data` fields. The `meta`
+          field consists of the senders `name`, the `time` the message was
+          processed on the server and the message code `once`.
 * Format: `application/json`
 
 ### Push
@@ -327,8 +330,8 @@ the body.
 
 * Action: `PUT` `https://api.pssst.name/user/<username>/<boxname>/`
 * Params: The `<username>` and `<boxname>` in the address. An JSON object with
-          `once`, `data` and `name` fields in the body. The `name` field must
-          contain the senders name.
+          `meta` and `data` fields in the body. The `meta` field must contain
+          the senders `name` and the message code `once`.
 
 **Response**
 

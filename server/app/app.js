@@ -31,8 +31,8 @@ module.exports = function App(redis) {
    * @return {Object} the message
    */
   function addTime(message) {
-    message.meta.time = Number((new Date).getTime() / 1000).toFixed(0);
-    
+    message.meta.time = Number((new Date()).getTime() / 1000).toFixed(0);
+
     return message;
   }
 
@@ -56,6 +56,11 @@ module.exports = function App(redis) {
           // Assert user does not exist
           if (user !== null) {
             return res.sendSigned(409, 'User already exists');
+          }
+
+          // Assert key is a public key
+          if (req.body.key.indexOf('BEGIN PUBLIC KEY') < 0) {
+            return res.sendSigned(400, 'Public key invalid');
           }
 
           user = pssst.user.create(req.body.key);

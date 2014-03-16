@@ -37,7 +37,7 @@ except ImportError:
 
 try:
     from requests import request
-    from requests.exceptions import RequestException
+    from requests.exceptions import ConnectionError, Timeout
 except ImportError:
     sys.exit("Requires Requests (https://github.com/kennethreitz/requests)")
 
@@ -52,23 +52,23 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.18", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.19", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
 
 
-def _encode64(data): # Utility
+def _encode64(data): # Utility shortcut
     return base64.b64encode(data).decode("ascii")
 
 
-def _decode64(data): # Utility
+def _decode64(data): # Utility shortcut
     return base64.b64decode(data.encode("ascii"))
 
 
 class Name:
     """
-    Pssst class for canonical name parsing.
+    Pssst helper class for canonical name parsing.
 
     """
     def __init__(self, user, box=None, password=None):
@@ -103,10 +103,10 @@ class Name:
         self.box = box.lower() if box else box
         self.password = password
 
-        self.all = (self.user, self.box)
+        self.full = (self.user, self.box)
 
         if self.box:
-            self.path = "%s/%s/" % self.all
+            self.path = "%s/%s/" % self.full
         else:
             self.path = "%s/" % self.user
 
@@ -116,7 +116,7 @@ class Name:
 
         """
         if self.box:
-            return str("pssst.%s.%s" % self.all)
+            return str("pssst.%s.%s" % self.full)
         else:
             return str("pssst.%s" % self.user)
 
@@ -162,7 +162,7 @@ class Pssst:
 
         """
         def __init__(self, user, password):
-            self.name, test = user, password or "None2Test"
+            self.name, test = user, password or "Okay4Test"
 
             if not re.match("^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,})$", test):
                 raise Exception("Password weak")
@@ -294,6 +294,8 @@ class Pssst:
         ------
         Exception
             Because the server could not be authenticated.
+        Exception
+            Because the password is required.
 
         Notes
         -----
@@ -311,7 +313,8 @@ class Pssst:
         in fingerprint.
 
         A valid password must consist of upper and lower case letters and also
-        numbers. The required minimum length of a password is 8 characters.
+        numbers. The required minimum length of a password is 8 characters. If
+        you use the offical API, a password is mandatory.
 
         """
         if os.path.exists(".pssst"):
@@ -319,10 +322,13 @@ class Pssst:
         else:
             verify, self.api = True, "https://api.pssst.name"
 
-        key, fingerprint = self.__file("key"), "".join(FINGERPRINT.split())
+        key, fingerprint = self.__get("key"), "".join(FINGERPRINT.split())
 
         if verify and not fingerprint == SHA512.new(key).hexdigest():
             raise Exception("Server could not be authenticated")
+
+        if verify and not password:
+            raise Exception("Password is required")
 
         self.user = Pssst.User(Name(name).user, password)
 
@@ -343,7 +349,7 @@ class Pssst:
 
     def __api(self, method, url, body={}):
         """
-        Sends an API request (sign and verify).
+        Sends an API request (signs and verifies).
 
         Parameters
         ----------
@@ -364,11 +370,11 @@ class Pssst:
         Exception
             Because the user was deleted.
         Exception
-            Because the verification is missing.
+            Because the signature is missing.
         Exception
-            Because the verification is corrupt.
+            Because the signature is corrupt.
         Exception
-            Because the verification is failed.
+            Because the verification has failed.
 
         Notes
         -----
@@ -415,14 +421,14 @@ class Pssst:
 
         return body
 
-    def __file(self, file):
+    def __get(self, url):
         """
-        Sends a file request with out any checks.
+        Sends a GET request (with out any checks).
 
         Parameters
         ----------
-        param file : string
-            Requested file.
+        param url : string
+            Requested path.
 
         Returns
         -------
@@ -431,7 +437,7 @@ class Pssst:
 
         Raises
         ------
-        Exception
+        ConnectionError
             Because the file was not found.
 
         Notes
@@ -439,13 +445,13 @@ class Pssst:
         Please see __init__ method.
 
         """
-        response = request("GET", "%s/%s" % (self.api, file),
+        response = request("GET", "%s/%s" % (self.api, url),
             headers={"user-agent": repr(self)},
             verify=False
         )
 
         if response.status_code == 404:
-            raise Exception("File not found")
+            raise ConnectionError("Not Found")
 
         return response.text
 
@@ -477,7 +483,8 @@ class Pssst:
 
         Notes
         -----
-        If the user was deleted, the object can not be used any further.
+        If the user was deleted, the object can not be used any further and
+        any API call wil result in an error. The user file is also deleted.
 
         """
         self.__api("DELETE", Name(self.user.name, box).path)
@@ -563,7 +570,7 @@ class Pssst:
             The message.
 
         """
-        for user, box in [Name(name).all for name in names]:
+        for user, box in [Name(name).full for name in names]:
 
             if user not in self.user.list():
                 self.user.save(user, self.find(user)) # Add public key
@@ -656,7 +663,7 @@ def main(script, command="--help", user=None, receiver=None, *message):
             name = Name(user)
 
         if user and not name.password:
-            name.password = getpass("Password (will not be shown): ")
+            name.password = getpass("Password (will be hidden): ")
 
         if command in ("-h", "--help"):
             usage(main.__doc__, __version__, os.path.basename(script))
@@ -705,8 +712,11 @@ def main(script, command="--help", user=None, receiver=None, *message):
     except KeyboardInterrupt:
         print("Exit")
 
-    except RequestException:
-        return "Error: Network"
+    except ConnectionError:
+        return "Could not connect to API"
+
+    except Timeout:
+        return "Connection timeout"
 
     except Exception as ex:
         return "Error: %s" % ex
