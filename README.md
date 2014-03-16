@@ -2,7 +2,7 @@ Pssst ![Build](https://travis-ci.org/pssst/pssst.png?branch=master)
 =====
 Pssst is a simple and secure way to communicate. We are not a service
 provider, but we provide you with the tools to start your own service.
-These tools are build upon open source software and strong end-to-end
+These tools are build upon open source software and use strong end-to-end
 encryption.
 
 As this project is under continuous development, we advise you to not rely
@@ -36,7 +36,7 @@ If you wish to install the CLI on a Unix system, just execute:
 
 Please use the `--help` option to show further help on the CLI. All user
 specific data will be stored as zip files named `.pssst.<username>` in
-the current directory.
+the calling directory.
 
 Commands
 --------
@@ -48,32 +48,6 @@ Currently these commands are supported by the API:
 * `list` all boxes of an user.
 * `pull` a message from a box.
 * `push` a message onto a box.
-
-Examples
---------
-This full-blown real life example will demonstrate you, how to create the
-user `sender` and `receiver` as well as the receivers box `spam`. Then
-pushing a message from the `sender` to this box and pulling it by the
-`receiver`. And finally deleting the box (_because nobody likes spam_).
-
-```
-$ pssst create sender
-```
-```
-$ pssst create receiver
-```
-```
-$ pssst create receiver.spam
-```
-```
-$ pssst push sender receiver.spam "Hello World!"
-```
-```
-$ pssst pull receiver.spam
-```
-```
-$ pssst delete receiver.spam
-```
 
 Names
 -----
@@ -89,7 +63,7 @@ box name is omited, the users default box `box` is used.
 Server
 ------
 If you want to use any other than the official server, simply create a file
-named `.pssst` in the directory of the app with the desired server address:
+named `.pssst` in the directory of the CLI with the desired server address:
 
 `$ echo https://localhost:443 > app/cli/.pssst`
 
@@ -101,7 +75,34 @@ When done, execute the following command inside your `server` directory:
 
 The server will now start and print `Ready`.
 
-> We also have built-in support for Heroku with the Redis Cloud add-on.
+> We also have built-in support for Heroku with the Redis Cloud add-on. In
+> case you want to run Pssst in the cloud.
+
+Examples
+--------
+This example will demonstrate you, how to create the users `sender` and 
+`receiver` as well as the receivers box `spam`. Then pushing a message 
+from the `sender` to this box and pulling it by the `receiver`. And 
+finally deleting the box (_because nobody likes spam_).
+
+```
+$ pssst create sender
+```
+```
+$ pssst create receiver
+```
+```
+$ pssst create receiver.spam
+```
+```
+$ pssst push sender receiver.spam "Hello World"
+```
+```
+$ pssst pull receiver.spam
+```
+```
+$ pssst delete receiver.spam
+```
 
 API
 ===
@@ -119,7 +120,7 @@ _very easy_), and test your apps and/or bug fixes there:
 Every branch uses its own redis server. The database for the `develop` branch
 will be reset each day at midnight and is not persisted. Please be warned:
 
-> **WE DO NOT BACKUP OUR REDIS DATABASES**
+> **WE DO NOT BACKUP OUR REDIS DATABASES. A MESSAGE CAN ONLY PULLED ONCE.**
 
 Additional informations about the official Pssst server can be requested under
 the following addresses below:
@@ -137,17 +138,19 @@ encoded in `UTF-8`. Please refer to the mime type in the HTTP `content-type`
 header to decide which format and encoding is returned. Server errors will
 always be returned in plain text. Please be aware:
 
-> All messages will be stored protocol agnostic.
+> All messages will be stored protocol agnostic. You can add more fields to 
+> the messages body. The only field required by the server is the sender.
 
-All clients are requested to send an unique `user-agent` header.
+Client implementations are requested to send an unique `user-agent` header.
 
 ### Keys
 
-All RSA keys have a key size of 4096 bits.
+All RSA keys use a key size of 4096 bits.
+All AES keys use a key size of 256 bits.
 
 ### Encryption
 
-Encryption of the message data is done as follows:
+Encryption of the message data is done in the following steps:
 
 1. Generate cyptographically secure `48` random bytes as message code.
 2. Encrypt the data with `AES 256` (`CFB`) using the first `32` bytes from
@@ -156,17 +159,17 @@ Encryption of the message data is done as follows:
 
 ### Decryption
 
-Decryption of the received `data` and `once` is done as follows:
+Decryption of the received `data` and `once` is done in the following steps:
 
 1. Decrypt the received once with `PKCS#1 OAEP` and the receivers private key.
 2. Decrypt the data with `AES 256` (`CFB`) using the first `32` bytes from
    the decrypted message code as key and the last `16` bytes as IV.
 
 All encrypted data is exchanged as `JSON` object in the request/response body
-with `meta` and `data` fields. The `data` and `once` fields are both encoded
-in `Base64`. Please be aware:
+within `meta` and `data` fields. The `data` and `once` fields are both encoded
+in `Base64` with padding. Please be aware:
 
-> The message code is called _once_ for a reason. Never use this code twice.
+> The message code is called _once_ for a reason. **NEVER USE IT TWICE.**
 
 ### Verification
 
@@ -177,8 +180,8 @@ The format of this header is specified as:
 `content-hash: <timestamp>; <signature>`
 
 Where `timestamp` is the `EPOCH` (without decimals) of the request/response
-and `signature` the calculated and signed hash of the body encoded in
-`Base64`. Calculation of the hash is done as follows:
+and `signature` the calculated and signed hash of the body encoded in `Base64`
+with padding. Calculation of the hash is done in the following steps:
 
 1. Create a `SHA512` HMAC of the HTTP body with the timestamp string as key.
 2. Create a `SHA512` hash of the resulting HMAC one more time.
@@ -191,8 +194,8 @@ The grace period for requests/responses to be verified is `30` seconds. Which
 derives to `-30` or `+30` seconds from the actual `EPOCH` at the time of
 processing.
 
-### Fingerprint
-
+Fingerprint
+-----------
 The public key of the official API has the following `SHA512` fingerprint:
 
 ```
@@ -213,18 +216,29 @@ All user actions, except `find`, must be signed with the senders private key.
 ### Create
 
 Creates a new user with the given public key. Every user is created with one
-default box named `box`.
+default box named `box`. The given key must be in `PEM` format.
 
 **Request**
 
-* Action: `POST` `https://api.pssst.name/user/<username>`
-* Params: The `<username>` in the address. An JSON object with a `key` field
-          in the body, which holds the users public key in `PEM` format.
+```
+POST /user/<username> HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+content-type: application/json
+content-hash: <timestamp>; <signature>
+
+{ key: "<key>" }
+```
 
 **Response**
 
-* Result: `200` `User created`
-* Format: `text/plain`
+```
+HTTP/1.1 200 OK
+content-type: text/plain
+content-hash: <timestamp>; <signature>
+
+User created
+```
 
 ### Delete
 
@@ -234,27 +248,44 @@ used afterwards for a new user.
 
 **Request**
 
-* Action: `DELETE` `https://api.pssst.name/user/<username>`
-* Params: The `<username>` in the address.
+```
+DELETE /user/<username> HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+content-hash: <timestamp>; <signature>
+```
 
 **Response**
 
-* Result: `200` `User disabled`
-* Format: `text/plain`
+```
+HTTP/1.1 200 OK
+content-type: text/plain
+content-hash: <timestamp>; <signature>
+
+User disabled
+```
 
 ### Find
 
-Returns the users public key.
+Returns the users public key in `PEM` format.
 
 **Request**
 
-* Action: `GET` `https://api.pssst.name/user/<username>/key`
-* Params: The `<username>` in the address.
+```
+GET /user/<username>/key HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+```
 
 **Response**
 
-* Result: `200` and the users public key in `PEM` format.
-* Format: `text/plain`
+```
+HTTP/1.1 200 OK
+content-type: text/plain
+content-hash: <timestamp>; <signature>
+
+<key>
+```
 
 ### List
 
@@ -263,13 +294,22 @@ for other users.
 
 **Request**
 
-* Action: `GET` `https://api.pssst.name/user/<username>/list`
-* Params: The `<username>` in the address.
+```
+GET /user/<username>/list HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+content-hash: <timestamp>; <signature>
+```
 
 **Response**
 
-* Result: `200` and a list of the users box names as strings.
-* Format: `application/json`
+```
+HTTP/1.1 200 OK
+content-type: application/json
+content-hash: <timestamp>; <signature>
+
+[ "box" ]
+```
 
 Box Actions
 -----------
@@ -281,13 +321,22 @@ Creates a new empty box for the user.
 
 **Request**
 
-* Action: `POST` `https://api.pssst.name/user/<username>/<boxname>`
-* Params: The `<username>` and `<boxname>` in the address.
+```
+POST /user/<username>/<boxname> HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+content-hash: <timestamp>; <signature>
+```
 
 **Response**
 
-* Result: `200` `Box created`
-* Format: `text/plain`
+```
+HTTP/1.1 200 OK
+content-type: text/plain
+content-hash: <timestamp>; <signature>
+
+Box created
+```
 
 ### Delete
 
@@ -295,48 +344,75 @@ Deletes a box of the user. All messages in this box will be lost.
 
 **Request**
 
-* Action: `DELETE` `https://api.pssst.name/user/<username>/<boxname>`
-* Params: The `<username>` and `<boxname>` in the address.
+```
+DELETE /user/<username>/<boxname> HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+content-hash: <timestamp>; <signature>
+```
 
 **Response**
 
-* Result: `200` `Box deleted`
-* Format: `text/plain`
+```
+HTTP/1.1 200 OK
+content-type: text/plain
+content-hash: <timestamp>; <signature>
+
+Box deleted
+```
 
 ### Pull
 
 Returns the next message from the users box. Messages will be pulled in order
-from first to last. If no box is specified, the default box `box` is used.
+from first to last. If no box is specified, the default box `box` is used. The
+`time` field of the message will be filled in by the server with the current 
+timestamp while processing the incoming message.
 
 **Request**
 
-* Action: `GET` `https://api.pssst.name/user/<username>/<boxname>/`
-* Params: The `<username>` and `<boxname>` in the address.
+```
+GET /user/<username>/<boxname>/ HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+content-hash: <timestamp>; <signature>
+```
 
 **Response**
 
-* Result: `200` and an JSON object with `meta` and `data` fields. The `meta`
-          field consists of the senders `name`, the `time` the message was
-          processed on the server and the message code `once`.
-* Format: `application/json`
+```
+HTTP/1.1 200 OK
+content-type: application/json
+content-hash: <timestamp>; <signature>
+
+{ meta: { name: "<sender>", once: "<once>", time: "<time>" }, data: "<data>" }
+```
 
 ### Push
 
 Pushes a message into an users box. If no box is specified, the default box
-`box` is used. The sender will be verified with the `name` field in
-the body.
+`box` is used. The sender will be verified with the `name` field in the body. 
 
 **Request**
 
-* Action: `PUT` `https://api.pssst.name/user/<username>/<boxname>/`
-* Params: The `<username>` and `<boxname>` in the address. An JSON object with
-          `meta` and `data` fields in the body. The `meta` field must contain
-          the senders `name` and the message code `once`.
+```
+PUT /user/<username>/<boxname>/ HTTP/1.1
+host: api.pssst.name
+user-agent: Pssst <version>
+content-type: application/json
+content-hash: <timestamp>; <signature>
+
+{ meta: { name: "<sender>", once: "<once>" }, data: "<data>" }
+```
 
 **Response**
 
-* Result: `200` `Message pushed`
-* Format: `text/plain`
+```
+HTTP/1.1 200 OK
+content-type: text/plain
+content-hash: <timestamp>; <signature>
+
+Message pushed
+```
 
 Authors
 -------

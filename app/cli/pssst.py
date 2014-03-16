@@ -52,7 +52,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.19", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.20", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
