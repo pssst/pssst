@@ -110,32 +110,35 @@ class TestName:
     def test_name_with_all(self):
         """
         Tests if name is parsed correctly.
+
         """
         name = Name(" pssst.User.Box:P455w0rd ")
 
         assert name.path == "user/box/"
         assert name.user == "user"
         assert name.box == "box"
-        assert name.all == ("user", "box")
+        assert name.full == ("user", "box")
         assert name.password == "P455w0rd"
         assert str(name) == "pssst.user.box"
 
     def test_name_without_all(self):
         """
         Tests if name is parsed correctly.
+
         """
         name = Name("user")
 
         assert name.path == "user/"
         assert name.user == "user"
         assert name.box == None
-        assert name.all == ("user", None)
+        assert name.full == ("user", None)
         assert name.password == None
         assert str(name) == "pssst.user"
 
     def test_user_name_invalid(self):
         """
         Tests if name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
             Name("Invalid user.name !")
@@ -158,6 +161,7 @@ class TestFile:
     def test_file_user_list(self):
         """
         Tests if file is created correctly.
+
         """
         name1 = createUserName()
         name2 = createUserName()
@@ -196,6 +200,7 @@ class TestCrypto:
     def test_request_verify_user_not_found(self):
         """
         Tests if request user is not found.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -206,6 +211,7 @@ class TestCrypto:
     def test_request_verify_signature_invalid(self):
         """
         Tests if request signature is invalid.
+
         """
         original = Pssst.Key.sign
 
@@ -223,6 +229,7 @@ class TestCrypto:
     def test_request_verify_signature_wrong(self):
         """
         Tests if request verification signature is correct.
+
         """
         original = Pssst.Key.sign
 
@@ -280,6 +287,7 @@ class TestUser:
     def test_create_user(self):
         """
         Tests if an user can be created.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -287,6 +295,7 @@ class TestUser:
     def test_create_user_name_denied(self):
         """
         Tests if an user name is denied.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst("name")
@@ -297,6 +306,7 @@ class TestUser:
     def test_create_user_already_exists(self):
         """
         Tests if an user already exists.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -308,6 +318,7 @@ class TestUser:
     def test_delete_user(self):
         """
         Tests if an user can be deleted.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -316,6 +327,7 @@ class TestUser:
     def test_delete_user(self):
         """
         Tests if an user was deleted.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -328,6 +340,7 @@ class TestUser:
     def test_find_user(self):
         """
         Tests if an user public can be found.
+
         """
         name = createUserName()
         pssst = Pssst(name)
@@ -337,6 +350,7 @@ class TestUser:
     def test_find_user_was_deleted(self):
         """
         Tests if an user was deleted.
+
         """
         with pytest.raises(Exception) as ex:
             name = createUserName()
@@ -352,6 +366,7 @@ class TestUser:
     def test_find_user_not_found(self):
         """
         Tests if an user is not found.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -362,6 +377,7 @@ class TestUser:
     def test_list(self):
         """
         Tests if an user boxes can be listed.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -372,6 +388,7 @@ class TestUser:
     def test_user_name_invalid(self):
         """
         Tests if an user name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -422,6 +439,7 @@ class TestBox:
     def test_create_box(self):
         """
         Tests if a box can be created.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -430,6 +448,7 @@ class TestBox:
     def test_create_box_name_restricted(self):
         """
         Tests if a box name is restricted.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -441,6 +460,7 @@ class TestBox:
     def test_create_box_already_exists(self):
         """
         Tests if a box already exists.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -453,6 +473,7 @@ class TestBox:
     def test_delete_box(self):
         """
         Tests if a box can be deleted.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -462,6 +483,7 @@ class TestBox:
     def test_delete_box_name_restricted(self):
         """
         Tests if a box name is restricted.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -473,6 +495,7 @@ class TestBox:
     def test_push_box(self):
         """
         Tests if message could be pushed.
+
         """
         name1 = createUserName()
         name2 = createUserName()
@@ -487,6 +510,7 @@ class TestBox:
     def test_pull_box(self):
         """
         Tests if message could be pulled.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -495,6 +519,7 @@ class TestBox:
     def test_box_was_deleted(self):
         """
         Tests if a box was deleted.
+
         """
         with pytest.raises(Exception) as ex:
             name1 = createUserName()
@@ -513,6 +538,7 @@ class TestBox:
     def test_box_not_found(self):
         """
         Tests if a box is not found.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -524,6 +550,7 @@ class TestBox:
     def test_box_name_invalid(self):
         """
         Tests if a box name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -567,6 +594,7 @@ class TestPssst:
     def test_push_self(self):
         """
         Tests if a message could be pushed to sender.
+
         """
         name = createUserName()
         text = b"Echo"
@@ -583,6 +611,7 @@ class TestPssst:
     def test_push_single(self):
         """
         Tests if a message could be pushed to receiver.
+
         """
         name1 = createUserName()
         name2 = createUserName()
@@ -603,6 +632,7 @@ class TestPssst:
     def test_push_multi(self):
         """
         Tests if a message could be pushed to many receivers.
+
         """
         send = createUserName()
         text = b"Hello World !"
@@ -628,6 +658,7 @@ class TestPssst:
     def test_push_user_name_invalid(self):
         """
         Tests if user name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -638,6 +669,7 @@ class TestPssst:
     def test_push_pull_empty(self):
         """
         Tests if box is empty.
+
         """
         name = createUserName()
         text = b"Hello World !"
@@ -652,6 +684,7 @@ class TestPssst:
     def test_pull_empty(self):
         """
         Tests if box is empty.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -661,6 +694,7 @@ class TestPssst:
     def test_password_weak(self):
         """
         Tests if a password is weak.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName(), "weakpass")
@@ -670,6 +704,7 @@ class TestPssst:
     def test_password_wrong(self):
         """
         Tests if password is wrong.
+
         """
         with pytest.raises(Exception) as ex:
             name = createUserName()

@@ -153,11 +153,12 @@ module.exports = function Routes(app, redis) {
      * @return {Boolean} true if error was sent
      */
     res.sendError = function sendError(err) {
+      console.error(String(err));
       console.error(err.stack);
 
       // Apply information hiding
       if (config.debug > 0) {
-        return res.sendSigned(500, err);
+        return res.sendSigned(500, String(err));
       } else {
         return res.sendSigned(500);
       }
@@ -185,6 +186,11 @@ module.exports = function Routes(app, redis) {
     app.put(routes.box, pssst.box.push);
     app.delete(routes.box, pssst.box.erase);
 
+    // Time server
+    app.get('/time', function time(req, res) {
+      res.send(Number((new Date()).getTime() / 1000).toFixed(0));
+    });
+
     // File server
     app.get('/:file', file('public').serve);
 
@@ -195,7 +201,7 @@ module.exports = function Routes(app, redis) {
 
     // Server other
     app.get('*', function other(req, res) {
-      res.send(404, 'File not found');
+      res.send(404, 'Not found');
     });
   };
 

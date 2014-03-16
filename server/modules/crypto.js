@@ -71,7 +71,7 @@ module.exports = function Crypto() {
    * @return {Number} the timestamp
    */
   function getTimestamp() {
-    return Number((new Date).getTime() / 1000).toFixed(0);
+    return Number((new Date()).getTime() / 1000).toFixed(0);
   }
 
   /**
