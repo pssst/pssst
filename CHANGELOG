@@ -1,3 +1,8 @@
+0.2.20
+* Added unit test for time synchronizing
+* Changed CLI and server to behave accordingly to the specification
+* Changed API documentation
+
 0.2.19
 * Added sanity check to prevent private keys on server
 * Added check for password if the offical API is used

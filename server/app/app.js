@@ -24,18 +24,6 @@ module.exports = function App(redis) {
   var pssst = require('./pssst.js');
   var pssst = pssst(redis);
 
-  /**
-   * Adds the current epoch to a message.
-   *
-   * @param {Object} the message
-   * @return {Object} the message
-   */
-  function addTime(message) {
-    message.meta.time = Number((new Date()).getTime() / 1000).toFixed(0);
-
-    return message;
-  }
-
   return {
     user: {
 
@@ -167,7 +155,9 @@ module.exports = function App(redis) {
        */
       push: function push(req, res) {
         pssst.handle(req, res, function handle(user, box) {
-          box.push(addTime(req.body));
+          req.body.meta.time = req.timestamp;
+
+          box.push(req.body);
         }, {
           verify: req.body.meta.name,
           status: 'Message sent'

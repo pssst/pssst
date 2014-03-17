@@ -52,7 +52,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.19", (
+__all__, __version__, FINGERPRINT = ["Pssst", "Name"], "0.2.20", (
     "474cfaac9f9d6d02ba1fc185cf41b4907c1874a59553fd47fc364273c5a5e60f"
     "33d3c1fe383c0303c5ae0d0cb32064a0d68329dccb80388b56978e44000a3284"
 )
@@ -347,7 +347,7 @@ class Pssst:
         """
         return "Pssst " + __version__
 
-    def __api(self, method, url, body={}):
+    def __api(self, method, url, body=None):
         """
         Sends an API request (signs and verifies).
 
@@ -357,7 +357,7 @@ class Pssst:
             Request method.
         param url : string
             Request path.
-        param body : JSON, optional (default is {})
+        param body : JSON, optional (default is None)
             Request body.
 
         Returns
@@ -384,7 +384,7 @@ class Pssst:
         if not self.user:
             raise Exception("User was deleted")
 
-        body = str(json.dumps(body, separators=(",", ":")))
+        body = str(json.dumps(body, separators=(",", ":"))) if body else ""
 
         timestamp, signature = self.user.key.sign(body)
 
@@ -468,7 +468,7 @@ class Pssst:
         if not box:
             body = {"key": self.user.key.public()}
         else:
-            body = {}
+            body = None
 
         self.__api("POST", Name(self.user.name, box).path, body)
 
