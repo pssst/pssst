@@ -20,6 +20,7 @@ import os
 import random
 import string
 import sys
+import time
 
 
 from pssst import Pssst, Name
@@ -31,9 +32,15 @@ except ImportError:
     sys.exit("Requires py.test (https://pytest.org)")
 
 
+try:
+    import requests
+except ImportError:
+    sys.exit("Requires Requests (https://github.com/kennethreitz/requests)")
+
+
 def setup_module(module):
     """
-    Setup file list for tests.
+    Setup API address and file list for tests.
 
     Parameters
     ----------
@@ -41,8 +48,14 @@ def setup_module(module):
         The module name.
 
     """
-    global files
+    global api, grace, files
 
+    if os.path.exists(".pssst"):
+        api = io.open(".pssst").read().strip()
+    else:
+        api = "https://api.pssst.name"
+
+    grace = 30
     files = [".pssst.name"] # Fix invalid name
 
     Pssst.Key.size = 1024 # Use smaller keys for faster tests
@@ -87,6 +100,31 @@ def createUserName(length=16):
     files.append(".pssst." + name)
 
     return name
+
+
+class TestTime:
+    """
+    Tests client and server time with the test cases:
+
+    * Time sync
+
+    Methods
+    -------
+    test_time_sync()
+        Tests if the time is synchronized.
+
+    """
+    def test_time_sync(self):
+        """
+        Tests if the time is synchronized.
+
+        """
+        global api
+
+        client = int(round(time.time()))
+        server = int(requests.get("%s/time" % api).text)
+
+        assert (server - grace) < client < (server + grace)
 
 
 class TestName:

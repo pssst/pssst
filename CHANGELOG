@@ -1,4 +1,6 @@
 0.2.20
+* Added unit test for time synchronizing
+* Changed CLI and server to behave accordingly to the specification
 * Changed API documentation
 
 0.2.19

@@ -107,6 +107,12 @@ module.exports = function Routes(app, redis) {
 
   // Add crypto methods to requests/responses
   app.use(function middleware(req, res, next) {
+    req.timestamp = Number((new Date()).getTime() / 1000).toFixed(0);
+
+    // Clear empty body
+    if (JSON.stringify(req.body) === '{}') {
+      req.body = '';
+    }
 
     /**
      * Verifies a HTTP request.
@@ -188,7 +194,7 @@ module.exports = function Routes(app, redis) {
 
     // Time server
     app.get('/time', function time(req, res) {
-      res.send(Number((new Date()).getTime() / 1000).toFixed(0));
+      res.send(req.timestamp);
     });
 
     // File server

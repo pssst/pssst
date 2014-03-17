@@ -120,7 +120,7 @@ _very easy_), and test your apps and/or bug fixes there:
 Every branch uses its own redis server. The database for the `develop` branch
 will be reset each day at midnight and is not persisted. Please be warned:
 
-> **WE DO NOT BACKUP OUR REDIS DATABASES. A MESSAGE CAN ONLY PULLED ONCE.**
+> **We do not backup our Redis databases. A message can only be pulled once.**
 
 Additional informations about the official Pssst server can be requested under
 the following addresses below:
@@ -148,6 +148,10 @@ Client implementations are requested to send an unique `user-agent` header.
 All RSA keys use a key size of 4096 bits.
 All AES keys use a key size of 256 bits.
 
+Please be aware:
+
+> **The message code is called _once_ for a reason. Never use it twice.**
+
 ### Encryption
 
 Encryption of the message data is done in the following steps:
@@ -167,9 +171,7 @@ Decryption of the received `data` and `once` is done in the following steps:
 
 All encrypted data is exchanged as `JSON` object in the request/response body
 within `meta` and `data` fields. The `data` and `once` fields are both encoded
-in `Base64` with padding. Please be aware:
-
-> The message code is called _once_ for a reason. **NEVER USE IT TWICE.**
+in `Base64` with padding.
 
 ### Verification
 
@@ -194,8 +196,8 @@ The grace period for requests/responses to be verified is `30` seconds. Which
 derives to `-30` or `+30` seconds from the actual `EPOCH` at the time of
 processing.
 
-Fingerprint
------------
+### Fingerprint
+
 The public key of the official API has the following `SHA512` fingerprint:
 
 ```
@@ -211,7 +213,8 @@ If they do not match, the client must terminate immediately.
 
 User Actions
 ------------
-All user actions, except `find`, must be signed with the senders private key.
+All user actions, except `find`, must be signed with the senders private key. 
+Only required HTTP headers are listed.
 
 ### Create
 
@@ -223,7 +226,7 @@ default box named `box`. The given key must be in `PEM` format.
 ```
 POST /user/<username> HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
@@ -251,7 +254,7 @@ used afterwards for a new user.
 ```
 DELETE /user/<username> HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 content-hash: <timestamp>; <signature>
 ```
 
@@ -274,7 +277,7 @@ Returns the users public key in `PEM` format.
 ```
 GET /user/<username>/key HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 ```
 
 **Response**
@@ -297,7 +300,7 @@ for other users.
 ```
 GET /user/<username>/list HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 content-hash: <timestamp>; <signature>
 ```
 
@@ -313,7 +316,8 @@ content-hash: <timestamp>; <signature>
 
 Box Actions
 -----------
-All box actions must be signed with the senders private key.
+All box actions must be signed with the senders private key. Only required 
+HTTP headers are listed.
 
 ### Create
 
@@ -324,7 +328,7 @@ Creates a new empty box for the user.
 ```
 POST /user/<username>/<boxname> HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 content-hash: <timestamp>; <signature>
 ```
 
@@ -347,7 +351,7 @@ Deletes a box of the user. All messages in this box will be lost.
 ```
 DELETE /user/<username>/<boxname> HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 content-hash: <timestamp>; <signature>
 ```
 
@@ -373,7 +377,7 @@ timestamp while processing the incoming message.
 ```
 GET /user/<username>/<boxname>/ HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 content-hash: <timestamp>; <signature>
 ```
 
@@ -397,7 +401,7 @@ Pushes a message into an users box. If no box is specified, the default box
 ```
 PUT /user/<username>/<boxname>/ HTTP/1.1
 host: api.pssst.name
-user-agent: Pssst <version>
+user-agent: <app>
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
