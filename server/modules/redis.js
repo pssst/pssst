@@ -48,7 +48,7 @@ module.exports = function Redis(config, callback) {
     heroku = url.parse(process.env.REDISTOGO_URL);
   }
 
-  if (heroku) {
+  if (typeof(heroku) != "undefined") {
     client = redis.createClient(heroku.port, heroku.hostname);
     client.auth(heroku.auth.split(':')[1]);
   } else {

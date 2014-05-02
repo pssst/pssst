@@ -194,7 +194,7 @@ module.exports = function Routes(app, redis) {
 
     // Time server
     app.get('/time', function time(req, res) {
-      res.sendSigned(req.timestamp);
+      res.sendSigned(200, req.timestamp);
     });
 
     // File server
