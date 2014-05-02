@@ -194,7 +194,7 @@ module.exports = function Routes(app, redis) {
 
     // Time server
     app.get('/time', function time(req, res) {
-      res.send(req.timestamp);
+      res.sendSigned(req.timestamp);
     });
 
     // File server
@@ -207,7 +207,7 @@ module.exports = function Routes(app, redis) {
 
     // Server other
     app.get('*', function other(req, res) {
-      res.send(404, 'Not found');
+      res.sendSigned(404, 'Not found');
     });
   };
 

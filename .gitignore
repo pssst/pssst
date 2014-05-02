@@ -1,17 +1,2 @@
-*.crt
-*.iso
-*.key
-*.log
-*.pub
-*.pyc
-*.pyd
-*.pyo
-*.save
 .pssst
 .pssst.*
-config.json
-env
-iso
-key
-node_modules
-npm-debug.log

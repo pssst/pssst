@@ -14,11 +14,7 @@
 // along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A simple Redis wrapper. The Database number is based on the Git branch:
- *
- *   0 = develop
- *   1 = release
- *   2 = master
+ * A simple Redis wrapper with Heroku support.
  *
  * @param {Object} the config
  * @param {Function} callback
@@ -27,17 +23,34 @@ module.exports = function Redis(config, callback) {
   var self = this;
 
   // Required imports
-  var url   = require('url');
+  var url = require('url');
   var redis = require('redis');
 
   var client;
 
-  // Heroku support
-  if (process.env.REDISCLOUD_URL) {
-    var url = url.parse(process.env.REDISCLOUD_URL);
+  // Heroku add-on Open Redis
+  if (process.env.OPENREDIS_URL) {
+    heroku = url.parse(process.env.OPENREDIS_URL);
+  }
 
-    client = redis.createClient(url.port, url.hostname);
-    client.auth(url.auth.split(':')[1]);
+  // Heroku add-on Redis Cloud
+  if (process.env.REDISCLOUD_URL) {
+    heroku = url.parse(process.env.REDISCLOUD_URL);
+  }
+
+  // Heroku add-on Redis Green
+  if (process.env.REDISGREEN_URL) {
+    heroku = url.parse(process.env.REDISGREEN_URL);
+  }
+
+  // Heroku add-on Redis To Go
+  if (process.env.REDISTOGO_URL) {
+    heroku = url.parse(process.env.REDISTOGO_URL);
+  }
+
+  if (heroku) {
+    client = redis.createClient(heroku.port, heroku.hostname);
+    client.auth(heroku.auth.split(':')[1]);
   } else {
     client = redis.createClient(config.source);
   }

@@ -1,0 +1,6 @@
+*.pyc
+*.pyd
+*.pyo
+.pssst
+.pssst.*
+env

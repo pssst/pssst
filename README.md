@@ -75,8 +75,7 @@ When done, execute the following command inside your `server` directory:
 
 The server will now start and print `Ready`.
 
-> We also have built-in support for Heroku with the Redis Cloud add-on. In
-> case you want to run Pssst in the cloud.
+> We also have built-in support for Heroku and all Redis add-ons.
 
 Examples
 --------
@@ -136,7 +135,8 @@ All data is encoded in `ASCII` and exchanged in either `JSON` or `plain text`
 format with HTTPS requests/responses. Except served static files, which are
 encoded in `UTF-8`. Please refer to the mime type in the HTTP `content-type`
 header to decide which format and encoding is returned. Server errors will
-always be returned in plain text. Please be aware:
+always be returned in plain text. Line endings must only consists of a 
+`Line Feed` character. Please be aware:
 
 > All messages will be stored protocol agnostic. You can add more fields to 
 > the messages body. The only field required by the server is the sender.
@@ -145,8 +145,8 @@ Client implementations are requested to send an unique `user-agent` header.
 
 ### Keys
 
-All RSA keys use a key size of 4096 bits.
-All AES keys use a key size of 256 bits.
+All RSA keys have a size of `4096` bits and are encoded in `PEM` / `PKCS#8`.
+All AES keys have a size of `256` bits.
 
 Please be aware:
 
@@ -185,8 +185,8 @@ Where `timestamp` is the `EPOCH` (without decimals) of the request/response
 and `signature` the calculated and signed hash of the body encoded in `Base64`
 with padding. Calculation of the hash is done in the following steps:
 
-1. Create a `SHA512` HMAC of the HTTP body with the timestamp string as key.
-2. Create a `SHA512` hash of the resulting HMAC one more time.
+1. Create a `SHA1` HMAC of the HTTP body with the timestamp string as key.
+2. Create a `SHA1` hash of the resulting HMAC one more time.
 3. Sign the resulting hash with the senders private key using `PKCS#1 v1.5`.
 
 To verify a request/response, calculate its hash as described above in the
@@ -198,17 +198,12 @@ processing.
 
 ### Fingerprint
 
-The public key of the official API has the following `SHA512` fingerprint:
+The public key of the official API has the following `SHA1` fingerprint:
 
-```
-47:4c:fa:ac:9f:9d:6d:02:ba:1f:c1:85:cf:41:b4:90
-7c:18:74:a5:95:53:fd:47:fc:36:42:73:c5:a5:e6:0f
-33:d3:c1:fe:38:3c:03:03:c5:ae:0d:0c:b3:20:64:a0
-d6:83:29:dc:cb:80:38:8b:56:97:8e:44:00:0a:32:84
-```
+`56:3c:b9:03:19:92:f5:03:a2:1f:3f:a7:be:16:05:67:f1:38:04:67`
 
 If a client connects to the official APIs `master` Branch, it is required to
-match the APIs delivered public key against this fingerprint using `SHA512`.
+match the APIs delivered public key against this fingerprint using `SHA1`.
 If they do not match, the client must terminate immediately.
 
 User Actions
@@ -230,7 +225,7 @@ user-agent: <app>
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-{ key: "<key>" }
+{"key":"<key>"}
 ```
 
 **Response**
@@ -311,7 +306,7 @@ HTTP/1.1 200 OK
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-[ "box" ]
+["box"]
 ```
 
 Box Actions
@@ -388,7 +383,7 @@ HTTP/1.1 200 OK
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-{ meta: { name: "<sender>", once: "<once>", time: "<time>" }, data: "<data>" }
+{"meta":{"name":"<sender>","once":"<once>","time":"<time>"},"data":"<data>"}
 ```
 
 ### Push
@@ -405,7 +400,7 @@ user-agent: <app>
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-{ meta: { name: "<sender>", once: "<once>" }, data: "<data>" }
+{"meta":{"name":"<sender>","once":"<once>"},"data":"<data>"}
 ```
 
 **Response**
