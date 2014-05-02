@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="API_ADDRESS"
+        android:title="@string/menu_api_address"
+        android:summary=""
+        android:defaultValue="https://api.pssst.name" />
+    <EditTextPreference
+        android:key="USER_DIRECTORY"
+        android:title="@string/menu_user_directory"
+        android:summary=""
+        android:defaultValue="/data/data/name.pssst.app/files" />
+</PreferenceScreen>

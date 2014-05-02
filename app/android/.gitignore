@@ -1,0 +1,10 @@
+*.apk
+*.ap_
+*.class
+.idea/
+local.properties
+pssst.*
+pssst.*/
+build/
+gen/
+libs/

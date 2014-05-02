@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name">Pssst</string>
+    <string name="menu_info">Info</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_api_address">API Address</string>
+    <string name="menu_user_directory">User Directory</string>
+    <string name="menu_write">Write</string>
+</resources>
