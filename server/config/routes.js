@@ -34,10 +34,10 @@ module.exports = function Routes(app, redis) {
   var HEADER = 'content-hash';
 
   var routes = {
-    user: '/user/:user',
-    key:  '/user/:user/key',
-    list: '/user/:user/list',
-    box:  '/user/:user/:box?*'
+    user: '/1/:user',
+    key:  '/1/:user/key',
+    list: '/1/:user/list',
+    box:  '/1/:user/:box?*'
   };
 
   /**

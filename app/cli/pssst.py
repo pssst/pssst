@@ -45,7 +45,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.21"
+__all__, __version__ = ["Pssst", "Name"], "0.2.22"
 
 
 def _encode64(data): # Utility shortcut
@@ -385,7 +385,7 @@ class Pssst:
 
         timestamp, signature = self.store.key.sign(body)
 
-        response = request(method, "%s/user/%s" % (self.api, path),
+        response = request(method, "%s/1/%s" % (self.api, path),
             data=body,
             headers={
                 "content-hash": "%s; %s" % (timestamp, _encode64(signature)),

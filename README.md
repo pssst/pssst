@@ -219,7 +219,7 @@ default box named `box`. The given key must be in `PEM` format.
 **Request**
 
 ```
-POST /user/<username> HTTP/1.1
+POST /1/<username> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-type: application/json
@@ -247,7 +247,7 @@ used afterwards for a new user.
 **Request**
 
 ```
-DELETE /user/<username> HTTP/1.1
+DELETE /1/<username> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -270,7 +270,7 @@ Returns the users public key in `PEM` format.
 **Request**
 
 ```
-GET /user/<username>/key HTTP/1.1
+GET /1/<username>/key HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 ```
@@ -293,7 +293,7 @@ for other users.
 **Request**
 
 ```
-GET /user/<username>/list HTTP/1.1
+GET /1/<username>/list HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -321,7 +321,7 @@ Creates a new empty box for the user.
 **Request**
 
 ```
-POST /user/<username>/<boxname> HTTP/1.1
+POST /1/<username>/<boxname> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -344,7 +344,7 @@ Deletes a box of the user. All messages in this box will be lost.
 **Request**
 
 ```
-DELETE /user/<username>/<boxname> HTTP/1.1
+DELETE /1/<username>/<boxname> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -370,7 +370,7 @@ timestamp while processing the incoming message.
 **Request**
 
 ```
-GET /user/<username>/<boxname>/ HTTP/1.1
+GET /1/<username>/<boxname>/ HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -394,7 +394,7 @@ Pushes a message into an users box. If no box is specified, the default box
 **Request**
 
 ```
-PUT /user/<username>/<boxname>/ HTTP/1.1
+PUT /1/<username>/<boxname>/ HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-type: application/json

@@ -1,3 +1,6 @@
+0.2.22
+* Added API version to URLs
+
 0.2.21
 * Added server support for OpenRedis
 * Added server support for Redis Green
