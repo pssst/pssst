@@ -202,7 +202,7 @@ module.exports = function Routes(app, redis) {
 
     // Server index
     app.get('/', function index(req, res) {
-      res.redirect('https://pssst.name');
+      res.sendSigned(200, "Pssst");
     });
 
     // Server other
