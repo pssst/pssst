@@ -2,7 +2,6 @@ language: python
 branches:
   only:
     - develop
-    - release
     - master
 python:
   - "2.7"
@@ -11,6 +10,7 @@ services:
   - redis-server
 install:
   - "pip install pycrypto requests"
+  - "pip install ndg-httpsclient pyasn1 pyopenssl"
 before_script:
   - echo 'http://localhost:62421' > .pssst
   - echo '{"debug":0,"port":62421,"deny":null,"db":{"source":6379,"number":0}}' > server/config/config.json
