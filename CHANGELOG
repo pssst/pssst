@@ -1,6 +1,8 @@
 0.2.22
 * Added API version to URLs
-* Removed API redirect to website
+* Added SSL verification to CLI
+* Fixed typo in unit tests
+* Removed API redirect to website in server
 
 0.2.21
 * Added server support for OpenRedis

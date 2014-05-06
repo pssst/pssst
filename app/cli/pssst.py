@@ -45,6 +45,13 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
+try:
+    for module in ["OpenSSL", "pyasn1", "ndg.httpsclient"]:
+        __import__(module)
+except ImportError as ex:
+    sys.exit(ex)
+
+
 __all__, __version__ = ["Pssst", "Name"], "0.2.22"
 
 
@@ -293,20 +300,14 @@ class Pssst:
         -----
         If a file in the current directory with the name '.pssst' exists, the
         content of this file is parsed and used as the API server address and
-        port. In this case, the servers SSL certificate will not be verified.
-
-        Because Requests uses a different CA store, which does not has our CA
-        stored, the server will not be verified if the official API address is
-        used. This is also not necessary, because all server responses will be
-        signed and verified in the HTTP 'content-hash' header with the servers
-        private key.
-
-        The public key of the official API will be verified against the built-
-        in fingerprint.
+        port.
 
         A valid password must consist of upper and lower case letters and also
         numbers. The required minimum length of a password is 8 characters. If
         you use the offical API, a password is mandatory.
+
+        The public key of the official API will be verified against the built-
+        in fingerprint.
 
         """
         FINGERPRINT = "563cb9031992f503a21f3fa7be160567f1380467"
@@ -385,14 +386,12 @@ class Pssst:
 
         timestamp, signature = self.store.key.sign(body)
 
-        response = request(method, "%s/1/%s" % (self.api, path),
-            data=body,
+        response = request(method, "%s/1/%s" % (self.api, path), data=body,
             headers={
                 "content-hash": "%s; %s" % (timestamp, _encode64(signature)),
                 "content-type": "application/json" if data else "text/plain",
                 "user-agent": repr(self)
-            },
-            verify=False
+            }
         )
 
         mime = response.headers.get("content-type", "text/plain")
@@ -443,8 +442,9 @@ class Pssst:
 
         """
         response = request("GET", "%s/%s" % (self.api, path),
-            headers={"user-agent": repr(self)},
-            verify=False
+            headers={
+                "user-agent": repr(self)
+            }
         )
 
         if response.status_code != 200:

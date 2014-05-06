@@ -18,6 +18,12 @@ Required for the command line interface (CLI):
 * Requests `2.0.1` or newer
 * PyCrypto `2.6.1` or newer
 
+Required for SSL verification:
+
+* ndg-httpsclient `0.3.2` or newer
+* PyASN1          `0.1.7` or newer
+* pyOpenSSL       `0.13`  or newer
+
 Required if you want to run your own server:
 
 * Node.js `0.10` or newer
@@ -79,9 +85,9 @@ The server will now start and print `Ready`.
 
 Examples
 --------
-This example will demonstrate you, how to create the users `sender` and 
-`receiver` as well as the receivers box `spam`. Then pushing a message 
-from the `sender` to this box and pulling it by the `receiver`. And 
+This example will demonstrate you, how to create the users `sender` and
+`receiver` as well as the receivers box `spam`. Then pushing a message
+from the `sender` to this box and pulling it by the `receiver`. And
 finally deleting the box (_because nobody likes spam_).
 
 ```
@@ -135,10 +141,10 @@ All data is encoded in `ASCII` and exchanged in either `JSON` or `plain text`
 format with HTTPS requests/responses. Except served static files, which are
 encoded in `UTF-8`. Please refer to the mime type in the HTTP `content-type`
 header to decide which format and encoding is returned. Server errors will
-always be returned in plain text. Line endings must only consists of a 
+always be returned in plain text. Line endings must only consists of a
 `Line Feed` character. Please be aware:
 
-> All messages will be stored protocol agnostic. You can add more fields to 
+> All messages will be stored protocol agnostic. You can add more fields to
 > the messages body. The only field required by the server is the sender.
 
 Client implementations are requested to send an unique `user-agent` header.
@@ -208,7 +214,7 @@ If they do not match, the client must terminate immediately.
 
 User Actions
 ------------
-All user actions, except `find`, must be signed with the senders private key. 
+All user actions, except `find`, must be signed with the senders private key.
 Only required HTTP headers are listed.
 
 ### Create
@@ -311,7 +317,7 @@ content-hash: <timestamp>; <signature>
 
 Box Actions
 -----------
-All box actions must be signed with the senders private key. Only required 
+All box actions must be signed with the senders private key. Only required
 HTTP headers are listed.
 
 ### Create
@@ -364,7 +370,7 @@ Box deleted
 
 Returns the next message from the users box. Messages will be pulled in order
 from first to last. If no box is specified, the default box `box` is used. The
-`time` field of the message will be filled in by the server with the current 
+`time` field of the message will be filled in by the server with the current
 timestamp while processing the incoming message.
 
 **Request**
@@ -389,7 +395,7 @@ content-hash: <timestamp>; <signature>
 ### Push
 
 Pushes a message into an users box. If no box is specified, the default box
-`box` is used. The sender will be verified with the `name` field in the body. 
+`box` is used. The sender will be verified with the `name` field in the body.
 
 **Request**
 

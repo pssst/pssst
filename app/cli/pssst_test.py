@@ -49,9 +49,10 @@ def setup_module(module):
         api = "https://api.pssst.name"
 
     grace = 30
-    files = [".pssst.name"] # Fix invalid name
+    files = [".pssst.name"] # Clean up invalid name test
 
-    Pssst.Key.size = 1024 # Use smaller keys for faster tests
+    # Use smaller keys for faster tests. DO NOT DO THIS IN PRODUCTION CODE !!
+    Pssst.Key.size = 1024
 
 
 def teardown_module(module):
@@ -776,7 +777,7 @@ def main(script, *args):
         api = master
 
     if api == master:
-        return "Please do not test against to official API"
+        return "Please do not test against the official API"
 
     print("Using API: " + api)
 
