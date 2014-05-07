@@ -45,13 +45,6 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-try:
-    for module in ["OpenSSL", "pyasn1", "ndg.httpsclient"]:
-        __import__(module)
-except ImportError as ex:
-    sys.exit(ex)
-
-
 __all__, __version__ = ["Pssst", "Name"], "0.2.22"
 
 

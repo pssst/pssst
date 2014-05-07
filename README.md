@@ -18,12 +18,6 @@ Required for the command line interface (CLI):
 * Requests `2.0.1` or newer
 * PyCrypto `2.6.1` or newer
 
-Required for SSL verification:
-
-* ndg-httpsclient `0.3.2` or newer
-* PyASN1          `0.1.7` or newer
-* pyOpenSSL       `0.13`  or newer
-
 Required if you want to run your own server:
 
 * Node.js `0.10` or newer
