@@ -18,6 +18,9 @@ Required for the command line interface (CLI):
 * Requests `2.0.1` or newer
 * PyCrypto `2.6.1` or newer
 
+> If you use Python `2.7` the pyASN, pyOpenSSL and ndg-httpsclient 
+> module packages are also required for verified HTTPS connections.
+
 Required if you want to run your own server:
 
 * Node.js `0.10` or newer
