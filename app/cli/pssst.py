@@ -680,7 +680,7 @@ def main(script, command="--help", username=None, receiver=None, *message):
 
             if data:
                 name, time, message = data
-                print("%s -- %s, %s" % (
+                print("%s\n--\n%s, %s" % (
                     message.decode("utf-8"), Name(name),
                     datetime.fromtimestamp(time)
                 ))

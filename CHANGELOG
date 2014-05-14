@@ -2,6 +2,7 @@
 * Added API version to URLs
 * Added SSL verification to CLI
 * Fixed typo in unit tests
+* Changed CLI output format
 * Removed API redirect to website in server
 
 0.2.21
