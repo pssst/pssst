@@ -37,6 +37,7 @@ import java.net.URI;
  */
 public abstract class CommandBase implements Command {
     protected static final String USERAGENT = "Pssst " + Pssst.VERSION;
+    protected static final Integer PROTOCOL = 1;
     protected KeyStore store;
 
     /**
@@ -195,7 +196,7 @@ public abstract class CommandBase implements Command {
      * @return path
      */
     private String getUserPath(String user) {
-        return String.format("%s/user/%s", Pssst.getApiAddress(), user);
+        return String.format("%s/%s/%s", Pssst.getApiAddress(), PROTOCOL, user);
     }
 
     /**

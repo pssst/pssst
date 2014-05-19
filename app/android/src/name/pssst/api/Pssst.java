@@ -122,7 +122,9 @@ public final class Pssst {
      * @param directory user directory
      */
     public static void setUserDirectory(java.io.File directory) {
-        Pssst.directory = directory;
+        if (directory.exists() || directory.mkdir()) {
+            Pssst.directory = directory;
+        }
     }
 
     /**

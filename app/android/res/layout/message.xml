@@ -5,30 +5,28 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:paddingLeft="0dp"
-              android:paddingRight="0dp"
-              android:paddingTop="4dp"
-              android:paddingBottom="4dp">
+              android:paddingRight="0dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:id="@+id/text"
-        android:hint="Hello ..."/>
+        android:paddingTop="8dp"/>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:id="@+id/name"
-            android:hint="pssst.name"/>
+            android:textStyle="bold"/>
 
         <Space
             android:layout_width="wrap_content"
@@ -39,8 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/time"
-            android:hint="123456789"/>
+            android:id="@+id/time"/>
     </LinearLayout>
 
 </LinearLayout>

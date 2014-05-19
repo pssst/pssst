@@ -1,40 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:weightSum="1" android:baselineAligned="false"
-              android:padding="8dp">
 
-    <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/logo" android:layout_gravity="center"
-            android:longClickable="false" android:scaleType="fitCenter" android:layout_weight="1"
-            android:adjustViewBounds="false" android:cropToPadding="false"
-            android:src="@drawable/ic_stat_pssst_black" android:padding="60dp"
-        />
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:layout_gravity="center">
 
-    <AutoCompleteTextView
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/username" android:layout_gravity="center_horizontal|top"
-            android:hint="Username" android:editable="true"/>
+            android:layout_gravity="center"
+            android:padding="8dp">
 
-    <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:id="@+id/password" android:layout_gravity="center_horizontal|top"
-            android:hint="Password" android:editable="true"/>
+            <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/username" android:layout_gravity="center_horizontal|top"
+                    android:hint="@string/hint_username" android:editable="true"
+                    android:textStyle="bold"/>
 
-    <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/start" android:layout_gravity="center_horizontal"
-            android:text="Start"
-        />
+            <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:ems="10"
+                    android:id="@+id/password" android:layout_gravity="center_horizontal|top"
+                    android:hint="@string/hint_password" android:editable="true"/>
 
-</LinearLayout>
+            <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/start" android:layout_gravity="center_horizontal"
+                    android:text="@string/button_start"
+                />
+        </LinearLayout>
 
+</FrameLayout>

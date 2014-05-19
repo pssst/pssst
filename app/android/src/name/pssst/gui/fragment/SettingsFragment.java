@@ -37,6 +37,7 @@ public final class SettingsFragment extends PreferenceFragment implements Shared
 
         addPreferencesFromResource(R.xml.settings);
 
+        updateSummary("DEFAULT_BOX");
         updateSummary("API_ADDRESS");
         updateSummary("USER_DIRECTORY");
 
