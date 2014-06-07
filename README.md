@@ -63,6 +63,16 @@ only contain of the lowercase letters `a-z` and numbers. The service prefix
 `pssst` can be omited, but should be specified for clarity reasons. If the
 box name is omited, the users default box `box` is used.
 
+Limits
+------
+Every user has a fix limit of `512` MB overall buffered data. This includes 
+all user specific data, such as the public key, boxes and messages. Neither 
+the number of the users boxes, nor the size of a message are limited 
+separately. As this is a Redis database limit, it can not be changed by 
+further requests.
+
+> Only messages not yet pulled by the user will fall under this limit.
+
 Server
 ------
 If you want to use any other than the official server, simply create a file
@@ -79,16 +89,6 @@ When done, execute the following command inside your `server` directory:
 The server will now start and print `Ready`.
 
 > We also have built-in support for Heroku and all Redis add-ons.
-
-Limits
-------
-Every user has a fix limit of `512`mb overall buffered data. This includes 
-all user specific data, such as the public key, boxes and messages. Neither 
-the number of the users boxes, nor the size of a message are limited 
-separately. As this is a Redis database limit, it can not be changed by 
-further requests.
-
-> Only messages not yet pulled by the user will fall under this limit.
 
 Examples
 --------
