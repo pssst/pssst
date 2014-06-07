@@ -1,6 +1,7 @@
 0.2.22
 * Added API version to URLs
 * Added SSL verification to CLI
+* Added Limits section to README.md
 * Fixed typo in unit tests
 * Changed CLI output format
 * Removed API redirect to website in server

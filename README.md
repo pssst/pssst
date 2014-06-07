@@ -80,6 +80,16 @@ The server will now start and print `Ready`.
 
 > We also have built-in support for Heroku and all Redis add-ons.
 
+Limits
+------
+Every user has a fix limit of `512`mb overall buffered data. This includes 
+all user specific data, such as the public key, boxes and messages. Neither 
+the number of the users boxes, nor the size of a message are limited 
+separately. As this is a Redis database limit, it can not be changed by 
+further requests.
+
+> Only messages not yet pulled by the user will fall under this limit.
+
 Examples
 --------
 This example will demonstrate you, how to create the users `sender` and
