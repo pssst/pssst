@@ -1,3 +1,36 @@
+0.2.23
+* Added config from repository
+* Added script from repository
+* Fixed some typos
+
+0.2.22
+* Added API version to URLs
+* Added SSL verification to CLI
+* Added Limits section to README.md
+* Fixed typo in unit tests
+* Changed CLI output format
+* Removed API redirect to website in server
+
+0.2.21
+* Added server support for OpenRedis
+* Added server support for Redis Green
+* Added server support for Redis To Go
+* Added synchronized time check to CLI
+* Added Windows compatible help option
+* Added signature to all server responses
+* Fixed possible bug in URL request
+* Changed documentation
+* Changed unit tests names
+* Changed fingerprint to SHA1
+* Changed private key export format to PKCS#8
+* Removed unnecessary code for fingerprint
+* Removed unnecessary code for url quoting
+* Removed time sync unit test
+* Renamed class User to KeyStore
+* Refactored user file removal
+* Refactored api and url calls
+* Splitted .gitignore files
+
 0.2.20
 * Added unit test for time synchronizing
 * Changed CLI and server to behave accordingly to the specification

@@ -34,10 +34,10 @@ module.exports = function Routes(app, redis) {
   var HEADER = 'content-hash';
 
   var routes = {
-    user: '/user/:user',
-    key:  '/user/:user/key',
-    list: '/user/:user/list',
-    box:  '/user/:user/:box?*'
+    user: '/1/:user',
+    key:  '/1/:user/key',
+    list: '/1/:user/list',
+    box:  '/1/:user/:box?*'
   };
 
   /**
@@ -194,7 +194,7 @@ module.exports = function Routes(app, redis) {
 
     // Time server
     app.get('/time', function time(req, res) {
-      res.send(req.timestamp);
+      res.sendSigned(200, req.timestamp);
     });
 
     // File server
@@ -202,12 +202,12 @@ module.exports = function Routes(app, redis) {
 
     // Server index
     app.get('/', function index(req, res) {
-      res.redirect('https://pssst.name');
+      res.sendSigned(200, "Pssst");
     });
 
     // Server other
     app.get('*', function other(req, res) {
-      res.send(404, 'Not found');
+      res.sendSigned(404, 'Not found');
     });
   };
 

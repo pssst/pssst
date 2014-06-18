@@ -18,6 +18,9 @@ Required for the command line interface (CLI):
 * Requests `2.0.1` or newer
 * PyCrypto `2.6.1` or newer
 
+> If you use Python `2.7` the pyASN, pyOpenSSL and ndg-httpsclient
+> module packages are also required for verified HTTPS connections.
+
 Required if you want to run your own server:
 
 * Node.js `0.10` or newer
@@ -60,6 +63,16 @@ only contain of the lowercase letters `a-z` and numbers. The service prefix
 `pssst` can be omited, but should be specified for clarity reasons. If the
 box name is omited, the users default box `box` is used.
 
+Limits
+------
+Every user has a fix limit of `512` MB overall buffered data. This includes
+all user specific data, such as the public key, boxes and messages. Neither
+the number of the users boxes, nor the size of a message are limited
+separately. As this is a Redis database limit, it can not be changed by
+further requests.
+
+> Only messages not yet pulled by the user will fall under this limit.
+
 Server
 ------
 If you want to use any other than the official server, simply create a file
@@ -75,14 +88,13 @@ When done, execute the following command inside your `server` directory:
 
 The server will now start and print `Ready`.
 
-> We also have built-in support for Heroku with the Redis Cloud add-on. In
-> case you want to run Pssst in the cloud.
+> We also have built-in support for Heroku and all Redis add-ons.
 
 Examples
 --------
-This example will demonstrate you, how to create the users `sender` and 
-`receiver` as well as the receivers box `spam`. Then pushing a message 
-from the `sender` to this box and pulling it by the `receiver`. And 
+This example will demonstrate you, how to create the users `sender` and
+`receiver` as well as the receivers box `spam`. Then pushing a message
+from the `sender` to this box and pulling it by the `receiver`. And
 finally deleting the box (_because nobody likes spam_).
 
 ```
@@ -136,17 +148,18 @@ All data is encoded in `ASCII` and exchanged in either `JSON` or `plain text`
 format with HTTPS requests/responses. Except served static files, which are
 encoded in `UTF-8`. Please refer to the mime type in the HTTP `content-type`
 header to decide which format and encoding is returned. Server errors will
-always be returned in plain text. Please be aware:
+always be returned in plain text. Line endings must only consists of a
+`Line Feed` character. Please be aware:
 
-> All messages will be stored protocol agnostic. You can add more fields to 
+> All messages will be stored protocol agnostic. You can add more fields to
 > the messages body. The only field required by the server is the sender.
 
 Client implementations are requested to send an unique `user-agent` header.
 
 ### Keys
 
-All RSA keys use a key size of 4096 bits.
-All AES keys use a key size of 256 bits.
+All RSA keys have a size of `4096` bits and are encoded in `PEM` / `PKCS#8`.
+All AES keys have a size of `256` bits.
 
 Please be aware:
 
@@ -185,8 +198,8 @@ Where `timestamp` is the `EPOCH` (without decimals) of the request/response
 and `signature` the calculated and signed hash of the body encoded in `Base64`
 with padding. Calculation of the hash is done in the following steps:
 
-1. Create a `SHA512` HMAC of the HTTP body with the timestamp string as key.
-2. Create a `SHA512` hash of the resulting HMAC one more time.
+1. Create a `SHA1` HMAC of the HTTP body with the timestamp string as key.
+2. Create a `SHA1` hash of the resulting HMAC one more time.
 3. Sign the resulting hash with the senders private key using `PKCS#1 v1.5`.
 
 To verify a request/response, calculate its hash as described above in the
@@ -198,22 +211,17 @@ processing.
 
 ### Fingerprint
 
-The public key of the official API has the following `SHA512` fingerprint:
+The public key of the official API has the following `SHA1` fingerprint:
 
-```
-47:4c:fa:ac:9f:9d:6d:02:ba:1f:c1:85:cf:41:b4:90
-7c:18:74:a5:95:53:fd:47:fc:36:42:73:c5:a5:e6:0f
-33:d3:c1:fe:38:3c:03:03:c5:ae:0d:0c:b3:20:64:a0
-d6:83:29:dc:cb:80:38:8b:56:97:8e:44:00:0a:32:84
-```
+`56:3c:b9:03:19:92:f5:03:a2:1f:3f:a7:be:16:05:67:f1:38:04:67`
 
 If a client connects to the official APIs `master` Branch, it is required to
-match the APIs delivered public key against this fingerprint using `SHA512`.
+match the APIs delivered public key against this fingerprint using `SHA1`.
 If they do not match, the client must terminate immediately.
 
 User Actions
 ------------
-All user actions, except `find`, must be signed with the senders private key. 
+All user actions, except `find`, must be signed with the senders private key.
 Only required HTTP headers are listed.
 
 ### Create
@@ -224,13 +232,13 @@ default box named `box`. The given key must be in `PEM` format.
 **Request**
 
 ```
-POST /user/<username> HTTP/1.1
+POST /1/<username> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-{ key: "<key>" }
+{"key":"<key>"}
 ```
 
 **Response**
@@ -252,7 +260,7 @@ used afterwards for a new user.
 **Request**
 
 ```
-DELETE /user/<username> HTTP/1.1
+DELETE /1/<username> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -275,7 +283,7 @@ Returns the users public key in `PEM` format.
 **Request**
 
 ```
-GET /user/<username>/key HTTP/1.1
+GET /1/<username>/key HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 ```
@@ -298,7 +306,7 @@ for other users.
 **Request**
 
 ```
-GET /user/<username>/list HTTP/1.1
+GET /1/<username>/list HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -311,12 +319,12 @@ HTTP/1.1 200 OK
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-[ "box" ]
+["box"]
 ```
 
 Box Actions
 -----------
-All box actions must be signed with the senders private key. Only required 
+All box actions must be signed with the senders private key. Only required
 HTTP headers are listed.
 
 ### Create
@@ -326,7 +334,7 @@ Creates a new empty box for the user.
 **Request**
 
 ```
-POST /user/<username>/<boxname> HTTP/1.1
+POST /1/<username>/<boxname> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -349,7 +357,7 @@ Deletes a box of the user. All messages in this box will be lost.
 **Request**
 
 ```
-DELETE /user/<username>/<boxname> HTTP/1.1
+DELETE /1/<username>/<boxname> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -369,13 +377,13 @@ Box deleted
 
 Returns the next message from the users box. Messages will be pulled in order
 from first to last. If no box is specified, the default box `box` is used. The
-`time` field of the message will be filled in by the server with the current 
+`time` field of the message will be filled in by the server with the current
 timestamp while processing the incoming message.
 
 **Request**
 
 ```
-GET /user/<username>/<boxname>/ HTTP/1.1
+GET /1/<username>/<boxname>/ HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -388,24 +396,24 @@ HTTP/1.1 200 OK
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-{ meta: { name: "<sender>", once: "<once>", time: "<time>" }, data: "<data>" }
+{"meta":{"name":"<sender>","once":"<once>","time":"<time>"},"data":"<data>"}
 ```
 
 ### Push
 
 Pushes a message into an users box. If no box is specified, the default box
-`box` is used. The sender will be verified with the `name` field in the body. 
+`box` is used. The sender will be verified with the `name` field in the body.
 
 **Request**
 
 ```
-PUT /user/<username>/<boxname>/ HTTP/1.1
+PUT /1/<username>/<boxname>/ HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-type: application/json
 content-hash: <timestamp>; <signature>
 
-{ meta: { name: "<sender>", once: "<once>" }, data: "<data>" }
+{"meta":{"name":"<sender>","once":"<once>"},"data":"<data>"}
 ```
 
 **Response**
@@ -417,6 +425,34 @@ content-hash: <timestamp>; <signature>
 
 Message pushed
 ```
+
+Script
+------
+You will find our maintenance scripts in the folder called `script`:
+
+### Debian
+
+* `install.sh` - Installs the CLI (w/o root privilege)
+* `makedeb.sh` - Creates a Debian package of the CLI
+* `makeiso.sh` - Creates a Debian minimal `ISO` image with user keys and CLI
+* `notify.sh`  - Displays the latest message in a desktop notification
+
+### Heroku
+
+* `checkout.sh` - Starts a server instance (_Heroku_)
+
+### Uberspace
+
+* `checkout.sh` - Starts a server instance (_Uberspace_)
+
+Config
+------
+You will find our server configurations in the folder called `config`:
+
+### Uberspace
+
+* `live.conf` - Redis database config used by `api.pssst.name`
+* `test.conf` - Redis database config used by `dev.pssst.name`
 
 Authors
 -------

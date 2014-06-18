@@ -2,7 +2,6 @@ language: python
 branches:
   only:
     - develop
-    - release
     - master
 python:
   - "2.7"

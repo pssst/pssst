@@ -20,7 +20,6 @@ import os
 import random
 import string
 import sys
-import time
 
 
 from pssst import Pssst, Name
@@ -30,12 +29,6 @@ try:
     import pytest
 except ImportError:
     sys.exit("Requires py.test (https://pytest.org)")
-
-
-try:
-    import requests
-except ImportError:
-    sys.exit("Requires Requests (https://github.com/kennethreitz/requests)")
 
 
 def setup_module(module):
@@ -56,9 +49,10 @@ def setup_module(module):
         api = "https://api.pssst.name"
 
     grace = 30
-    files = [".pssst.name"] # Fix invalid name
+    files = [".pssst.name"] # Clean up invalid name test
 
-    Pssst.Key.size = 1024 # Use smaller keys for faster tests
+    # Use smaller keys for faster tests. DO NOT DO THIS IN PRODUCTION CODE !!
+    Pssst.Key.size = 1024
 
 
 def teardown_module(module):
@@ -102,50 +96,25 @@ def createUserName(length=16):
     return name
 
 
-class TestTime:
-    """
-    Tests client and server time with the test cases:
-
-    * Time sync
-
-    Methods
-    -------
-    test_time_sync()
-        Tests if the time is synchronized.
-
-    """
-    def test_time_sync(self):
-        """
-        Tests if the time is synchronized.
-
-        """
-        global api
-
-        client = int(round(time.time()))
-        server = int(requests.get("%s/time" % api).text)
-
-        assert (server - grace) < client < (server + grace)
-
-
 class TestName:
     """
-    Tests Name parsing with the test cases:
+    Tests name parsing with the test cases:
 
-    * User name and box name
-    * User name alone
+    * User name parse maximum
+    * User name parse minimum
     * User name is invalid
 
     Methods
     -------
-    test_name_with_all()
-        Tests if name is parsed correctly.
-    test_name_without_all()
-        Tests if name is parsed correctly.
-    test_user_name_invalid()
-        Tests if name is invalid.
+    test_name_maximum()
+        Tests if a maximum name is parsed correctly.
+    test_name_minimum()
+        Tests if a minimum name is parsed correctly.
+    test_name_invalid()
+        Tests if a name is invalid.
 
     """
-    def test_name_with_all(self):
+    def test_name_maximum(self):
         """
         Tests if name is parsed correctly.
 
@@ -159,7 +128,7 @@ class TestName:
         assert name.password == "P455w0rd"
         assert str(name) == "pssst.user.box"
 
-    def test_name_without_all(self):
+    def test_name_minimum(self):
         """
         Tests if name is parsed correctly.
 
@@ -173,7 +142,7 @@ class TestName:
         assert name.password == None
         assert str(name) == "pssst.user"
 
-    def test_user_name_invalid(self):
+    def test_name_invalid(self):
         """
         Tests if name is invalid.
 
@@ -184,19 +153,19 @@ class TestName:
         assert str(ex.value) == "User name invalid"
 
 
-class TestFile:
+class TestKeyStore:
     """
-    Tests user file with the test cases:
+    Tests key store with the test cases:
 
-    * User list
+    * Key list
 
     Methods
     -------
-    test_file_user_list()
+    test_key_list()
         Tests if file is created correctly.
 
     """
-    def test_file_user_list(self):
+    def test_key_list(self):
         """
         Tests if file is created correctly.
 
@@ -214,7 +183,7 @@ class TestFile:
 
         content = [pssst1.api, name1 + ".private", name1, name2]
 
-        assert sorted(pssst1.user.list()) == sorted(content)
+        assert sorted(pssst1.store.list()) == sorted(content)
 
 
 class TestCrypto:
@@ -808,7 +777,7 @@ def main(script, *args):
         api = master
 
     if api == master:
-        return "Please do not test against to official API"
+        return "Please do not test against the official API"
 
     print("Using API: " + api)
 
