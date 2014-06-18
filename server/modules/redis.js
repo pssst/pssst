@@ -95,7 +95,7 @@ module.exports = function Redis(config, callback) {
    * @param {Function} callback
    */
   this.set = function set(key, val, callback) {
-    client.set(key, JSON.stringify(val), function set(err) {
+    client.set(key, JSON.stringify(val, null, 0), function set(err) {
       try {
         callback(err);
       } catch (err) {
