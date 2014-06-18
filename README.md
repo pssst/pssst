@@ -18,7 +18,7 @@ Required for the command line interface (CLI):
 * Requests `2.0.1` or newer
 * PyCrypto `2.6.1` or newer
 
-> If you use Python `2.7` the pyASN, pyOpenSSL and ndg-httpsclient 
+> If you use Python `2.7` the pyASN, pyOpenSSL and ndg-httpsclient
 > module packages are also required for verified HTTPS connections.
 
 Required if you want to run your own server:
@@ -65,10 +65,10 @@ box name is omited, the users default box `box` is used.
 
 Limits
 ------
-Every user has a fix limit of `512` MB overall buffered data. This includes 
-all user specific data, such as the public key, boxes and messages. Neither 
-the number of the users boxes, nor the size of a message are limited 
-separately. As this is a Redis database limit, it can not be changed by 
+Every user has a fix limit of `512` MB overall buffered data. This includes
+all user specific data, such as the public key, boxes and messages. Neither
+the number of the users boxes, nor the size of a message are limited
+separately. As this is a Redis database limit, it can not be changed by
 further requests.
 
 > Only messages not yet pulled by the user will fall under this limit.
@@ -425,6 +425,34 @@ content-hash: <timestamp>; <signature>
 
 Message pushed
 ```
+
+Script
+------
+You will find our maintenance scripts in the folder called `script`:
+
+### Debian
+
+* `install.sh` - Installs the CLI (w/o root privilege)
+* `makedeb.sh` - Creates a Debian package of the CLI
+* `makeiso.sh` - Creates a Debian minimal `ISO` image with user keys and CLI
+* `notify.sh`  - Displays the latest message in a desktop notification
+
+### Heroku
+
+* `checkout.sh` - Starts a server instance (_Heroku_)
+
+### Uberspace
+
+* `checkout.sh` - Starts a server instance (_Uberspace_)
+
+Config
+------
+You will find our server configurations in the folder called `config`:
+
+### Uberspace
+
+* `live.conf` - Redis database config used by `api.pssst.name`
+* `test.conf` - Redis database config used by `dev.pssst.name`
 
 Authors
 -------

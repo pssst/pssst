@@ -1,3 +1,8 @@
+0.2.23
+* Added config from repository
+* Added script from repository
+* Fixed some typos
+
 0.2.22
 * Added API version to URLs
 * Added SSL verification to CLI

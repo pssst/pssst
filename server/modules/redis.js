@@ -72,7 +72,7 @@ module.exports = function Redis(config, callback) {
   });
 
   /**
-   * Gets the value to the key.
+   * Gets the value for a key.
    *
    * @param {String} the key
    * @param {Function} callback
@@ -88,7 +88,7 @@ module.exports = function Redis(config, callback) {
   };
 
   /**
-   * Sets the value to the key.
+   * Sets the value for a key.
    *
    * @param {String} the key
    * @param {Object} the value
