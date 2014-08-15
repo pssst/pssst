@@ -1,3 +1,27 @@
+0.2.24
+* Refactored whole server
+* Added basic HTML5 GUI
+* Added basic test vectors
+* Added interactive CLI shell
+* Added server Docker support
+* Added server config file auto creation
+* Added some performance optimizations
+* Fixed some bugs in unit tests
+* Fixed wrong server debug timestamp
+* Fixed wrong server usage text
+* Fixed wrong method documentation
+* Adapted Travis CI script
+* Adapted checkout scripts
+* Adapted README.md
+* Changed install script to comply with FHS
+* Changed data exchange structure
+* Changed server package.json
+* Changed server log format
+* Removed unused code from CLI unit tests
+* Removed unsafe file transfer from CLI
+* Removed use of deprecated methods
+* Upgrated to Express 4.7.x
+
 0.2.23
 * Added config from repository
 * Added script from repository

@@ -35,14 +35,6 @@ Maintainer: Christian & Christian <hello@pssst.name>
 Description: Pssst CLI
 EOF
 
-cat > $DEB/changelog <<EOF
-pssst ($VERSION) unstable; urgency=low
-
-* Package script
-
--- Christian & Christian <hello@pssst.name>  Fri, 21 Feb 2014 00:00:00 +0100
-EOF
-
 cat > $DEB/copyright <<EOF
 Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
 

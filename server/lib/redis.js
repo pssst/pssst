@@ -1,52 +1,51 @@
-// Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program. If not, see <http://www.gnu.org/licenses/>.
-
 /**
+ * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
  * A simple Redis wrapper with Heroku support.
  *
  * @param {Object} the config
  * @param {Function} callback
  */
 module.exports = function Redis(config, callback) {
-  var self = this;
 
   // Required imports
   var url = require('url');
   var redis = require('redis');
 
-  var client;
-
-  // Heroku add-on Open Redis
+  // Heroku Open Redis add-on
   if (process.env.OPENREDIS_URL) {
     heroku = url.parse(process.env.OPENREDIS_URL);
   }
 
-  // Heroku add-on Redis Cloud
+  // Heroku Redis Cloud add-on
   if (process.env.REDISCLOUD_URL) {
     heroku = url.parse(process.env.REDISCLOUD_URL);
   }
 
-  // Heroku add-on Redis Green
+  // Heroku Redis Green add-on
   if (process.env.REDISGREEN_URL) {
     heroku = url.parse(process.env.REDISGREEN_URL);
   }
 
-  // Heroku add-on Redis To Go
+  // Heroku Redis To Go add-on
   if (process.env.REDISTOGO_URL) {
     heroku = url.parse(process.env.REDISTOGO_URL);
   }
+
+  var client, self = this;
 
   if (typeof(heroku) != "undefined") {
     client = redis.createClient(heroku.port, heroku.hostname);
@@ -57,7 +56,7 @@ module.exports = function Redis(config, callback) {
 
   // Error event handler
   client.on('error', function error(err) {
-    console.error(err.stack ? err.stack : err);
+    console.error(err.stack || err);
   });
 
   // Ready event handler
@@ -72,35 +71,27 @@ module.exports = function Redis(config, callback) {
   });
 
   /**
-   * Gets the value for a key.
+   * Gets the value of a key (Redis GET).
    *
    * @param {String} the key
    * @param {Function} callback
    */
   this.get = function get(key, callback) {
-    client.get(key, function get(err, val) {
-      try {
-        callback(err, err ? null : JSON.parse(val));
-      } catch (err) {
-        callback(err);
-      }
+    client.GET(key, function get(err, val) {
+      callback(err, JSON.parse(val));
     });
   };
 
   /**
-   * Sets the value for a key.
+   * Sets the value of a key (Redis SET).
    *
    * @param {String} the key
    * @param {Object} the value
    * @param {Function} callback
    */
   this.set = function set(key, val, callback) {
-    client.set(key, JSON.stringify(val, null, 0), function set(err) {
-      try {
-        callback(err);
-      } catch (err) {
-        callback(err);
-      }
+    client.SET(key, JSON.stringify(val, null, 0), function set(err) {
+      callback(err);
     });
   };
 }

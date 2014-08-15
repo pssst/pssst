@@ -9,14 +9,13 @@ fi
 
 BRANCH=$1
 HEROKU=$2
-ORIGIN=/tmp/pssst
-CONFIG='{"debug":0,"port":0,"deny":null,"db":{"source":0,"number":0}}'
 
-git clone https://github.com/pssst/pssst -b $BRANCH $ORIGIN
+TMP=/tmp/pssst
+
+git clone https://github.com/pssst/pssst -b $BRANCH $TMP
 
 if [[ ! -d $HEROKU ]]; then
-    mkdir -p $HEROKU/config
-    mkdir -p $HEROKU/public
+    mkdir -p $HEROKU/www
 
     cd $HEROKU && git init
 
@@ -29,11 +28,8 @@ fi
 git pull heroku master
 git checkout master
 
-cp -r -u $ORIGIN/server/* .
-rm config/config.json.sample
-echo $CONFIG > config/config.json
-
-rm -rf $ORIGIN
+cp -r -u $TMP/server/* .
+rm -rf $TMP
 
 git add .
 git commit -a -m "Checked out $BRANCH"

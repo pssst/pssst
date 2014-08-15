@@ -11,12 +11,11 @@ services:
 install:
   - "pip install pycrypto requests"
 before_script:
-  - echo 'http://localhost:62421' > .pssst
-  - echo '{"debug":0,"port":62421,"deny":null,"db":{"source":6379,"number":0}}' > server/config/config.json
+  - echo 'http://localhost' > .pssst
   - export PYTHON=`which python2`
   - cd server
   - npm install
-  - node start.js &
+  - npm start &
   - cd ..
   - sleep 10
 script:

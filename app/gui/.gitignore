@@ -1,0 +1,11 @@
+*.map
+*.pyc
+*.pyd
+*.pyo
+.pssst
+.pssst.*
+aes*
+boot*
+font*
+jquery*
+pssst.py

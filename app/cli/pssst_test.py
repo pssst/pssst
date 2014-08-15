@@ -33,25 +33,23 @@ except ImportError:
 
 def setup_module(module):
     """
-    Setup API address and file list for tests.
+    Setup file list for tests.
 
     Parameters
     ----------
     param module : string
         The module name.
 
+    Notes
+    -----
+    Smaller keys are only used for tests. DO NOT DO THIS IN PRODUCTION CODE!
+
     """
-    global api, grace, files
+    global files
 
-    if os.path.exists(".pssst"):
-        api = io.open(".pssst").read().strip()
-    else:
-        api = "https://api.pssst.name"
+    # Clean up invalid name test
+    files = [".pssst.name"]
 
-    grace = 30
-    files = [".pssst.name"] # Clean up invalid name test
-
-    # Use smaller keys for faster tests. DO NOT DO THIS IN PRODUCTION CODE !!
     Pssst.Key.size = 1024
 
 
@@ -119,13 +117,13 @@ class TestName:
         Tests if name is parsed correctly.
 
         """
-        name = Name(" pssst.User.Box:P455w0rd ")
+        name = Name(" pssst.User.Box:Pa55w0rd ")
 
         assert name.path == "user/box/"
         assert name.user == "user"
         assert name.box == "box"
         assert name.full == ("user", "box")
-        assert name.password == "P455w0rd"
+        assert name.password == "Pa55w0rd"
         assert str(name) == "pssst.user.box"
 
     def test_name_minimum(self):
@@ -254,10 +252,10 @@ class TestCrypto:
 
 class TestUser:
     """
-    Tests user with this test cases:
+    Tests user commands with this test cases:
 
     * User create
-    * User create failed, name denied
+    * User create failed, name restricted
     * User create failed, already exists
     * User delete
     * User delete, user was deleted
@@ -271,8 +269,8 @@ class TestUser:
     -------
     test_create_user()
         Tests if an user can be created.
-    test_create_user_name_denied()
-        Tests if an user name is denied.
+    test_create_user_name_restricted()
+        Tests if an user name is restricted.
     test_create_user_already_exists()
         Tests if an user already exists.
     test_delete_user()
@@ -299,16 +297,16 @@ class TestUser:
         pssst = Pssst(createUserName())
         pssst.create()
 
-    def test_create_user_name_denied(self):
+    def test_create_user_name_restricted(self):
         """
-        Tests if an user name is denied.
+        Tests if an user name is restricted.
 
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst("name")
             pssst.create()
 
-        assert str(ex.value) == "User name denied"
+        assert str(ex.value) == "User name restricted"
 
     def test_create_user_already_exists(self):
         """
@@ -406,7 +404,7 @@ class TestUser:
 
 class TestBox:
     """
-    Tests box with this test cases:
+    Tests box commands with this test cases:
 
     * Box create
     * Box create failed, name restricted
@@ -569,22 +567,23 @@ class TestBox:
 
 class TestPssst:
     """
-    Tests pssst with this test cases:
+    Tests client with this test cases:
 
     * Push self
-    * Push single
-    * Push multi
+    * Push single user
+    * Push multi users
     * Push failed, user name invalid
     * Pull empty
+    * Password weak
     * Password wrong
 
     Methods
     -------
     test_push_self()
         Tests if a message could be pushed to sender.
-    test_push_single()
-        Tests if a message could be pushed to receiver.
-    test_push_multi()
+    test_push_single_user()
+        Tests if a message could be pushed to one receiver.
+    test_push_multi_users()
         Tests if a message could be pushed to many receivers.
     test_push_user_name_invalid()
         Tests if user name is invalid.
@@ -593,9 +592,9 @@ class TestPssst:
     test_pull_empty()
         Tests if box is empty.
     test_password_weak()
-        Tests if password is weak.
+        Tests if a password is weak.
     test_password_wrong()
-        Tests if password is wrong.
+        Tests if a password is wrong.
 
     """
     def test_push_self(self):
@@ -615,9 +614,9 @@ class TestPssst:
         assert data[0] == name
         assert data[2] == text
 
-    def test_push_single(self):
+    def test_push_single_user(self):
         """
-        Tests if a message could be pushed to receiver.
+        Tests if a message could be pushed to one receiver.
 
         """
         name1 = createUserName()
@@ -636,7 +635,7 @@ class TestPssst:
         assert data[0] == name2
         assert data[2] == text
 
-    def test_push_multi(self):
+    def test_push_multi_users(self):
         """
         Tests if a message could be pushed to many receivers.
 
@@ -710,13 +709,13 @@ class TestPssst:
 
     def test_password_wrong(self):
         """
-        Tests if password is wrong.
+        Tests if a password is wrong.
 
         """
         with pytest.raises(Exception) as ex:
             name = createUserName()
-            Pssst(name, "Right123")
-            Pssst(name, "Wrong000")
+            Pssst(name, "RightPassword1234")
+            Pssst(name, "WrongPassword0000")
 
         assert str(ex.value) == "Password wrong"
 
@@ -760,27 +759,23 @@ def main(script, *args):
     param script : string
         Full script path.
     param args : tuple of strings, optional
-        All remaining arguments.
+        Arguments passed to py.test.
 
     Notes
     -----
-    Unit testing against the official API (master branch) should not be done,
-    because it slows down the server and clutters up the database.
+    Testing against the live API should not be done, because
+    it slows the server down and clutters up the database.
 
     """
-    master = "https://api.pssst.name"
+    master = api = "https://api.pssst.name"
 
-    # Prevent testing against master API
     if os.path.exists(".pssst"):
         api = io.open(".pssst").read().strip()
-    else:
-        api = master
 
     if api == master:
-        return "Please do not test against the official API"
+        return "Tests against the live API are not allowed"
 
-    print("Using API: " + api)
-
+    print("Using API:" + api)
     return pytest.main([script] + list(args))
 
 
