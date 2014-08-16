@@ -229,7 +229,7 @@ processing.
 
 The public key of our official API has the following `SHA1` fingerprint:
 
-`56:3c:b9:03:19:92:f5:03:a2:1f:3f:a7:be:16:05:67:f1:38:04:67`
+**`56:3c:b9:03:19:92:f5:03:a2:1f:3f:a7:be:16:05:67:f1:38:04:67`**
 
 If a client connects to the official APIs `master` Branch, it is required to
 match the APIs delivered public key against this fingerprint using `SHA1`.
@@ -443,15 +443,15 @@ In the `script` folder you will find the maintenance scripts we use:
 
 ### Docker
 
-* `Dockerfile`  - Builds a docker container (_Docker_)
+* `Dockerfile`  - Builds a docker container
 
 ### Heroku
 
-* `checkout.sh` - Builds and starts a server instance (_Heroku_)
+* `checkout.sh` - Builds and starts a server instance on _Heroku_
 
 ### Uberspace
 
-* `checkout.sh` - Builds and starts a server instance (_Uberspace_)
+* `checkout.sh` - Builds and starts a server instance on _Uberspace_
 
 Config
 ------
