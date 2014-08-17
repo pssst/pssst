@@ -16,6 +16,7 @@
 * Changed install script to comply with FHS
 * Changed data exchange structure
 * Changed server package.json
+* Changed server default port
 * Changed server log format
 * Removed unused code from CLI unit tests
 * Removed unsafe file transfer from CLI
