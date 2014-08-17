@@ -6,6 +6,7 @@
 .pssst.*
 aes*
 boot*
-font*
+font-*
+fonta*
 jquery*
 pssst.py
