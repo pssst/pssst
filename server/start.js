@@ -23,7 +23,7 @@ try {
   var config = JSON.stringify({
     "debug": 0,
     "deny": null,
-    "port": 80,
+    "port": 62421,
     "db": {
       "source": 6379,
       "number": 0
