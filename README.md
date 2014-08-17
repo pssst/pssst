@@ -34,7 +34,7 @@ If you wish to install the CLI on a POSIX system, just execute:
 If you want to use any other than our official server, simply create a file
 named `.pssst` in the directory of the CLI with the desired server address:
 
-`$ echo http://localhost > .pssst`
+`$ echo http://localhost:62421 > .pssst`
 
 Please use the `--help` option to show further help on the CLI. All user
 specific data will be stored as zip files named `.pssst.<username>` in
@@ -58,6 +58,8 @@ Required if you want to run your own server:
 
 Please refer to the file `server/package.json` for further details on the
 required Node.js modules and their version.
+
+> The default server port is `62421`.
 
 Commands
 --------
