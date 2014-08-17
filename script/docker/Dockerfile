@@ -58,7 +58,7 @@ RUN \
   npm install
 
 # Expose ports.
-EXPOSE 80
+EXPOSE 62421
 
 # Define default command.
 CMD ["redis-server", "/etc/redis/redis.conf", "&", "node", "start"]
