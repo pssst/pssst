@@ -48,10 +48,10 @@ cp $CFG/$CONFIG/* .
 mv pssst.key app/pssst.key
 mv pssst.pub www/key
 
-echo $BRANCH > files/branch
-node start -v | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' > files/version
+echo $BRANCH > www/branch
+node start -v | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' > www/version
 
-uberspace-setup-service pssst.$SERVER node $DIR/start.js
+uberspace-setup-service pssst.$SERVER node $DIR/start
 
 echo "Done"
 exit 0
