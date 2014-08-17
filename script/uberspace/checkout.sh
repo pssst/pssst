@@ -45,11 +45,11 @@ rm -rf $DIR/tmp
 
 cd $DIR && npm install
 cp $CFG/$CONFIG/* .
-mv pssst.key app/app.key
-mv pssst.pub files/key
+mv pssst.key app/pssst.key
+mv pssst.pub www/key
 
 echo $BRANCH > files/branch
-node start.js -v | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' > files/version
+node start -v | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' > files/version
 
 uberspace-setup-service pssst.$SERVER node $DIR/start.js
 
