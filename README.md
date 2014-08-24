@@ -1,8 +1,8 @@
 Pssst ![Build](https://travis-ci.org/pssst/pssst.png?branch=master)
 =====
-Pssst is a simple and secure way to communicate. We are not a service
-provider, but we provide you with the tools to start your own service.
-These tools are build upon open source software and use strong end-to-end
+Pssst is a simple and secure way to exchange information. We do not provide
+services by our self, but we provide you with the tools to start your own
+service. These tools build upon open-source software and use strong end-to-end
 encryption.
 
 As this project is under continuous development, we advise you to not rely
@@ -20,7 +20,7 @@ Required for the command line interface (CLI):
 * Requests `2.0.1` or newer
 * PyCrypto `2.6.1` or newer
 
-> If you use Python `2.7` the pyASN, pyOpenSSL and ndg-httpsclient
+> If you use Python `2.7` the pyASN1, pyOpenSSL and ndg-httpsclient
 > module packages are also required for verified HTTPS connections.
 
 There is no need to install anything, just run the `app/cli/pssst.py` script:
@@ -140,8 +140,8 @@ If you want to test your code, please use the addresses below accordingly.
 But we advise you to please setup your own local server and database (which
 is _very easy_), and test your apps and/or bug fixes there.
 
-* `https://dev.pssst.name` is the `test` API (from `develop` branch)
-* `https://api.pssst.name` is the `live` API (from `master` branch)
+* `https://dev.pssst.name` for the latest `develop` commit (`develop` branch)
+* `https://api.pssst.name` for the latest `stable` release (`master` branch)
 
 Each address uses its own Redis server. The database of the `dev` address
 will be reset each day at midnight and is not persisted. Please be warned:

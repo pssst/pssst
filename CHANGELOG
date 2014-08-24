@@ -1,3 +1,11 @@
+0.2.25
+* Changed HTML5 GUI to new website style
+* Changed Uberspace live Redis output
+* Changed Uberspace test Redis output
+* Changed Dockerfile Redis config
+* Changed README.md texts
+* Fixed wrong dependency in README.md
+
 0.2.24
 * Refactored whole server
 * Added basic HTML5 GUI

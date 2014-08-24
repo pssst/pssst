@@ -202,7 +202,7 @@ function Pssst(token) {
 
           if ($('.pssst #messages-' + box).length === 0) {
             $('.pssst #content').append(render(
-              '<div id="messages-{{box}}" class="messages"></div>'
+              '<section id="messages-{{box}}"></section>'
             , {
               box: box
             }));
@@ -240,16 +240,16 @@ function Pssst(token) {
       server.call('pull', [box], function call(data) {
         if (data) {
           $('.pssst #messages-' + box).append(render(
-            '<div class="message well">' +
+            '<article class="well">' +
               '<span>{{text}}</span><br/><small>- {{user}} {{time}}</small>' +
-            '</div>'
+            '</article>'
           , {
             text: data[2].replace(/\n/g, '<br/>'),
             user: 'pssst.' + data[0],
             time: new Date(data[1] * 1000)
           }));
 
-          $('.pssst #messages-' + box + ' .message:last-child').fadeIn(350);
+          $('.pssst #messages-' + box + ' article:last-child').fadeIn(350);
 
           $("html, body").animate({scrollTop: $(document).height()}, "slow");
         }
@@ -289,7 +289,7 @@ function Pssst(token) {
   function load(box) {
     $('.pssst #user').html(user + '.' + box + ' <b class="caret"></b>');
 
-    $('.pssst .messages').finish().hide();
+    $('.pssst section').finish().hide();
     $('.pssst #messages-' + box).finish().fadeIn(350);
 
     var all = $('.pssst .box');
