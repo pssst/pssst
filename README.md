@@ -436,22 +436,22 @@ Script
 ------
 In the `script` folder you will find the maintenance scripts we use:
 
-### Debian
+**Debian**
 
 * `install.sh` - Installs the CLI (w/o root permission)
 * `makedeb.sh` - Creates a Debian package of the CLI
 * `makeiso.sh` - Creates a Debian minimal `ISO` image with user keys and CLI
 * `notify.sh`  - Displays the latest message with a desktop notification
 
-### Docker
+**Docker**
 
 * `Dockerfile`  - Builds a docker container
 
-### Heroku
+**Heroku**
 
 * `checkout.sh` - Builds and starts a server instance on _Heroku_
 
-### Uberspace
+**Uberspace**
 
 * `checkout.sh` - Builds and starts a server instance on _Uberspace_
 
@@ -459,7 +459,7 @@ Config
 ------
 In the `config` folder you will our Redis server configurations:
 
-### Uberspace
+**Uberspace**
 
 * `live.conf` - Redis database config used by `api.pssst.name`
 * `test.conf` - Redis database config used by `dev.pssst.name`
