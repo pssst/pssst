@@ -631,7 +631,7 @@ def usage(text, *args):
         if os.name in ["posix"]:
 
             # Color description
-            if re.match("^  CLI", line):
+            if re.match("^.* version \d+\.\d+\.\d+$", line):
                 line = line.replace("version", "version\x1B[34;1m")
                 line = "\x1B[39;1m%s\x1B[0m" % line
 
