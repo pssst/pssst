@@ -89,7 +89,7 @@ def createUserName(length=16):
 
     pool = string.ascii_lowercase + string.digits
     name = "".join([random.choice(pool) for x in range(length)])
-    files.append(".pssst." + name)
+    files.append(".pssst.test_" + name)
 
     return name
 
@@ -574,7 +574,6 @@ class TestPssst:
     * Push multi users
     * Push failed, user name invalid
     * Pull empty
-    * Password weak
     * Password wrong
 
     Methods
@@ -591,8 +590,6 @@ class TestPssst:
         Tests if box is empty.
     test_pull_empty()
         Tests if box is empty.
-    test_password_weak()
-        Tests if a password is weak.
     test_password_wrong()
         Tests if a password is wrong.
 
@@ -696,16 +693,6 @@ class TestPssst:
         pssst.create()
 
         assert pssst.pull() == None
-
-    def test_password_weak(self):
-        """
-        Tests if a password is weak.
-
-        """
-        with pytest.raises(Exception) as ex:
-            pssst = Pssst(createUserName(), "weakpass")
-
-        assert str(ex.value) == "Password weak"
 
     def test_password_wrong(self):
         """

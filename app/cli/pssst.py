@@ -46,7 +46,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.25"
+__all__, __version__ = ["Pssst", "Name"], "0.2.26"
 
 
 def _encode64(data): # Utility shortcut
@@ -153,11 +153,8 @@ class Pssst:
 
         """
         def __init__(self, user, password):
-            self.user, test = user, password or "Password1" # Only for tests
-            self.file = repr(self)
-
-            if not re.match("^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,})$", test):
-                raise Exception("Password weak")
+            self.user = user
+            self.file = "%s/%s" % (os.path.expanduser("~"), self)
 
             if os.path.exists(self.file):
                 self.key = Pssst.Key(self.load(user + ".private"), password)
@@ -584,29 +581,35 @@ class Pssst:
             self.__api("PUT", Name(user, box).path, body)
 
 
-def shell(version):
+def shell(intro, prompt="pssst"):
     """
     Starts an interactive shell.
 
     Parameters
     ----------
-    param version : string
-        Version information.
+    param intro : string
+        The shell intro.
+    param prompt : string, optional (default is pssst)
+        The shell prompt.
 
     """
-    print(version + " (Shell mode)")
-    print('Use "exit" to close shell.')
+    print(intro)
+    print('Use "exit" to close the shell.')
 
     while True:
-        line = raw_input("> pssst ")
+        line = raw_input("> %s " % prompt)
+        args = line.split()
 
-        if line.strip() in ("exit", "quit"):
+        if not line:
+            continue
+
+        if args[0] in ("exit", "quit"):
             break
 
-        error = main("pssst", *line.split())
+        result = main(prompt, *args)
 
-        if error and not isinstance(error, int):
-            print(error)
+        if not isinstance(result or 0, int):
+            print(result)
 
 
 def usage(text, *args):
@@ -658,7 +661,7 @@ def main(script, command="--help", username=None, receiver=None, *message):
       CLI version %s
 
     Usage:
-      %s [option|command] [username:password] [receiver] [message]
+      %s [option|command] [username:password] [receiver message]
 
     Options:
       -s --shell     Run as interactive shell
@@ -679,8 +682,8 @@ def main(script, command="--help", username=None, receiver=None, *message):
         if username:
             name = Name(username)
 
-        if username and not hasattr(Pssst, "cli"):
-            Pssst.cli = Pssst(name.user, name.password or getpass())
+        if username and not hasattr(Pssst, "shell"):
+            Pssst.shell = Pssst(name.user, name.password or getpass())
 
         if command in ("/?", "-h", "--help", "help"):
             usage(main.__doc__, __version__, os.path.basename(script))
@@ -692,21 +695,21 @@ def main(script, command="--help", username=None, receiver=None, *message):
             print("Pssst CLI " + __version__)
 
         elif command in ("-s", "--shell") and username:
-            shell("Pssst CLI " + __version__)
+            shell("Pssst Shell " + __version__ + " for " + name.user)
 
         elif command in ("--create", "create") and username:
-            Pssst.cli.create(name.box)
+            Pssst.shell.create(name.box)
             print("Created %s" % name)
 
         elif command in ("--delete", "delete") and username:
-            Pssst.cli.delete(name.box)
+            Pssst.shell.delete(name.box)
             print("Deleted %s" % name)
 
         elif command in ("--list", "list") and username:
-            print("\n".join(Pssst.cli.list()))
+            print("\n".join(Pssst.shell.list()))
 
         elif command in ("--pull", "pull") and username:
-            data = Pssst.cli.pull(name.box)
+            data = Pssst.shell.pull(name.box)
 
             if data:
                 user, time, message = data
@@ -714,12 +717,12 @@ def main(script, command="--help", username=None, receiver=None, *message):
                 print("- %s %s" % (Name(user), datetime.fromtimestamp(time)))
 
         elif command in ("--push", "push") and username and receiver:
-            Pssst.cli.push([receiver], " ".join(message))
+            Pssst.shell.push([receiver], " ".join(message))
             print("Message pushed")
 
         else:
-            print("Unknown command: " + command)
-            print("Please use -h for help on commands.")
+            print("Unknown command or username not given: " + command)
+            print("Please use --help for help on commands.")
             return 2 # Incorrect usage
 
     except KeyboardInterrupt:

@@ -1,3 +1,15 @@
+0.2.26
+* Added unit test user prefix
+* Fixed CLI usage error output
+* Fixed heroku checkout script
+* Removed check for weak passwords
+* Changed user file location to $HOME
+* Changed server code to be more readable
+* Changed CLI shell code
+* Changed CLI usage text
+* Changed README.md
+* Upgraded to Font Awesome 4.2.0
+
 0.2.25
 * Changed HTML5 GUI to new website style
 * Changed Uberspace live Redis output

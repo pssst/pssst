@@ -38,7 +38,7 @@ named `.pssst` in the directory of the CLI with the desired server address:
 
 Please use the `--help` option to show further help on the CLI. All user
 specific data will be stored as zip files named `.pssst.<username>` in
-the calling directory.
+the users home directory.
 
 ### GUI
 
@@ -47,7 +47,7 @@ Required for the HTML 5 interface (GUI):
 * CherryPy `3.2.2` or newer
 
 Please start the GUI with the `app/gui/pssst-gui.sh` script. This will
-install all necessary prerequisite.
+download and install all necessary prerequisite.
 
 ### Server
 
@@ -128,7 +128,7 @@ To setup your own server, just execute the following command inside your
 The server will now start and create a default configuration file. A commented
 sample configuration can be found under `server/config.json.sample`.
 
-> We also have built-in support for Heroku and all Redis add-ons.
+> We also have built-in support for Heroku and all Redis database add-ons.
 
 API
 ===
@@ -148,14 +148,14 @@ will be reset each day at midnight and is not persisted. Please be warned:
 
 > **We do not backup our Redis databases. A message can only be pulled once.**
 
-Vital informations about the Pssst server can be requested under the following
-addresses below:
+Basic informations about the Pssst server can be requested under the following
+addresses:
 
 * `https://<server>/key`  is the servers public key in `PEM` format.
 * `https://<server>/time` is the servers actual time in `EPOCH` format.
 
 Additional informations about the Pssst server can be requested under the
-following addresses below:
+following addresses:
 
 * `https://<server>/branch`  is the used Git branch.
 * `https://<server>/version` is the servers version.

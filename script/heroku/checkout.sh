@@ -15,18 +15,20 @@ TMP=/tmp/pssst
 git clone https://github.com/pssst/pssst -b $BRANCH $TMP
 
 if [[ ! -d $HEROKU ]]; then
-    mkdir -p $HEROKU/www
+    mkdir -p $HEROKU
 
-    cd $HEROKU && git init
+    cd $HEROKU
+
+    git init
+    git remote add heroku git@heroku.com:$HEROKU.git
 
     heroku login
-    heroku git:remote -a $HEROKU
 else
     cd $HEROKU
-fi
 
-git pull heroku master
-git checkout master
+    git pull heroku master
+    git checkout master
+fi
 
 cp -r -u $TMP/server/* .
 rm -rf $TMP

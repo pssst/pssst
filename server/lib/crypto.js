@@ -66,9 +66,9 @@ module.exports = function Crypto() {
    *
    * @param {Object} the data
    * @param {Number} timestamp
-   * @return {Object} timestamp and HMAC
+   * @return {Object} timestamp and signature
    */
-  function buildHMAC(data, timestamp) {
+  function createHMAC(data, timestamp) {
     var hmac, timestamp = timestamp || now();
 
     hmac = crypto.createHmac('sha512', timestamp.toString());
@@ -76,7 +76,7 @@ module.exports = function Crypto() {
 
     return {
       timestamp: timestamp,
-      hmac: hmac.digest('base64')
+      signature: hmac.digest('base64')
     };
   };
 
@@ -100,12 +100,12 @@ module.exports = function Crypto() {
       data = JSON.stringify(data);
     }
 
-    var hmac = buildHMAC(data);
-    var signer = key.private;
+    var hmac = createHMAC(data);
+    var key = key.private;
 
     return {
       timestamp: hmac.timestamp,
-      signature: signer.hashAndSign('sha512', hmac.hmac, 'base64', 'base64')
+      signature: key.hashAndSign('sha512', hmac.signature, 'base64', 'base64')
     };
   };
 
@@ -123,13 +123,13 @@ module.exports = function Crypto() {
     }
 
     var time = parseInt(hmac.timestamp, 10);
-    var sign = hmac.signature;
+    var sig = hmac.signature;
 
     if (Math.abs(time - now()) <= 30) {
-      var hmac = buildHMAC(data, time);
-      var verifier = ursa.createPublicKey(pem, 'utf8');
+      var hmac = createHMAC(data, time);
+      var key = ursa.createPublicKey(pem, 'utf8');
 
-      return verifier.hashAndVerify('sha512', hmac.hmac, sign, 'base64');
+      return key.hashAndVerify('sha512', hmac.signature, sig, 'base64');
     } else {
       return false;
     }

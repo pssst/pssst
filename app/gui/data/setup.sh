@@ -10,7 +10,7 @@ BOOT_VERSION="3.2.0"
 BOOT_URL="https://github.com/twbs/bootstrap/releases/download/v$BOOT_VERSION/"
 BOOT_ZIP="bootstrap-$BOOT_VERSION-dist.zip"
 
-FONT_VERSION="4.1.0"
+FONT_VERSION="4.2.0"
 FONT_URL="https://fortawesome.github.io/Font-Awesome/assets/"
 FONT_ZIP="font-awesome-$FONT_VERSION.zip"
 
