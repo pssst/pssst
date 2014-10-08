@@ -20,6 +20,7 @@ import io
 import json
 import os
 import re
+import readline
 import sys
 import time
 
@@ -45,7 +46,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.23"
+__all__, __version__ = ["Pssst", "Name"], "0.2.26"
 
 
 def _encode64(data): # Utility shortcut
@@ -127,8 +128,8 @@ class Pssst:
         Returns all boxes of an user.
     pull(box=None)
         Pulls a message from a box.
-    push(names, message)
-        Pushes a message onto a box.
+    push(usernames, message)
+        Pushes a message into a box.
 
     """
     class KeyStore:
@@ -152,11 +153,8 @@ class Pssst:
 
         """
         def __init__(self, user, password):
-            self.user, test = user, password or "Password1" # Only for tests
-            self.file = repr(self)
-
-            if not re.match("^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,})$", test):
-                raise Exception("Password weak")
+            self.user = user
+            self.file = "%s/%s" % (os.path.expanduser("~"), self)
 
             if os.path.exists(self.file):
                 self.key = Pssst.Key(self.load(user + ".private"), password)
@@ -202,8 +200,8 @@ class Pssst:
         public()
             Returns the users public key (PEM format).
         encrypt(data)
-            Returns the encrypted data and once.
-        decrypt(data, once)
+            Returns the encrypted data and nonce.
+        decrypt(data, nonce)
             Returns the decrypted data.
         verify(data, timestamp, signature)
             Returns if data could be verified with timestamp and signature.
@@ -234,16 +232,16 @@ class Pssst:
             return self.key.publickey().exportKey("PEM").decode("ascii")
 
         def encrypt(self, data):
-            once = Random.get_random_bytes(32 + AES.block_size) # 256 bit key
+            nonce = Random.get_random_bytes(32 + AES.block_size) # 256 bit key
 
-            data = AES.new(once[:32], AES.MODE_CFB, once[32:]).encrypt(data)
-            once = PKCS1_OAEP.new(self.key).encrypt(once)
+            data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).encrypt(data)
+            nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
 
-            return (data, once)
+            return (data, nonce)
 
-        def decrypt(self, data, once):
-            once = PKCS1_OAEP.new(self.key).decrypt(once)
-            data = AES.new(once[:32], AES.MODE_CFB, once[32:]).decrypt(data)
+        def decrypt(self, data, nonce):
+            nonce = PKCS1_OAEP.new(self.key).decrypt(nonce)
+            data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).decrypt(data)
 
             return data
 
@@ -528,7 +526,7 @@ class Pssst:
         Returns
         -------
         tuple or None
-            The name, time and message, None if empty.
+            The user name, time and message, None if empty.
 
         """
         body = self.__api("GET", Name(self.store.user, box).path)
@@ -538,15 +536,15 @@ class Pssst:
 
         meta = body["meta"]
 
-        name = str(meta["name"])
+        user = str(meta["user"])
         time = int(meta["time"])
 
-        data = _decode64(body["data"])
-        once = _decode64(meta["once"])
+        nonce = _decode64(meta["nonce"])
+        data  = _decode64(body["data"])
 
-        message = self.store.key.decrypt(data, once)
+        message = self.store.key.decrypt(data, nonce)
 
-        return (name, time, message)
+        return (user, time, message)
 
     def push(self, usernames, message):
         """
@@ -565,14 +563,14 @@ class Pssst:
             if user not in self.store.list():
                 self.store.save(user, self.find(user)) # Add public key
 
-            data, once = Pssst.Key(self.store.load(user)).encrypt(message)
+            data, nonce = Pssst.Key(self.store.load(user)).encrypt(message)
 
-            once = _encode64(once)
-            data = _encode64(data)
+            nonce = _encode64(nonce)
+            data  = _encode64(data)
 
             meta = {
-                "name": self.store.user,
-                "once": once
+                "user": self.store.user,
+                "nonce": nonce
             }
 
             body = {
@@ -581,6 +579,37 @@ class Pssst:
             }
 
             self.__api("PUT", Name(user, box).path, body)
+
+
+def shell(intro, prompt="pssst"):
+    """
+    Starts an interactive shell.
+
+    Parameters
+    ----------
+    param intro : string
+        The shell intro.
+    param prompt : string, optional (default is pssst)
+        The shell prompt.
+
+    """
+    print(intro)
+    print('Use "exit" to close the shell.')
+
+    while True:
+        line = raw_input("> %s " % prompt)
+        args = line.split()
+
+        if not line:
+            continue
+
+        if args[0] in ("exit", "quit"):
+            break
+
+        result = main(prompt, *args)
+
+        if not isinstance(result or 0, int):
+            print(result)
 
 
 def usage(text, *args):
@@ -605,7 +634,7 @@ def usage(text, *args):
         if os.name in ["posix"]:
 
             # Color description
-            if re.match("^  CLI", line):
+            if re.match("^.* version \d+\.\d+\.\d+$", line):
                 line = line.replace("version", "version\x1B[34;1m")
                 line = "\x1B[39;1m%s\x1B[0m" % line
 
@@ -632,9 +661,10 @@ def main(script, command="--help", username=None, receiver=None, *message):
       CLI version %s
 
     Usage:
-      %s [option|command] [username:password] [receiver] [message|filename]
+      %s [option|command] [username:password] [receiver message]
 
     Options:
+      -s --shell     Run as interactive shell
       -h --help      Shows this text
       -l --license   Shows license
       -v --version   Shows version
@@ -652,10 +682,10 @@ def main(script, command="--help", username=None, receiver=None, *message):
         if username:
             name = Name(username)
 
-        if username and not name.password:
-            name.password = getpass("Password (will be hidden): ")
+        if username and not hasattr(Pssst, "shell"):
+            Pssst.shell = Pssst(name.user, name.password or getpass())
 
-        if command in ("/?", "-h", "--help"):
+        if command in ("/?", "-h", "--help", "help"):
             usage(main.__doc__, __version__, os.path.basename(script))
 
         elif command in ("-l", "--license"):
@@ -664,49 +694,45 @@ def main(script, command="--help", username=None, receiver=None, *message):
         elif command in ("-v", "--version"):
             print("Pssst CLI " + __version__)
 
+        elif command in ("-s", "--shell") and username:
+            shell("Pssst Shell " + __version__ + " for " + name.user)
+
         elif command in ("--create", "create") and username:
-            Pssst(name.user, name.password).create(name.box)
+            Pssst.shell.create(name.box)
             print("Created %s" % name)
 
         elif command in ("--delete", "delete") and username:
-            Pssst(name.user, name.password).delete(name.box)
+            Pssst.shell.delete(name.box)
             print("Deleted %s" % name)
 
         elif command in ("--list", "list") and username:
-            print("\n".join(Pssst(name.user, name.password).list()))
+            print("\n".join(Pssst.shell.list()))
 
         elif command in ("--pull", "pull") and username:
-            data = Pssst(name.user, name.password).pull(name.box)
+            data = Pssst.shell.pull(name.box)
 
             if data:
-                name, time, message = data
-                print("%s\n- %s %s" % (
-                    message.decode("utf-8"), Name(name),
-                    datetime.fromtimestamp(time)
-                ))
+                user, time, message = data
+                print(message.decode("utf-8"))
+                print("- %s %s" % (Name(user), datetime.fromtimestamp(time)))
 
         elif command in ("--push", "push") and username and receiver:
-            data = " ".join(message)
-
-            if os.path.exists(data):
-                data = io.open(data, "rb").read()
-
-            Pssst(name.user, name.password).push([receiver], data)
+            Pssst.shell.push([receiver], " ".join(message))
             print("Message pushed")
 
         else:
-            print("Unknown command: " + command)
-            print("Please use -h for help on commands.")
+            print("Unknown command or username not given: " + command)
+            print("Please use --help for help on commands.")
             return 2 # Incorrect usage
 
     except KeyboardInterrupt:
-        print("Exit")
+        print("exit")
 
     except ConnectionError:
-        return "Could not connect to API"
+        return "API connection failed"
 
     except Timeout:
-        return "Connection timeout"
+        return "API connection timeout"
 
     except Exception as ex:
         return "Error: %s" % ex

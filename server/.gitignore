@@ -2,6 +2,7 @@
 *.key
 *.log
 *.pub
+crt
 key
 config.json
 node_modules/

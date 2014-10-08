@@ -44,13 +44,14 @@ mv $DIR/tmp/server/* $DIR/
 rm -rf $DIR/tmp
 
 cd $DIR && npm install
-cp $CFG/$CONFIG/* config/
-cp config/pssst.pub public/key
+cp $CFG/$CONFIG/* .
+mv pssst.key app/pssst.key
+mv pssst.pub www/key
 
-echo $BRANCH > public/branch
-node start.js -v | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' > public/version
+echo $BRANCH > www/branch
+node start -v | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' > www/version
 
-uberspace-setup-service pssst.$SERVER node $DIR/start.js
+uberspace-setup-service pssst.$SERVER node $DIR/start
 
 echo "Done"
 exit 0
