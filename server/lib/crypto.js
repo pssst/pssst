@@ -101,11 +101,11 @@ module.exports = function Crypto() {
     }
 
     var hmac = createHMAC(data);
-    var key = key.private;
+    var prv = key.private;
 
     return {
       timestamp: hmac.timestamp,
-      signature: key.hashAndSign('sha512', hmac.signature, 'base64', 'base64')
+      signature: prv.hashAndSign('sha512', hmac.signature, 'base64', 'base64')
     };
   };
 
@@ -127,9 +127,9 @@ module.exports = function Crypto() {
 
     if (Math.abs(time - now()) <= 30) {
       var hmac = createHMAC(data, time);
-      var key = ursa.createPublicKey(pem, 'utf8');
+      var pub = ursa.createPublicKey(pem, 'utf8');
 
-      return key.hashAndVerify('sha512', hmac.signature, sig, 'base64');
+      return pub.hashAndVerify('sha512', hmac.signature, sig, 'base64');
     } else {
       return false;
     }
