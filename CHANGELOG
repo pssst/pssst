@@ -1,3 +1,8 @@
+0.2.27
+* Added check for OpenSSL errors to server
+* Changed message structure
+* Changed README.md
+
 0.2.26
 * Added unit test user prefix
 * Fixed CLI usage error output
