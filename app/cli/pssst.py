@@ -46,7 +46,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.26"
+__all__, __version__ = ["Pssst", "Name"], "0.2.27"
 
 
 def _encode64(data): # Utility shortcut
@@ -529,20 +529,20 @@ class Pssst:
             The user name, time and message, None if empty.
 
         """
-        body = self.__api("GET", Name(self.store.user, box).path)
+        data = self.__api("GET", Name(self.store.user, box).path)
 
-        if not body:
+        if not data:
             return None # Box is empty
 
-        meta = body["meta"]
+        head = data["head"]
 
-        user = str(meta["user"])
-        time = int(meta["time"])
+        user = str(head["user"])
+        time = int(head["time"])
 
-        nonce = _decode64(meta["nonce"])
-        data  = _decode64(body["data"])
+        nonce = _decode64(head["nonce"])
+        body  = _decode64(data["body"])
 
-        message = self.store.key.decrypt(data, nonce)
+        message = self.store.key.decrypt(body, nonce)
 
         return (user, time, message)
 
@@ -566,19 +566,19 @@ class Pssst:
             data, nonce = Pssst.Key(self.store.load(user)).encrypt(message)
 
             nonce = _encode64(nonce)
-            data  = _encode64(data)
+            body  = _encode64(data)
 
-            meta = {
+            head = {
                 "user": self.store.user,
                 "nonce": nonce
             }
 
-            body = {
-                "meta": meta,
-                "data": data
+            data = {
+                "head": head,
+                "body": body
             }
 
-            self.__api("PUT", Name(user, box).path, body)
+            self.__api("PUT", Name(user, box).path, data)
 
 
 def shell(intro, prompt="pssst"):
