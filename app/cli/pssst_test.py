@@ -48,7 +48,7 @@ def setup_module(module):
     global files
 
     # Clean up invalid name test
-    files = [".pssst.name"]
+    files = [os.path.expanduser("~") + "/.pssst.name"]
 
     Pssst.Key.size = 1024
 
@@ -89,7 +89,8 @@ def createUserName(length=16):
 
     pool = string.ascii_lowercase + string.digits
     name = "".join([random.choice(pool) for x in range(length)])
-    files.append(".pssst.test_" + name)
+
+    files.append("%s/.pssst.%s" % (os.path.expanduser("~"), name))
 
     return name
 
@@ -762,7 +763,7 @@ def main(script, *args):
     if api == master:
         return "Tests against the live API are not allowed"
 
-    print("Using API:" + api)
+    print("Using API: " + api)
     return pytest.main([script] + list(args))
 
 
