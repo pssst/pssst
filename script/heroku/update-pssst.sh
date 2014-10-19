@@ -10,7 +10,11 @@ fi
 BRANCH=$1
 HEROKU=$2
 
-TMP=/tmp/pssst
+TMP=/tmp/pssst-update-$(date +%s)
+
+if [[ ! -f $HOME/.netrc ]]; then
+    heroku login
+fi
 
 git clone https://github.com/pssst/pssst -b $BRANCH $TMP
 
@@ -21,8 +25,7 @@ if [[ ! -d $HEROKU ]]; then
 
     git init
     git remote add heroku git@heroku.com:$HEROKU.git
-
-    heroku login
+    git pull heroku master
 else
     cd $HEROKU
 
@@ -30,7 +33,7 @@ else
     git checkout master
 fi
 
-cp -r -u $TMP/server/* .
+cp -r $TMP/server/* .
 rm -rf $TMP
 
 git add .
