@@ -23,8 +23,5 @@ if (hash_hmac($hash, $raw, SECRET) === $signature) {
         die("Branch unknown");
     }
 
-    shell_exec("update-pssst $branch");
-    shell_exec("update-pssst-www");
-
-    die("Updated $branch");
+    die(shell_exec("update-pssst $branch"));
 }
