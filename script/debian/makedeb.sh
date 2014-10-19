@@ -30,7 +30,7 @@ Version: $VERSION
 Depends: python (>= 2.7)
 Priority: optional
 Architecture: all
-Installed-Size: 62
+Installed-Size: 73
 Maintainer: Christian & Christian <hello@pssst.name>
 Description: Pssst CLI
 EOF

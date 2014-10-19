@@ -458,19 +458,23 @@ This folder contains the maintenance scripts we use.
 * `install.sh` - Installs the CLI (w/o root permission)
 * `makedeb.sh` - Creates a Debian package of the CLI
 * `makeiso.sh` - Creates a Debian minimal ISO image with user keys and CLI
-* `notify.sh`  - Displays the latest message with a desktop notification
+* `notify-pssst.sh` - Displays the latest message with a desktop notification
 
 #### Docker
 
-* `Dockerfile`  - Builds a docker container
+* `Dockerfile` - Builds a docker container
+
+#### GitHub
+
+* `push.php` - Updates a server instance via webhook from GitHub
 
 #### Heroku
 
-* `checkout.sh` - Builds and starts a server instance on https://heroku.com
+* `update-pssst.sh` - Starts a server instance on https://heroku.com
 
 #### Uberspace
 
-* `checkout.sh` - Builds and starts a server instance on https://uberspace.de
+* `update-pssst.sh` - Starts a server instance on https://uberspace.de
 
 Contact
 -------

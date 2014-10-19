@@ -1,5 +1,9 @@
 0.2.27
 * Added check for OpenSSL errors to server
+* Added GitHub push webhook to scripts
+* Changed Heroku checkout script
+* Changed Debian package script
+* Changed some script names
 * Changed message structure
 * Changed README.md
 
