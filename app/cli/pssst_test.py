@@ -756,9 +756,10 @@ def main(script, *args):
 
     """
     master = api = "https://api.pssst.name"
+    config = os.path.expanduser("~") + "/.pssst"
 
-    if os.path.exists(".pssst"):
-        api = io.open(".pssst").read().strip()
+    if os.path.exists(config):
+        api = io.open(config).read().strip()
 
     if api == master:
         return "Tests against the live API are not allowed"

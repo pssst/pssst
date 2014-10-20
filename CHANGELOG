@@ -1,11 +1,15 @@
-0.2.27
-* Added check for OpenSSL errors to server
+0.2.28
 * Added GitHub push webhook to scripts
 * Fixed CLI unit test user prefix
 * Fixed CLI unit test API output
+* Changed CLI config file location to $HOME
 * Changed Heroku checkout script
 * Changed Debian package script
 * Changed some script names
+* Changed README.md
+
+0.2.27
+* Added check for OpenSSL errors to server
 * Changed message structure
 * Changed README.md
 
