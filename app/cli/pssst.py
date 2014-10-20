@@ -46,7 +46,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.27"
+__all__, __version__ = ["Pssst", "Name"], "0.2.28"
 
 
 def _encode64(data): # Utility shortcut
@@ -303,8 +303,10 @@ class Pssst:
         """
         FINGERPRINT = "563cb9031992f503a21f3fa7be160567f1380467"
 
-        if os.path.exists(".pssst"):
-            verify, self.api = False, io.open(".pssst").read().strip()
+        config = os.path.expanduser("~") + "/.pssst"
+
+        if os.path.exists(config):
+            verify, self.api = False, io.open(config).read().strip()
         else:
             verify, self.api = True, "https://api.pssst.name"
 

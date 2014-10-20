@@ -5,8 +5,8 @@ services by our self, but we provide you with the tools to start your own
 service. These tools build upon open-source software and use strong end-to-end
 encryption.
 
-As this project is under continuous development, we advise you to not rely
-on our server and run your own. We may change things, we may break things.
+As this project is under continuous development, we advise you to not rely on
+our test server and run your own. We may change things, we may break things.
 
 Created by Christian & Christian just for the joy of it.
 
@@ -28,10 +28,10 @@ If you wish to install the CLI on a POSIX system, just execute:
 
 `$ curl -s https://pssst.name/install | bash`
 
-If you want to use any other than our official server, simply create a file
-named `.pssst` in the directory of the CLI with the desired server address:
+If you want to use any other than our test server, simply create a file
+named `.pssst` in your home directory with the desired server address:
 
-`$ echo http://localhost:62421 > .pssst`
+`$ echo http://localhost:62421 > ~/.pssst`
 
 Please use the `--help` option to show further help on the CLI. All user
 specific data will be stored as zip files named `.pssst.<username>` in
@@ -128,7 +128,7 @@ requested to send an unique `user-agent` header per implementation.
 
 URL
 ---
-The official address of the API (stable) is:
+The official address of our (test) API is:
 
 `https://api.pssst.name`
 
@@ -442,7 +442,7 @@ Folders
 -------
 ### Config
 
-This folder contains our Redis server configurations.
+This folder contains our Redis configurations.
 
 #### Uberspace
 
@@ -466,7 +466,7 @@ This folder contains the maintenance scripts we use.
 
 #### GitHub
 
-* `push.php` - Updates a server instance via webhook from GitHub
+* `push.php` - Push webhook for GitHub
 
 #### Heroku
 
