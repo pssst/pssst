@@ -4,6 +4,7 @@
 * Fixed CLI unit test API output
 * Changed CLI config file location to $HOME
 * Changed Heroku checkout script
+* Changed Debian install script
 * Changed Debian package script
 * Changed some script names
 * Changed README.md
