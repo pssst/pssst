@@ -193,7 +193,7 @@ class Server:
             self.pssst.create()
             return name.user
 
-        if os.path.exists(".pssst." + name.user):
+        if os.path.exists(os.path.expanduser("~") + "/.pssst." + name.user):
             self.pssst = Pssst(username, password)
             return name.user
 
