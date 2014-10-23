@@ -716,7 +716,7 @@ def main(script, command="--help", username=None, receiver=None, *message):
             if data:
                 user, time, message = data
                 print(message.decode("utf-8"))
-                print("- %s %s" % (Name(user), datetime.fromtimestamp(time)))
+                print("%s, %s" % (Name(user), datetime.fromtimestamp(time)))
 
         elif command in ("--push", "push") and username and receiver:
             Pssst.shell.push([receiver], " ".join(message))
