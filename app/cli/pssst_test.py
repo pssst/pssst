@@ -48,7 +48,7 @@ def setup_module(module):
     global files
 
     # Clean up invalid name test
-    files = [os.path.expanduser("~") + "/.pssst.name"]
+    files = [os.path.join(os.path.expanduser("~"), ".pssst.name")]
 
     Pssst.Key.size = 1024
 
@@ -90,7 +90,7 @@ def createUserName(length=16):
     pool = string.ascii_lowercase + string.digits
     name = "".join([random.choice(pool) for x in range(length)])
 
-    files.append("%s/.pssst.%s" % (os.path.expanduser("~"), name))
+    files.append(os.path.join(os.path.expanduser("~"), ".pssst." + name))
 
     return name
 
@@ -756,7 +756,7 @@ def main(script, *args):
 
     """
     master = api = "https://api.pssst.name"
-    config = os.path.expanduser("~") + "/.pssst"
+    config = os.path.join(os.path.expanduser("~"), ".pssst")
 
     if os.path.exists(config):
         api = io.open(config).read().strip()

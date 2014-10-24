@@ -20,13 +20,18 @@ import io
 import json
 import os
 import re
-import readline
 import sys
 import time
 
 from datetime import datetime
 from getpass import getpass
 from zipfile import ZipFile
+
+
+try:
+	import readline
+except ImportError:
+	pass # Windows doesn't support this
 
 
 try:
@@ -154,7 +159,7 @@ class Pssst:
         """
         def __init__(self, user, password):
             self.user = user
-            self.file = "%s/%s" % (os.path.expanduser("~"), self)
+            self.file = os.path.join(os.path.expanduser("~"), repr(self))
 
             if os.path.exists(self.file):
                 self.key = Pssst.Key(self.load(user + ".private"), password)
@@ -303,7 +308,7 @@ class Pssst:
         """
         FINGERPRINT = "563cb9031992f503a21f3fa7be160567f1380467"
 
-        config = os.path.expanduser("~") + "/.pssst"
+        config = os.path.join(os.path.expanduser("~"), ".pssst")
 
         if os.path.exists(config):
             verify, self.api = False, io.open(config).read().strip()
@@ -736,8 +741,8 @@ def main(script, command="--help", username=None, receiver=None, *message):
     except Timeout:
         return "API connection timeout"
 
-    except Exception as ex:
-        return "Error: %s" % ex
+    # except Exception as ex:
+    #     return "Error: %s" % ex
 
 
 if __name__ == "__main__":
