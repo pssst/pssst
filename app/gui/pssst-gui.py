@@ -187,13 +187,14 @@ class Server:
 
         """
         name = Name(username)
+        home = os.path.expanduser("~")
 
         if create:
             self.pssst = Pssst(username, password)
             self.pssst.create()
             return name.user
 
-        if os.path.exists(os.path.expanduser("~") + "/.pssst." + name.user):
+        if os.path.exists(os.path.join(home, ".pssst." + name.user)):
             self.pssst = Pssst(username, password)
             return name.user
 

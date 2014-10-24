@@ -1,5 +1,6 @@
 0.2.28
 * Added GitHub push webhook to scripts
+* Fixed CLI Windows compatibility
 * Fixed CLI unit test user prefix
 * Fixed CLI unit test API output
 * Changed CLI config file location to $HOME
