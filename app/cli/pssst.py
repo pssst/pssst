@@ -741,8 +741,8 @@ def main(script, command="--help", username=None, receiver=None, *message):
     except Timeout:
         return "API connection timeout"
 
-    # except Exception as ex:
-    #     return "Error: %s" % ex
+    except Exception as ex:
+        return "Error: %s" % ex
 
 
 if __name__ == "__main__":
