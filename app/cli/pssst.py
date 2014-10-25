@@ -306,7 +306,7 @@ class Pssst:
         in fingerprint.
 
         """
-        FINGERPRINT = "563cb9031992f503a21f3fa7be160567f1380467"
+        FINGERPRINT = "5a749f99dbc2a03b0cde327bafcf9bd7dc616830"
 
         config = os.path.join(os.path.expanduser("~"), ".pssst")
 
