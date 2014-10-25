@@ -3,6 +3,7 @@
 * Fixed CLI Windows compatibility
 * Fixed CLI unit test user prefix
 * Fixed CLI unit test API output
+* Fixed server public key fingerprint
 * Changed CLI config file location to $HOME
 * Changed CLI message output format
 * Changed Heroku checkout script
