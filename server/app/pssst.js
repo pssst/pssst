@@ -1,4 +1,4 @@
-/**
+  /**
  * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -214,12 +214,12 @@ module.exports = function Pssst(app, db, deny) {
     api.request(req, res, function request(user, box) {
 
       // Add request timestamp to message
-      req.body.meta.time = req.timestamp;
+      req.body.head.time = req.timestamp;
 
       box.push(req.body);
 
       return 'Message sent';
-    }, req.body.meta.user);
+    }, req.body.head.user);
   });
 
   /**

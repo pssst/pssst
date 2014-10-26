@@ -13,5 +13,5 @@ fi
 wget -O $DIR/pssst $URL > /dev/null 2>&1
 chmod 755 $DIR/pssst
 
-echo "Installed in $DIR"
+echo "Pssst installed in $DIR"
 exit 0

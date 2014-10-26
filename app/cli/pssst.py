@@ -20,13 +20,18 @@ import io
 import json
 import os
 import re
-import readline
 import sys
 import time
 
 from datetime import datetime
 from getpass import getpass
 from zipfile import ZipFile
+
+
+try:
+	import readline
+except ImportError:
+	pass # Windows doesn't support this
 
 
 try:
@@ -46,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.26"
+__all__, __version__ = ["Pssst", "Name"], "0.2.28"
 
 
 def _encode64(data): # Utility shortcut
@@ -154,7 +159,7 @@ class Pssst:
         """
         def __init__(self, user, password):
             self.user = user
-            self.file = "%s/%s" % (os.path.expanduser("~"), self)
+            self.file = os.path.join(os.path.expanduser("~"), repr(self))
 
             if os.path.exists(self.file):
                 self.key = Pssst.Key(self.load(user + ".private"), password)
@@ -301,10 +306,12 @@ class Pssst:
         in fingerprint.
 
         """
-        FINGERPRINT = "563cb9031992f503a21f3fa7be160567f1380467"
+        FINGERPRINT = "5a749f99dbc2a03b0cde327bafcf9bd7dc616830"
 
-        if os.path.exists(".pssst"):
-            verify, self.api = False, io.open(".pssst").read().strip()
+        config = os.path.join(os.path.expanduser("~"), ".pssst")
+
+        if os.path.exists(config):
+            verify, self.api = False, io.open(config).read().strip()
         else:
             verify, self.api = True, "https://api.pssst.name"
 
@@ -529,20 +536,20 @@ class Pssst:
             The user name, time and message, None if empty.
 
         """
-        body = self.__api("GET", Name(self.store.user, box).path)
+        data = self.__api("GET", Name(self.store.user, box).path)
 
-        if not body:
+        if not data:
             return None # Box is empty
 
-        meta = body["meta"]
+        head = data["head"]
 
-        user = str(meta["user"])
-        time = int(meta["time"])
+        user = str(head["user"])
+        time = int(head["time"])
 
-        nonce = _decode64(meta["nonce"])
-        data  = _decode64(body["data"])
+        nonce = _decode64(head["nonce"])
+        body  = _decode64(data["body"])
 
-        message = self.store.key.decrypt(data, nonce)
+        message = self.store.key.decrypt(body, nonce)
 
         return (user, time, message)
 
@@ -566,19 +573,19 @@ class Pssst:
             data, nonce = Pssst.Key(self.store.load(user)).encrypt(message)
 
             nonce = _encode64(nonce)
-            data  = _encode64(data)
+            body  = _encode64(data)
 
-            meta = {
+            head = {
                 "user": self.store.user,
                 "nonce": nonce
             }
 
-            body = {
-                "meta": meta,
-                "data": data
+            data = {
+                "head": head,
+                "body": body
             }
 
-            self.__api("PUT", Name(user, box).path, body)
+            self.__api("PUT", Name(user, box).path, data)
 
 
 def shell(intro, prompt="pssst"):
@@ -714,7 +721,7 @@ def main(script, command="--help", username=None, receiver=None, *message):
             if data:
                 user, time, message = data
                 print(message.decode("utf-8"))
-                print("- %s %s" % (Name(user), datetime.fromtimestamp(time)))
+                print("%s, %s" % (Name(user), datetime.fromtimestamp(time)))
 
         elif command in ("--push", "push") and username and receiver:
             Pssst.shell.push([receiver], " ".join(message))

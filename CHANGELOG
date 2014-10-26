@@ -1,3 +1,24 @@
+0.2.28
+* Added GitHub push webhook to scripts
+* Fixed makeiso user handling
+* Fixed CLI Windows compatibility
+* Fixed CLI unit test user prefix
+* Fixed CLI unit test API output
+* Fixed server public key fingerprint
+* Changed CLI config file location to $HOME
+* Changed CLI message output format
+* Changed Heroku checkout script
+* Changed Debian install script
+* Changed Debian package script
+* Changed some script names
+* Changed script rights
+* Changed README.md
+
+0.2.27
+* Added check for OpenSSL errors to server
+* Changed message structure
+* Changed README.md
+
 0.2.26
 * Added unit test user prefix
 * Fixed CLI usage error output

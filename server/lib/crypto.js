@@ -129,10 +129,14 @@ module.exports = function Crypto() {
       var hmac = createHMAC(data, time);
       var pub = ursa.createPublicKey(pem, 'utf8');
 
-      return pub.hashAndVerify('sha512', hmac.signature, sig, 'base64');
-    } else {
-      return false;
+      try {
+        return pub.hashAndVerify('sha512', hmac.signature, sig, 'base64');
+      } catch (err) {
+        return false; // OpenSSL error
+      }
     }
+
+    return false;
   };
 
   return this;
