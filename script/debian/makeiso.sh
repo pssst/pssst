@@ -2,6 +2,11 @@
 set -o errexit
 set -o nounset
 
+if [[ -z ${1:-} ]]; then
+    echo Usage: $(basename $0) USER
+    exit 2
+fi
+
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root" 1>&2
     exit 1
@@ -77,7 +82,7 @@ po::powerokwait:/etc/init.d/powerfail stop
 1:2345:respawn:/sbin/getty --autologin root 38400 tty1
 EOF
 
-sudo cp $HOME/.pssst.* chroot/root/ || true
+sudo cp /home/$1/.pssst.* chroot/root/ || true
 sudo cp chroot/boot/vmlinuz-* binary/live/vmlinuz
 sudo cp chroot/boot/initrd.img-* binary/live/initrd
 sudo cp /usr/lib/syslinux/isolinux.bin binary/isolinux/
