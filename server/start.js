@@ -38,6 +38,11 @@ try {
       fs.writeFileSync(__dirname + '/config.json', config);
     }
 
+    // Create the static directory
+    if (!fs.existsSync(__dirname + '/www')) {
+      fs.mkdirSync(__dirname + '/www');
+    }
+
     // Required imports
     var express = require('express');
     var parser  = require('body-parser');

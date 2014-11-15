@@ -17,7 +17,7 @@ except ImportError:
 
 
 # Raw test data
-ONCE, TIME, DATA, KEY = b"x"*48, 123456789, "Hello World!", """\
+NONCE, TIME, DATA, KEY = b"x"*48, 123456789, "Hello World!", """\
 -----BEGIN RSA PRIVATE KEY-----
 MIIJJwIBAAKCAgEA9SfIbmihxE6SFDDgXXWioZzLIiIhqP/3yOrAvrvUzMNUZxak
 tWas0usJkDhIC/HXLqANZNzcUGvmiIswow01vKch6Q6Wj9JGYMBO8SM1wL1Yq8JS
@@ -85,11 +85,11 @@ def test_time(time=TIME):
     return str(int(round(time))).encode("ascii")
 
 
-def test_once(once=ONCE):
+def test_nonce(nonce=NONCE):
     """
-    Raw Once
+    Raw Nonce
     """
-    return once
+    return nonce
 
 
 def test_hmac(time=TIME, data=DATA):
@@ -102,20 +102,20 @@ def test_hmac(time=TIME, data=DATA):
     return base64.b64encode(mac.digest()), len(mac.digest())
 
 
-def test_aes_encrypt(data=DATA, once=ONCE):
+def test_aes_encrypt(data=DATA, nonce=NONCE):
     """
     AES Encrypt (256 Bit, CFB8 Mode, No Padding)
     """
-    data = AES.new(once[:32], AES.MODE_CFB, once[32:]).encrypt(data)
+    data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).encrypt(data)
     return base64.b64encode(data), len(data)
 
 
-def test_aes_decrypt(data=DATA, once=ONCE):
+def test_aes_decrypt(data=DATA, nonce=NONCE):
     """
     AES Decrypt (256 Bit, CFB8 Mode, No Padding)
     """
     data = base64.b64decode(test_aes_encrypt(data, once)[0])
-    return AES.new(once[:32], AES.MODE_CFB, once[32:]).decrypt(data)
+    return AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).decrypt(data)
 
 
 def test_rsa_private(key=KEY):
@@ -136,22 +136,22 @@ def test_rsa_public(key=KEY):
     return key, len(key)
 
 
-def test_rsa_encrypt(key=KEY, once=ONCE):
+def test_rsa_encrypt(key=KEY, nonce=ONCE):
     """
     RSA Encrypt (PKCS #1, OAEP)
     """
     key = RSA.importKey(key)
-    once = PKCS1_OAEP.new(key).encrypt(once)
-    return base64.b64encode(once), len(once)
+    nonce = PKCS1_OAEP.new(key).encrypt(nonce)
+    return base64.b64encode(nonce), len(nonce)
 
 
-def test_rsa_decrypt(key=KEY, once=ONCE):
+def test_rsa_decrypt(key=KEY, nonce=NONCE):
     """
     RSA Decrypt (PKCS #1, OAEP)
     """
-    once = base64.b64decode(test_rsa_encrypt(key, once)[0])
+    nonce = base64.b64decode(test_rsa_encrypt(key, nonce)[0])
     key = RSA.importKey(key)
-    return PKCS1_OAEP.new(key).decrypt(once)
+    return PKCS1_OAEP.new(key).decrypt(nonce)
 
 
 def test_rsa_sign(key=KEY, time=TIME, data=DATA):
@@ -198,7 +198,7 @@ def main(script):
     print(__doc__.lstrip())
     pretty(test_data)
     pretty(test_time)
-    pretty(test_once)
+    pretty(test_nonce)
     pretty(test_hmac)
     pretty(test_aes_encrypt)
     pretty(test_aes_decrypt)

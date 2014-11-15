@@ -1,9 +1,8 @@
 #!/bin/bash
 set -o errexit
-set -o nounset
 
 if [ ! -f pssst.py ]; then
-    sh data/setup.sh
+    bower install
     ln -s ../cli/pssst.py
 fi
 

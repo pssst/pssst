@@ -20,8 +20,13 @@ import binascii
 import json
 import os
 import sys
+import webbrowser
 
-from pssst import __version__, Name, Pssst
+
+try:
+    from pssst import Name, Pssst, usage, __version__
+except ImportError:
+    sys.exit("Please execute the start script")
 
 
 try:
@@ -37,18 +42,18 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-class Server:
+class CLI:
     """
-    Local server class for CLI wrapping.
+    Local CLI wrapper for encrypted calls.
 
     Methods
     -------
     call(params)
         Calls the CLI and returns the result.
     login(username, password)
-        Creates a Pssst instance.
+        Creates the Pssst instance.
     logout()
-        Clears a Pssst instance.
+        Clears the Pssst instance.
     version()
         Returns the CLI version.
 
@@ -59,7 +64,7 @@ class Server:
 
         Parameters
         ----------
-        param token : string
+        param token : Bytes
             Security token.
 
         """
@@ -82,18 +87,18 @@ class Server:
 
         Notes
         -----
-        Encryption will be done with the following steps:
+        Encryption is done in the following steps:
 
-        1. Decode from UTF-8
-        3. Add PKCS#7 padding
-        2. Encrypt with AES (256 Bit, CBC Mode, PKCS#7 Padding)
-        4. Encode in standard Base64
+        1. Add PKCS#7 padding
+        2. Decode bytes from UTF-8
+        3. Encrypt with AES (256 Bit, CBC Mode, PKCS#7 Padding)
+        4. Encode bytes in standard Base64
 
         """
         key, iv, size = self.token[:32], self.token[32:], AES.block_size
 
-        data = text.decode("utf-8")
-        data = data + (size - len(data) % size) * chr(size - len(data) % size)
+        data = text + (size - len(text) % size) * chr(size - len(text) % size)
+        data = data.encode("utf-8")
         data = AES.new(key, AES.MODE_CBC, iv).encrypt(data)
         data = base64.b64encode(data)
 
@@ -115,61 +120,69 @@ class Server:
 
         Notes
         -----
-        Decryption will be done with the following steps:
+        Decryption is done in the following steps:
 
-        1. Decode from standard Base64
+        1. Decode bytes from standard Base64
         2. Decrypt with AES (256 Bit, CBC Mode, PKCS#7 Padding)
-        3. Remove PKCS#7 padding
-        4. Encode in UTF-8
+        3. Encode bytes to UTF-8
+        4. Remove PKCS#7 padding
 
         """
         key, iv = self.token[:32], self.token[32:]
 
         data = base64.b64decode(data)
         data = AES.new(key, AES.MODE_CBC, iv).decrypt(data)
-        data = data[0:-ord(data[-1])]
-        text = data.encode("utf-8")
+        data = data.decode("utf-8")
+        text = data[0:-ord(data[-1])]
 
         return text
 
-    @cherrypy.expose
-    def call(self, params):
+    def call(self, request):
         """
-        Calls the CLI and returns the result.
+        Calls the CLI and returns the response.
 
         Parameters
         ----------
-        param params : string
-            Encrypted call parameters.
+        param request : string
+            Encrypted request.
 
         Returns
         -------
         string
-            Encrypted call result or error.
+            Encrypted response.
 
         """
         try:
-            params = json.loads(self.__decrypt(params))
+            request = json.loads(self.__decrypt(request))
 
-            name = params["method"]
-            args = params["args"]
+            method = request["method"]
+            params = request["params"]
 
             for obj in [self, self.pssst]:
-                if name in dir(obj):
-                    result = getattr(obj, name)(*args)
-                    result = json.dumps(result)
+                if method in dir(obj):
+                    result = getattr(obj, method)(*params)
+
+                    # Encode messages to UTF-8
+                    if result and method == "pull":
+                        response = json.dumps((
+                            result[0],
+                            result[1],
+                            result[2].decode("utf-8")
+                        ))
+                    else:
+                        response = json.dumps(result)
                     break
 
         except Exception as ex:
-            cherrypy.response.status = 500
-            result = str(ex)
+            cherrypy.response.status = 500 # Internal Server Error
+            response = str(ex)
 
         finally:
-            return self.__encrypt(result)
+            return self.__encrypt(response)
 
     def login(self, create, username, password):
         """
-        Creates a Pssst instance.
+        Creates the Pssst instance.
 
         Parameters
         ----------
@@ -183,24 +196,26 @@ class Server:
         Returns
         -------
         string
-            The users canonical name or None.
+            The canonical user name or None.
 
         """
         name = Name(username)
         home = os.path.expanduser("~")
 
+        # New user
         if create:
             self.pssst = Pssst(username, password)
             self.pssst.create()
             return name.user
 
+        # Old user
         if os.path.exists(os.path.join(home, ".pssst." + name.user)):
             self.pssst = Pssst(username, password)
             return name.user
 
     def logout(self):
         """
-        Clears a Pssst instance.
+        Clears the Pssst instance.
 
         """
         self.pssst = None
@@ -217,35 +232,76 @@ class Server:
         """
         return __version__
 
+    call.exposed = True
 
-def main(script, arg="8211"):
+
+def main(script, option="8211", usepipe=False):
     """
-    Usage: %s [PORT]
+          ________               ___
+         /  ___  /______________/  /_
+        /  /__/ / ___/ ___/ ___/  __/
+       /  _____/__  /__  /__  /  /_
+      /__/    /____/____/____/\___/
+
+      GUI version %s
+
+    Usage:
+      %s [option|port]
+
+    Options:
+      -h --help      Shows this text
+      -l --license   Shows license
+      -v --version   Shows version
+
+    Report bugs to <hello@pssst.name>
     """
     try:
-        if arg in ("/?", "-h", "--help"):
-            print(main.__doc__.strip() % os.path.basename(script))
+        if option in ("/?", "-h", "--help", "help"):
+            usage(main.__doc__, __version__, os.path.basename(script))
 
-        else:
-            host, port, key = "0.0.0.0", int(arg), Random.get_random_bytes(48)
+        elif option in ("-l", "--license"):
+            print(__doc__.strip())
 
-            print("http://%s:%s/#%s" % (host, port, binascii.hexlify(key)))
+        elif option in ("-v", "--version"):
+            print("Pssst GUI " + __version__)
 
-            cherrypy.quickstart(Server(key), "/", {
+        elif option.isdigit():
+            host, port = "127.0.0.1", int(option)
+
+            tokenbin = Random.get_random_bytes(48)
+            tokenhex = binascii.hexlify(tokenbin).decode("ascii")
+
+            url = "http://%s:%s/pssst#%s" % (host, port, tokenhex)
+
+            if not usepipe:
+                webbrowser.open_new_tab(url)
+            else:
+                print(url) # URL for piping
+
+            bower = os.path.join(os.path.dirname(__file__), "bower")
+            pssst = os.path.join(os.path.dirname(__file__), "pssst")
+
+            cherrypy.quickstart(CLI(tokenbin), "/", {
                 "global": {
-                    "log.screen": False,
                     "server.socket_host": host,
-                    "server.socket_port": port
+                    "server.socket_port": port,
+                    "log.screen": False
                 },
-                "/": {
+                "/bower": {
                     "tools.staticdir.on": True,
-                    "tools.staticdir.dir": os.path.abspath("./data"),
+                    "tools.staticdir.dir": os.path.abspath(bower)
+                },
+                "/pssst": {
+                    "tools.staticdir.on": True,
+                    "tools.staticdir.dir": os.path.abspath(pssst),
                     "tools.staticdir.index": "index.html"
                 }
             })
 
-    except KeyboardInterrupt:
-        print("exit")
+        else:
+            print("Unknown option: " + option)
+            print("Please use --help for help on options.")
+            return 2 # Incorrect usage
 
     except Exception as ex:
         return "Error: %s" % ex
