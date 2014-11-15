@@ -15,10 +15,12 @@ VERSION=$(echo $VERSION | sed 's/[^0-9.]*\([0-9.]*\).*/\1/')
 
 DEB=pssst-$VERSION/DEBIAN
 BIN=pssst-$VERSION/usr/bin
+MAN=pssst-$VERSION/usr/share/man/man1
 DOC=pssst-$VERSION/usr/share/doc/pssst
 
-mkdir -p $DEB $BIN $DOC
+mkdir -p $DEB $BIN $MAN $DOC
 
+gzip -c pssst/app/man/pssst > $MAN/pssst.1.gz
 cp pssst/app/cli/pssst.py $BIN/pssst
 cp pssst/* $DOC/ || true
 chmod a+x $BIN/pssst

@@ -8,7 +8,7 @@ Raw Time:
 123456789
 (9 Bytes)
 
-Raw Once:
+Raw Nonce:
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 (48 Bytes)
 
@@ -130,4 +130,3 @@ T1CA7lui+5W8PxJYtZ8PlmEaI87bOQh9BP/fpRAijZQ=
 RSA Verify (PKCS #1 v1.5):
 Yes
 (3 Bytes)
-

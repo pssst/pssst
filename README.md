@@ -45,6 +45,7 @@ the users home directory.
 Required for the HTML 5 interface (GUI):
 
 * At least CherryPy 3.2.2
+* At least Bower 1.3.12
 
 Please start the GUI with the `app/gui/pssst-gui.sh` script. This will
 download and install all necessary prerequisite.
@@ -136,25 +137,20 @@ If you want to test your code, please use the addresses below accordingly.
 But we advise you to please setup your own local server and database (which
 is _very easy_), and test your apps and/or bug fixes there.
 
-* `https://dev.pssst.name` from the latest `develop` commit
-* `https://api.pssst.name` from the latest `master` commit
+* `https://dev.pssst.name` for the latest `develop` commit
+* `https://api.pssst.name` for the latest `master` commit
 
 Each address uses its own Redis server. The database of the `dev` address
 will be reset each day at midnight and is not persisted. Please be warned:
 
 > We do not backup our Redis databases. A message can only be pulled once.
 
-Basic informations about the Pssst server can be found under the following
+Additional informations about the Server can be requested under the following
 addresses:
 
-* `https://<server>/key`  is the servers public key in PEM format.
-* `https://<server>/time` is the servers actual time in EPOCH format.
-
-Additional informations about the Pssst server can be found under the
-following addresses:
-
-* `https://<server>/branch`  is the used Git branch.
-* `https://<server>/version` is the servers version.
+* `https://<server>/`     respond the servers protocol version.
+* `https://<server>/key`  respond the servers public key in PEM format.
+* `https://<server>/time` respond the servers actual time in EPOCH format.
 
 Cryptography
 ------------

@@ -42,14 +42,12 @@ git clone https://github.com/pssst/pssst.git -b $BRANCH $DIR/tmp
 
 mv $DIR/tmp/server/* $DIR/
 rm -rf $DIR/tmp
+mkdir $DIR/www
 
 cd $DIR && npm install
 cp $CFG/$CONFIG/* .
 mv pssst.key app/pssst.key
 mv pssst.pub www/key
-
-echo $BRANCH > www/branch
-node start -v | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' > www/version
 
 uberspace-setup-service pssst.$SERVER node $DIR/start
 

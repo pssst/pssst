@@ -1,0 +1,11 @@
+{
+  "name": "Pssst",
+  "dependencies": {
+    "bootstrap": "3.2.0",
+    "cryptojslib": "3.1.2",
+    "font-awesome": "4.2.0",
+    "jquery": "2.1.1",
+    "less": "2.0.0",
+    "requirejs": "2.1.15"
+  }
+}

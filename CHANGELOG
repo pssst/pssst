@@ -1,3 +1,21 @@
+0.2.29
+* Refactored GUI app
+* Added basic manpage for CLI
+* Added basic manpage for GUI
+* Added support for Bower to GUI
+* Added less file for GUI style
+* Added version to server protocol
+* Added directory creation to server
+* Added Windows start file for GUI
+* Fixed Firefox bug in GUI style
+* Fixed Python 3 support for GUI
+* Fixed typo in test vectors
+* Changed Debian makedeb script
+* Changed CLI usage text
+* Changed gitignore files
+* Changed README.md
+* Removed server branch information
+
 0.2.28
 * Added GitHub push webhook to scripts
 * Fixed makeiso user handling

@@ -51,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.28"
+__all__, __version__ = ["Pssst", "Name"], "0.2.29"
 
 
 def _encode64(data): # Utility shortcut
@@ -668,7 +668,7 @@ def main(script, command="--help", username=None, receiver=None, *message):
       CLI version %s
 
     Usage:
-      %s [option|command] [username:password] [receiver message]
+      %s [option|command] [username:password] [receiver message...]
 
     Options:
       -s --shell     Run as interactive shell

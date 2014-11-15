@@ -30,6 +30,7 @@ module.exports = function Server(app, config, callback) {
   var util  = require('util');
 
   // Required libraries
+  var info   = require('../package.json');
   var pssst  = require('../app/pssst.js');
   var redis  = require('../lib/redis.js');
   var crypto = require('../lib/crypto.js');
@@ -200,7 +201,7 @@ module.exports = function Server(app, config, callback) {
 
       // Returns supported protocols
       app.get('/', function index(req, res) {
-        res.sign(200, "Pssst");
+        res.sign(200, "Pssst " + info['version']);
       });
 
       // Returns nothing
