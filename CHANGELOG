@@ -1,3 +1,15 @@
+0.2.30
+* Added experimental AWS support
+* Added Animate.css to GUI app
+* Added mustache.js to GUI app
+* Added autofocus to GUI app
+* Fixed GUI message line breaks
+* Fixed GUI message encoding
+* Changed Uberspace configs
+* Changed Dockerfile
+* Changed GUI style
+* Changed README.md
+
 0.2.29
 * Refactored GUI app
 * Added basic manpage for CLI

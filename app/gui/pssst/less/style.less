@@ -4,31 +4,42 @@ html, body {
   height: 100%;
 }
 
-.modal {
-  top: 30%;
-}
+.pssst {
+  .modal {
+    top: 30%;
+  }
 
-.panel {
-  display: none;
-  text-align: justify;
-  word-wrap: break-word;
-  margin: 0 5px 5px 5px;
-}
+  .alert {
+    border-radius: 0;
+    display: none;
+    position: fixed;
+    text-align: center;
+    width: 100%;
+    z-index: 1050;
+  }
 
-#content {
-  margin-top: 55px;
-}
+  .panel {
+    display: none;
+    margin: 0 5px 5px 5px;
+    text-align: justify;
+    word-wrap: break-word;
+  }
 
-#username, #receiver {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
+  #content {
+    padding-top: 55px;
+  }
 
-#password, #message {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
+  #username, #receiver {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
 
-#message {
-  resize: none;
+  #password, #message {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  #message {
+    resize: none;
+  }
 }

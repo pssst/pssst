@@ -50,6 +50,10 @@ class CLI:
     -------
     call(params)
         Calls the CLI and returns the result.
+    pull(box=None)
+        Pulls a message from a box.
+    push(usernames, message)
+        Pushes a message into a box.
     login(username, password)
         Creates the Pssst instance.
     logout()
@@ -160,17 +164,7 @@ class CLI:
 
             for obj in [self, self.pssst]:
                 if method in dir(obj):
-                    result = getattr(obj, method)(*params)
-
-                    # Encode messages to UTF-8
-                    if result and method == "pull":
-                        response = json.dumps((
-                            result[0],
-                            result[1],
-                            result[2].decode("utf-8")
-                        ))
-                    else:
-                        response = json.dumps(result)
+                    response = json.dumps(getattr(obj, method)(*params))
                     break
 
         except Exception as ex:
@@ -179,6 +173,40 @@ class CLI:
 
         finally:
             return self.__encrypt(response)
+
+    def pull(self, box=None):
+        """
+        Pulls a message from a box (override).
+
+        Parameters
+        ----------
+        param box : string, optional (default is None)
+            Name of the users box.
+
+        Returns
+        -------
+        tuple or None
+            The user name, time and message, None if empty.
+
+        """
+        data = self.pssst.pull(box)
+
+        if data:
+            return (data[0], data[1], data[2].decode("utf-8"))
+
+    def push(self, usernames, message):
+        """
+        Pushes a message into a box (override).
+
+        Parameters
+        ----------
+        param usernames : list of strings
+            List of user names.
+        param message : byte string
+            The message.
+
+        """
+        self.pssst.push(usernames, message.encode("utf-8"))
 
     def login(self, create, username, password):
         """
