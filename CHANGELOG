@@ -1,3 +1,8 @@
+0.2.31
+* Changed GUI app
+* Changed GUI style
+* Removed LESS dependency
+
 0.2.30
 * Added experimental AWS support
 * Added Animate.css to GUI app

@@ -15,34 +15,6 @@
  */
 define(['js/pssst.api.js'], function (api) {
   return function (token) {
-    /**
-     * Shows a error message.
-     *
-     * @param {String} the error message
-     */
-    function error(message) {
-      $('.pssst #error').html(message).fadeIn(200).delay(3000).fadeOut(200);
-    }
-
-    /**
-     * Changes the active box.
-     *
-     * @param {String} the box name
-     */
-    function change(boxname) {
-      $('.pssst #user').html(user + '.' + boxname + ' <b class="caret"></b>');
-      $('.pssst section').hide();
-      $('.pssst #box-' + boxname).show();
-
-      var all = $('.pssst .box span');
-      var box = $('.pssst #boxname-' + boxname + ' span');
-
-      all.removeClass('fa-folder-open').addClass('fa-folder');
-      box.removeClass('fa-folder').addClass('fa-folder-open');
-
-      document.title = 'Pssst - ' + user + '.' + boxname;
-    }
-
     var user = null;
     var box = 'box';
 
@@ -60,7 +32,13 @@ define(['js/pssst.api.js'], function (api) {
           if (!err) {
             callback(val);
           } else {
-            error(err);
+            $('#error').html(err).fadeIn(200).delay(3000).fadeOut(200);
+
+            if (method === 'login') {
+              $('#login-create span').removeClass('fa-spin fa-spinner');
+              $('#login-create span').addClass('fa-user');
+              $('#login-create').prop('disabled', false);
+            }
           }
         });
       },
@@ -71,27 +49,27 @@ define(['js/pssst.api.js'], function (api) {
        * @param {Boolean} create user
        */
       login: function login(create) {
-        var username = $.trim($('.pssst #username').val());
-        var password = $.trim($('.pssst #password').val());
+        var username = $.trim($('#username').val());
+        var password = $.trim($('#password').val());
         var args = [create === true, username, password];
 
         if (username && password) {
-          $('.pssst #login-dialog').removeClass('animated shake');
+          $('#login-dialog').removeClass('animated shake');
 
           if (create === true) {
-            $('.pssst #login-create').prop('disabled', true);
-            $('.pssst #login-create span').removeClass('fa-user');
-            $('.pssst #login-create span').addClass('fa-spin fa-spinner');
+            $('#login-create').prop('disabled', true);
+            $('#login-create span').removeClass('fa-user');
+            $('#login-create span').addClass('fa-spin fa-spinner');
           }
 
           app.call('login', args, function call(data) {
             if (data) {
               user = data;
               app.list();
-              $('.pssst #write').focus();
-              $('.pssst #login-dialog').modal('hide');
+              $('#write').focus();
+              $('#login-dialog').modal('hide');
             } else {
-              $('.pssst #login-dialog').addClass('animated shake');
+              $('#login-dialog').addClass('animated shake');
             }
           });
         }
@@ -111,7 +89,7 @@ define(['js/pssst.api.js'], function (api) {
        */
       version: function version() {
         app.call('version', null, function call(data) {
-          $('.pssst .version').text(data);
+          $('.version').text(data);
         });
       },
 
@@ -128,12 +106,12 @@ define(['js/pssst.api.js'], function (api) {
        * Creates a box.
        */
       create: function create() {
-        var boxname = $.trim($('.pssst #boxname').val());
+        var boxname = $.trim($('#boxname').val());
 
         if (boxname) {
           app.call('create', [boxname], function call() {
             app.list(box = boxname);
-            $('.pssst #boxname').val('');
+            $('#boxname').val('');
           });
         }
       },
@@ -143,9 +121,28 @@ define(['js/pssst.api.js'], function (api) {
        */
       erase: function erase() {
         app.call('delete', [box], function call() {
-          $('.pssst #box-' + box).remove();
+          $('#box-' + box).remove();
           app.list(box = 'box');
         });
+      },
+
+      /**
+       * Changes the active box.
+       *
+       * @param {String} the box name
+       */
+      change: function(boxname) {
+        $('#user').html(user + '.' + boxname + ' <b class="caret"></b>');
+        $('section').hide();
+        $('#box-' + boxname).show();
+
+        var all = $('.box span');
+        var box = $('#boxname-' + boxname + ' span');
+
+        all.removeClass('fa-folder-open').addClass('fa-folder');
+        box.removeClass('fa-folder').addClass('fa-folder-open');
+
+        document.title = 'Pssst - ' + user + '.' + boxname;
       },
 
       /**
@@ -153,12 +150,12 @@ define(['js/pssst.api.js'], function (api) {
        *
        * @param {String} the box to change to
        */
-      list: function list(active) {
+      list: function list(change) {
         app.call('list', null, function call(boxes) {
-          $('.pssst #boxes').empty();
+          $('#boxes').empty();
 
           boxes.forEach(function(box) {
-            $('.pssst #boxes').append(Mustache.render(
+            $('#boxes').append(Mustache.render(
               '<li>'
             + '  <a id="boxname-{{box}}" class="box" href="">'
             + '    <span class="fa fa-folder"></span>&nbsp;&nbsp;{{box}}'
@@ -166,18 +163,18 @@ define(['js/pssst.api.js'], function (api) {
             + '</li>', {box: box}
             ));
 
-            if ($('.pssst #box-' + box).length === 0) {
-              $('.pssst #content').append(Mustache.render(
+            if ($('#box-' + box).length === 0) {
+              $('#content').append(Mustache.render(
                 '<section id="box-{{box}}"></section>', {box: box}
               ));
             }
           });
 
-          $('.pssst .box').click(function() {
-            change(box = $.trim($(this).text()));
+          $('.box').click(function() {
+            app.change(box = $.trim($(this).text()));
           });
 
-          change(active || box);
+          app.change(change || box);
         });
       },
 
@@ -187,7 +184,7 @@ define(['js/pssst.api.js'], function (api) {
       pull: function pull() {
         app.call('pull', [box], function call(data) {
           if (data) {
-            $('.pssst #box-' + box).append(Mustache.render(
+            $('#box-' + box).append(Mustache.render(
               '<article class="panel panel-default">'
             + '  <div class="panel-body">'
             + '    {{#text}}'
@@ -203,7 +200,7 @@ define(['js/pssst.api.js'], function (api) {
               user: 'pssst.' + data[0],
               time: new Date(data[1] * 1000)
             }));
-            $('.pssst #box-' + box + ' article:last-child').fadeIn(200);
+            $('#box-' + box + ' article:last-child').fadeIn(200);
             $('html,body').animate({scrollTop: $(document).height()}, 'slow');
           }
         });
@@ -213,33 +210,36 @@ define(['js/pssst.api.js'], function (api) {
        * Pushes a message into a box.
        */
       push: function push() {
-        var receiver = $.trim($('.pssst #receiver').val());
-        var message  = $.trim($('.pssst #message').val());
+        var receiver = $.trim($('#receiver').val());
+        var message  = $.trim($('#message').val());
 
         if (receiver && message) {
           app.call('push', [[receiver], message], function call(data) {
-            $('.pssst #receiver').val('');
-            $('.pssst #message').val('');
+            $('#receiver').val('');
+            $('#message').val('');
           });
         }
       }
     };
 
+    app.version();
+
     // Add token to all internal links
-    $('.pssst').on('click', 'a', function(event) {
+    $('body').on('click', 'a', function(event) {
       if ($(this).attr('href') === '') {
         $(this).attr('href', '#' + token);
       }
     });
 
-    $('.pssst #login-create').click(function() { app.login(true); });
-    $('.pssst #login-exists').click(app.login);
-    $('.pssst #logout').click(app.logout);
-    $('.pssst #disable').click(app.disable);
-    $('.pssst #create').click(app.create);
-    $('.pssst #delete').click(app.erase);
-    $('.pssst #send').click(app.push);
-    $('.pssst .modal').modal({
+    // Set app bindings
+    $('#login-create').click(function() { app.login(true); });
+    $('#login-exists').click(app.login);
+    $('#logout').click(app.logout);
+    $('#disable').click(app.disable);
+    $('#create').click(app.create);
+    $('#delete').click(app.erase);
+    $('#send').click(app.push);
+    $('.modal').modal({
       backdrop: 'static',
       keyboard: false,
       show: false
@@ -254,13 +254,12 @@ define(['js/pssst.api.js'], function (api) {
       $(this).find('[autofocus]:first').focus();
     });
 
+    // Set message pulling
     setInterval(function task() {
       if (user) app.pull();
     }, 2000);
 
-    app.version();
-
-    $('.pssst #login-dialog').modal('show');
+    $('#login-dialog').modal('show');
 
     return this;
   };
