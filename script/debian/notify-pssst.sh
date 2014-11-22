@@ -14,7 +14,7 @@ fi
 MESSAGE=$(pssst pull $1:$2)
 
 if [[ ! -z $MESSAGE ]]; then
-    notify-send -t 5000 "$MESSAGE"
+    notify-send -t 10000 Pssst "$MESSAGE"
 fi
 
 exit 0

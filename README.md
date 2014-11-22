@@ -47,7 +47,7 @@ Required for the HTML 5 interface (GUI):
 * At least CherryPy 3.2.2
 * At least Bower 1.3.12
 
-Please start the GUI with the `app/gui/pssst-gui.sh` script. This will
+Please start the GUI with the `app/gui/start` script. This will
 download and install all necessary prerequisite.
 
 ### Server
@@ -441,6 +441,10 @@ Folders
 
 This folder contains our Redis configurations.
 
+#### Amazon
+
+* `t2.micro.conf` - Redis config for an AWS T2 Micro instance
+
 #### Uberspace
 
 * `live.conf` - Redis database config used by `api.pssst.name`
@@ -449,6 +453,10 @@ This folder contains our Redis configurations.
 ### Script
 
 This folder contains the maintenance scripts we use.
+
+#### Amazon
+
+* `Dockerfile` - Docker container for Amazon Web Services
 
 #### Debian
 
@@ -459,7 +467,7 @@ This folder contains the maintenance scripts we use.
 
 #### Docker
 
-* `Dockerfile` - Builds a docker container
+* `Dockerfile` - Docker container based on Debian
 
 #### GitHub
 

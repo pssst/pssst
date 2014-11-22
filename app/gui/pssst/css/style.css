@@ -8,15 +8,24 @@ html, body {
   top: 30%;
 }
 
+.alert {
+  border-radius: 0;
+  display: none;
+  position: fixed;
+  text-align: center;
+  width: 100%;
+  z-index: 1050;
+}
+
 .panel {
   display: none;
+  margin: 0 5px 5px 5px;
   text-align: justify;
   word-wrap: break-word;
-  margin: 0 5px 5px 5px;
 }
 
 #content {
-  margin-top: 55px;
+  padding-top: 55px;
 }
 
 #username, #receiver {

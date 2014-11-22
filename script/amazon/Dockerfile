@@ -21,12 +21,7 @@ RUN \
   make install && \
   cp -f src/redis-sentinel /usr/local/bin && \
   mkdir -p /etc/redis && \
-  cp -f *.conf /etc/redis && \
-  rm -rf /tmp/redis-stable* && \
-  sed -i 's/^\(bind .*\)$/# \1/' /etc/redis/redis.conf && \
-  sed -i 's/^\(daemonize .*\)$/# \1/' /etc/redis/redis.conf && \
-  sed -i 's/^\(dir .*\)$/# \1\ndir \/pssst/' /etc/redis/redis.conf && \
-  sed -i 's/^\(logfile .*\)$/# \1/' /etc/redis/redis.conf
+  rm -rf /tmp/redis-stable*
 
 # Install Node.js.
 RUN \
@@ -53,6 +48,7 @@ WORKDIR /pssst
 RUN \
   cd /tmp && \
   git clone https://github.com/pssst/pssst/ pssst-latest && \
+  cp -f pssst-latest/config/amazon/t2.micro.conf /etc/redis/redis.conf && \
   mv pssst-latest/server/* /pssst && \
   rm -rf pssst-latest && \
   cd /pssst && \

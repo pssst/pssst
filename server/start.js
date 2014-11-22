@@ -59,14 +59,18 @@ try {
     app.use(parser.urlencoded({extended: true}))
     app.use(parser.json())
 
-    // Error hook
-    app.use(function hook(err, req, res, next) {
-      res.error(err);
-    });
-
     // Debug hook
     app.use(function hook(req, res, next) {
       debug(config.debug, req, res, next);
+    });
+
+    // Error hook
+    app.use(function hook(err, req, res, next) {
+      if (res.error) {
+        res.error(err);
+      } else {
+        console.error(err);
+      }
     });
 
     server = server(app, config, function ready(err) {
@@ -96,8 +100,8 @@ try {
         console.log([
           'Usage: node start [OPTION]',
           '',
-          '  -l --license   Shows the server license',
-          '  -v --version   Shows the server version',
+          '  -l --license   Shows license',
+          '  -v --version   Shows version',
           '',
           'Report bugs to <hello@pssst.name>'
         ].join('\n'));
