@@ -51,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.31"
+__all__, __version__ = ["Pssst"], "0.2.33"
 
 
 def _encode64(data): # Utility shortcut
@@ -60,61 +60,6 @@ def _encode64(data): # Utility shortcut
 
 def _decode64(data): # Utility shortcut
     return base64.b64decode(data.encode("ascii"))
-
-
-class Name:
-    """
-    Pssst canonical name parser.
-
-    """
-    def __init__(self, user, box=None, password=None):
-        """
-        Initializes the instance with the parsed name.
-
-        Parameters
-        ----------
-        param user : string
-            User name (full or partly).
-        param box : string, optional (default is None)
-            Box name.
-        param password : string, optional (default is None)
-            User private key password.
-
-        """
-        user = user.strip()
-
-        if not re.match("^(pssst\.)?\w{2,63}(\.\w{2,63})?(:\S*)?$", user):
-            raise Exception("User name invalid")
-
-        if user.startswith("pssst."):
-            user = user[6:]
-
-        if ":" in user and not password:
-            user, password = user.rsplit(":", 1)
-
-        if "." in user and not box:
-            user, box = user.rsplit(".", 1)
-
-        self.user = user.lower()
-        self.box = box.lower() if box else box
-        self.password = password
-
-        self.full = (self.user, self.box)
-
-        if self.box:
-            self.path = "%s/%s/" % self.full
-        else:
-            self.path = "%s/" % self.user
-
-    def __repr__(self):
-        """
-        Returns the full name in canonical notation.
-
-        """
-        if self.box:
-            return str("pssst.%s.%s" % self.full)
-        else:
-            return str("pssst.%s" % self.user)
 
 
 class Pssst:
@@ -137,7 +82,62 @@ class Pssst:
         Pushes a message into a box.
 
     """
-    class KeyStore:
+    class Name:
+        """
+        Class for canonical name parsing.
+
+        """
+        def __init__(self, user, box=None, password=None):
+            """
+            Initializes the instance with the parsed name.
+
+            Parameters
+            ----------
+            param user : string
+                User name (full or partly).
+            param box : string, optional (default is None)
+                Box name.
+            param password : string, optional (default is None)
+                User private key password.
+
+            """
+            user = user.strip()
+
+            if not re.match("^(pssst\.)?\w{2,63}(\.\w{2,63})?(:\S*)?$", user):
+                raise Exception("User name invalid")
+
+            if user.startswith("pssst."):
+                user = user[6:]
+
+            if ":" in user and not password:
+                user, password = user.rsplit(":", 1)
+
+            if "." in user and not box:
+                user, box = user.rsplit(".", 1)
+
+            self.user = user.lower()
+            self.box = box.lower() if box else box
+            self.password = password
+
+            self.full = (self.user, self.box)
+
+            if self.box:
+                self.path = "%s/%s/" % self.full
+            else:
+                self.path = "%s/" % self.user
+
+        def __repr__(self):
+            """
+            Returns the full name in canonical notation.
+
+            """
+            if self.box:
+                return str("pssst.%s.%s" % self.full)
+            else:
+                return str("pssst.%s" % self.user)
+
+
+    class _KeyStore:
         """
         Class for storing public and private keys.
 
@@ -162,9 +162,9 @@ class Pssst:
             self.file = os.path.join(os.path.expanduser("~"), repr(self))
 
             if os.path.exists(self.file):
-                self.key = Pssst.Key(self.load(user + ".private"), password)
+                self.key = Pssst._Key(self.load(user + ".private"), password)
             else:
-                self.key = Pssst.Key()
+                self.key = Pssst._Key()
 
                 self.save(user + ".private", self.key.private(password))
                 self.save(user, self.key.public())
@@ -194,7 +194,7 @@ class Pssst:
                 file.writestr(name, key)
 
 
-    class Key:
+    class _Key:
         """
         Class for providing cryptographic methods.
 
@@ -225,7 +225,7 @@ class Pssst:
                 if key:
                     self.key = RSA.importKey(key, password)
                 else:
-                    self.key = RSA.generate(Pssst.Key.size)
+                    self.key = RSA.generate(Pssst._Key.size)
 
             except (IndexError, TypeError, ValueError) as ex:
                 raise Exception("Password wrong")
@@ -326,7 +326,7 @@ class Pssst:
         if verify and not password:
             raise Exception("Password is required")
 
-        self.store = Pssst.KeyStore(Name(username).user, password)
+        self.store = Pssst._KeyStore(Pssst.Name(username).user, password)
 
         if self.api not in self.store.list():
             self.store.save(self.api, key)
@@ -402,7 +402,7 @@ class Pssst:
         timestamp, signature = head.split(";", 1)
         timestamp, signature = int(timestamp), _decode64(signature)
 
-        pssst = Pssst.Key(self.store.load(self.api))
+        pssst = Pssst._Key(self.store.load(self.api))
 
         if not pssst.verify(body, timestamp, signature):
             raise Exception("Verification failed")
@@ -465,7 +465,7 @@ class Pssst:
         else:
             body = None
 
-        self.__api("POST", Name(self.store.user, box).path, body)
+        self.__api("POST", Pssst.Name(self.store.user, box).path, body)
 
     def delete(self, box=None):
         """
@@ -482,7 +482,7 @@ class Pssst:
         any API call wil result in an error. The key store is also deleted.
 
         """
-        self.__api("DELETE", Name(self.store.user, box).path)
+        self.__api("DELETE", Pssst.Name(self.store.user, box).path)
 
         if not box:
             self.store.delete()
@@ -536,7 +536,7 @@ class Pssst:
             The user name, time and message, None if empty.
 
         """
-        data = self.__api("GET", Name(self.store.user, box).path)
+        data = self.__api("GET", Pssst.Name(self.store.user, box).path)
 
         if not data:
             return None # Box is empty
@@ -565,12 +565,12 @@ class Pssst:
             The message.
 
         """
-        for user, box in [Name(username).full for username in usernames]:
+        for user, box in [Pssst.Name(name).full for name in usernames]:
 
             if user not in self.store.list():
                 self.store.save(user, self.find(user)) # Add public key
 
-            data, nonce = Pssst.Key(self.store.load(user)).encrypt(message)
+            data, nonce = Pssst._Key(self.store.load(user)).encrypt(message)
 
             nonce = _encode64(nonce)
             body  = _encode64(data)
@@ -585,7 +585,7 @@ class Pssst:
                 "body": body
             }
 
-            self.__api("PUT", Name(user, box).path, data)
+            self.__api("PUT", Pssst.Name(user, box).path, data)
 
 
 def shell(intro, prompt="pssst"):
@@ -687,7 +687,7 @@ def main(script, command="--help", username=None, receiver=None, *message):
     """
     try:
         if username:
-            name = Name(username)
+            name = Pssst.Name(username)
 
         if username and not hasattr(Pssst, "shell"):
             Pssst.shell = Pssst(name.user, name.password or getpass())
@@ -720,8 +720,9 @@ def main(script, command="--help", username=None, receiver=None, *message):
 
             if data:
                 user, time, message = data
+                username = Pssst.Name(user)
                 print(message.decode("utf-8"))
-                print("%s, %s" % (Name(user), datetime.fromtimestamp(time)))
+                print("%s, %s" % (username, datetime.fromtimestamp(time)))
 
         elif command in ("--push", "push") and username and receiver:
             Pssst.shell.push([receiver], " ".join(message))

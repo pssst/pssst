@@ -197,7 +197,7 @@ define(['js/pssst.api.js'], function (api) {
             + '</article>'
             , {
               text: data[2].split('\n'),
-              user: 'pssst.' + data[0],
+              user: data[0],
               time: new Date(data[1] * 1000)
             }));
             $('#box-' + box + ' article:last-child').fadeIn(200);

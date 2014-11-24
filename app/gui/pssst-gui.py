@@ -24,7 +24,7 @@ import webbrowser
 
 
 try:
-    from pssst import Name, Pssst, usage, __version__
+    from pssst import Pssst, usage, __version__
 except ImportError:
     sys.exit("Please execute the start script")
 
@@ -192,7 +192,8 @@ class CLI:
         data = self.pssst.pull(box)
 
         if data:
-            return (data[0], data[1], data[2].decode("utf-8"))
+            user, time, message = data
+            return (Pssst.Name(user), time, message.decode("utf-8"))
 
     def push(self, usernames, message):
         """
@@ -227,7 +228,7 @@ class CLI:
             The canonical user name or None.
 
         """
-        name = Name(username)
+        name = Pssst.Name(username)
         home = os.path.expanduser("~")
 
         # New user
