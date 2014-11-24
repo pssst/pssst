@@ -22,7 +22,7 @@ import string
 import sys
 
 
-from pssst import Pssst, Name
+from pssst import Pssst
 
 
 try:
@@ -50,7 +50,8 @@ def setup_module(module):
     # Clean up invalid name test
     files = [os.path.join(os.path.expanduser("~"), ".pssst.name")]
 
-    Pssst.Key.size = 1024
+    # Only for testing
+    Pssst._Key.size = 1024
 
 
 def teardown_module(module):
@@ -118,7 +119,7 @@ class TestName:
         Tests if name is parsed correctly.
 
         """
-        name = Name(" pssst.User.Box:Pa55w0rd ")
+        name = Pssst.Name(" pssst.User.Box:Pa55w0rd ")
 
         assert name.path == "user/box/"
         assert name.user == "user"
@@ -132,7 +133,7 @@ class TestName:
         Tests if name is parsed correctly.
 
         """
-        name = Name("user")
+        name = Pssst.Name("user")
 
         assert name.path == "user/"
         assert name.user == "user"
@@ -147,7 +148,7 @@ class TestName:
 
         """
         with pytest.raises(Exception) as ex:
-            Name("Invalid user.name !")
+            Pssst.Name("Invalid user.name !")
 
         assert str(ex.value) == "User name invalid"
 
@@ -219,16 +220,16 @@ class TestCrypto:
         Tests if request signature is invalid.
 
         """
-        original = Pssst.Key.sign
+        original = Pssst._Key.sign
 
         with pytest.raises(Exception) as ex:
-            Pssst.Key.sign = lambda self, data: ("!", b"!")
+            Pssst._Key.sign = lambda self, data: ("!", b"!")
 
             pssst = Pssst(createUserName())
             pssst.create()
             pssst.pull()
 
-        Pssst.Key.sign = original
+        Pssst._Key.sign = original
 
         assert str(ex.value) == "Verification failed"
 
@@ -237,16 +238,16 @@ class TestCrypto:
         Tests if request verification signature is correct.
 
         """
-        original = Pssst.Key.sign
+        original = Pssst._Key.sign
 
         with pytest.raises(Exception) as ex:
-            Pssst.Key.sign = lambda self, data: original(self, "Test")
+            Pssst._Key.sign = lambda self, data: original(self, "Test")
 
             pssst = Pssst(createUserName())
             pssst.create()
             pssst.pull()
 
-        Pssst.Key.sign = original
+        Pssst._Key.sign = original
 
         assert str(ex.value) == "Verification failed"
 

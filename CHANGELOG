@@ -1,3 +1,9 @@
+0.2.33
+* Fixed user name handling in GUI
+* Fixed wrong CLI version number
+* Changed name parser structure
+* Changed CLI exports
+
 0.2.32
 * Added summary to notify script
 * Changed expire time in notify script
