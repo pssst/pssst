@@ -1,3 +1,11 @@
+0.2.34
+* Added example file transfer scripts
+* Added Debian persistence script
+* Changed CLI shell internals
+* Changed README.md
+* Renamed Debian notify script
+* Removed GitHub push webhook (unused)
+
 0.2.33
 * Fixed user name handling in GUI
 * Fixed wrong CLI version number
