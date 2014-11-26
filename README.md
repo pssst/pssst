@@ -452,7 +452,7 @@ This folder contains our Redis configurations.
 
 ### Script
 
-This folder contains the maintenance scripts we use.
+This folder contains our maintenance and helper scripts.
 
 #### Amazon
 
@@ -463,15 +463,17 @@ This folder contains the maintenance scripts we use.
 * `install.sh` - Installs the CLI (w/o root permission)
 * `makedeb.sh` - Creates a Debian package of the CLI
 * `makeiso.sh` - Creates a Debian minimal ISO image with user keys and CLI
-* `notify-pssst.sh` - Displays the latest message with a desktop notification
+* `pssst-box.sh` - Persists the contents of a box to the users home directory
+* `pssst-notify.sh` - Displays the latest message with a desktop notification
 
 #### Docker
 
 * `Dockerfile` - Docker container based on Debian
 
-#### GitHub
+#### Example
 
-* `push.php` - Push webhook for GitHub
+* `pssst-pull.py` - Example script derived from the CLI for file pulling
+* `pssst-push.py` - Example script derived from the CLI for file pushing
 
 #### Heroku
 

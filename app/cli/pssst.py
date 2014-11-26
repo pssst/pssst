@@ -51,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.33"
+__all__, __version__ = ["Pssst"], "0.2.34"
 
 
 def _encode64(data): # Utility shortcut
@@ -689,8 +689,8 @@ def main(script, command="--help", username=None, receiver=None, *message):
         if username:
             name = Pssst.Name(username)
 
-        if username and not hasattr(Pssst, "shell"):
-            Pssst.shell = Pssst(name.user, name.password or getpass())
+        if username and not hasattr(Pssst, "cli"):
+            Pssst.cli = Pssst(name.user, name.password or getpass())
 
         if command in ("/?", "-h", "--help", "help"):
             usage(main.__doc__, __version__, os.path.basename(script))
@@ -705,18 +705,18 @@ def main(script, command="--help", username=None, receiver=None, *message):
             shell("Pssst Shell " + __version__ + " for " + name.user)
 
         elif command in ("--create", "create") and username:
-            Pssst.shell.create(name.box)
+            Pssst.cli.create(name.box)
             print("Created %s" % name)
 
         elif command in ("--delete", "delete") and username:
-            Pssst.shell.delete(name.box)
+            Pssst.cli.delete(name.box)
             print("Deleted %s" % name)
 
         elif command in ("--list", "list") and username:
-            print("\n".join(Pssst.shell.list()))
+            print("\n".join(Pssst.cli.list()))
 
         elif command in ("--pull", "pull") and username:
-            data = Pssst.shell.pull(name.box)
+            data = Pssst.cli.pull(name.box)
 
             if data:
                 user, time, message = data
@@ -725,7 +725,7 @@ def main(script, command="--help", username=None, receiver=None, *message):
                 print("%s, %s" % (username, datetime.fromtimestamp(time)))
 
         elif command in ("--push", "push") and username and receiver:
-            Pssst.shell.push([receiver], " ".join(message))
+            Pssst.cli.push([receiver], " ".join(message))
             print("Message pushed")
 
         else:
