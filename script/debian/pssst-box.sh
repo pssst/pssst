@@ -15,7 +15,7 @@ while true; do
     MESSAGE="$(pssst pull $1:$2)"
 
     if [[ ! -z $MESSAGE ]]; then
-        echo $MESSAGE >> "$HOME/pssst.$1"
+        echo "$MESSAGE" >> "$HOME/pssst.$1"
     else
         exit 0
     fi
