@@ -1,4 +1,5 @@
 #!/bin/bash
+# This code is an example that should not be used in a productive environment
 set -o errexit
 set -o nounset
 
@@ -16,6 +17,7 @@ while true; do
 
     if [[ ! -z $MESSAGE ]]; then
         echo "$MESSAGE" >> "$HOME/pssst.$1"
+        notify-send Pssst "$MESSAGE"
     else
         exit 0
     fi

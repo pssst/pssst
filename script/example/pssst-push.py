@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-PLEASE BE AWARE: THIS CODE IS ONLY AN EXAMPLE ON HOW TO DERIVE FROM THE CLI
+This code is an example that should not be used in a productive environment
 """
 import base64
 import io

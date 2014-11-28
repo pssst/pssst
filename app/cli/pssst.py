@@ -51,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.34"
+__all__, __version__ = ["Pssst"], "0.2.35"
 
 
 def _encode64(data): # Utility shortcut
