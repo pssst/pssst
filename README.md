@@ -463,8 +463,6 @@ This folder contains our maintenance and helper scripts.
 * `install.sh` - Installs the CLI (w/o root permission)
 * `makedeb.sh` - Creates a Debian package of the CLI
 * `makeiso.sh` - Creates a Debian minimal ISO image with user keys and CLI
-* `pssst-box.sh` - Persists the contents of a box to the users home directory
-* `pssst-notify.sh` - Displays the latest message with a desktop notification
 
 #### Docker
 
@@ -474,6 +472,7 @@ This folder contains our maintenance and helper scripts.
 
 * `pssst-pull.py` - Example script derived from the CLI for file pulling
 * `pssst-push.py` - Example script derived from the CLI for file pushing
+* `pssst-box.sh`  - Displays and persists the latest messages from a box
 
 #### Heroku
 

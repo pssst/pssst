@@ -1,3 +1,9 @@
+0.2.35
+* Fixed example pull script box bug
+* Merged notify and persist scripts
+* Changed example notice
+* Changed README.md
+
 0.2.34
 * Added example file transfer scripts
 * Added Debian persistence script

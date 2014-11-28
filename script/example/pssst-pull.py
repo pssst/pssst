@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-PLEASE BE AWARE: THIS CODE IS ONLY AN EXAMPLE ON HOW TO DERIVE FROM THE CLI
+This code is an example that should not be used in a productive environment
 """
 import base64
 import io
@@ -27,7 +27,7 @@ def main(script, username=None, path="."):
 
     try:
         name = Pssst.Name(username)
-        data = Pssst(name.user, name.password or getpass()).pull()
+        data = Pssst(name.user, name.password or getpass()).pull(name.box)
 
         if data:
             user, time, message = data
