@@ -26,7 +26,7 @@ There is no need to install anything, just run the `app/cli/pssst.py` script:
 
 If you wish to install the CLI on a POSIX system, just execute:
 
-`$ curl -s https://pssst.name/install | bash`
+`$ curl -s https://get.pssst.name | bash`
 
 If you want to use any other than our test server, simply create a file
 named `.pssst` in your home directory with the desired server address:
@@ -481,6 +481,10 @@ This folder contains our maintenance and helper scripts.
 #### Uberspace
 
 * `update-pssst.sh` - Starts a server instance on https://uberspace.de
+
+#### Windows
+
+* `makebin.cmd` - Creates a Windows PE file of the CLI
 
 Contact
 -------
