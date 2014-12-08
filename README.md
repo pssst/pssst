@@ -48,7 +48,7 @@ Required for the HTML 5 interface (GUI):
 * At least Bower 1.3.12
 
 Please start the GUI with the `app/gui/start` script. This will
-download and install all necessary prerequisite.
+download and install all necessary prerequisites.
 
 ### Server
 
