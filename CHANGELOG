@@ -1,4 +1,10 @@
+0.2.36
+* Added Windows PE build script
+* Changed GUI favicon
+* Changed README.md
+
 0.2.35
+* Fixed bug with non ASCII characters
 * Fixed example pull script box bug
 * Merged notify and persist scripts
 * Changed example notice
