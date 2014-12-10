@@ -1,5 +1,6 @@
 0.2.36
 * Added Windows PE build script
+* Fixed user name bug in GUI
 * Changed GUI favicon
 * Changed README.md
 

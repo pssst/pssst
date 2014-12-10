@@ -193,7 +193,7 @@ class CLI:
 
         if data:
             user, time, message = data
-            return (Pssst.Name(user), time, message.decode("utf-8"))
+            return (repr(Pssst.Name(user)), time, message.decode("utf-8"))
 
     def push(self, usernames, message):
         """
