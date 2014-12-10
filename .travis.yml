@@ -12,6 +12,7 @@ install:
   - "pip install pycrypto requests"
 before_script:
   - echo 'http://localhost:62421' > ~/.pssst
+  - export PYTHON=`which python2`
   - cd server
   - npm install
   - node start &
