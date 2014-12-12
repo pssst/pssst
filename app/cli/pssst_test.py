@@ -153,9 +153,9 @@ class TestName:
         assert str(ex.value) == "User name invalid"
 
 
-class TestKeyStore:
+class TestKeyStorage:
     """
-    Tests key store with the test cases:
+    Tests key storage with the test cases:
 
     * Key list
 
@@ -183,7 +183,7 @@ class TestKeyStore:
 
         content = [pssst1.api, name1 + ".private", name1, name2]
 
-        assert sorted(pssst1.store.list()) == sorted(content)
+        assert sorted(pssst1.keys.list()) == sorted(content)
 
 
 class TestCrypto:

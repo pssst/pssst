@@ -64,7 +64,7 @@ def _decode64(data): # Utility shortcut
 
 class Pssst:
     """
-    Pssst class for API communication.
+    Pssst API low level communication class.
 
     Methods
     -------
@@ -84,7 +84,7 @@ class Pssst:
     """
     class Name:
         """
-        Class for canonical name parsing.
+        Canonical name parser.
 
         """
         def __init__(self, user, box=None, password=None):
@@ -137,14 +137,14 @@ class Pssst:
                 return str("pssst.%s" % self.user)
 
 
-    class _KeyStore:
+    class _KeyStorage:
         """
-        Class for storing public and private keys.
+        Storage class for public and private keys.
 
         Methods
         -------
         delete()
-            Deletes the key store.
+            Deletes the users key storage.
         list()
             Returns an alphabetical list of all key names.
         load(name)
@@ -196,7 +196,7 @@ class Pssst:
 
     class _Key:
         """
-        Class for providing cryptographic methods.
+        Key class providing cryptographic methods.
 
         Methods
         -------
@@ -326,10 +326,10 @@ class Pssst:
         if verify and not password:
             raise Exception("Password is required")
 
-        self.store = Pssst._KeyStore(Pssst.Name(username).user, password)
+        self.keys = Pssst._KeyStorage(Pssst.Name(username).user, password)
 
-        if self.api not in self.store.list():
-            self.store.save(self.api, key)
+        if self.api not in self.keys.list():
+            self.keys.save(self.api, key)
 
     def __repr__(self):
         """
@@ -377,12 +377,12 @@ class Pssst:
         Please see __init__ method.
 
         """
-        if not self.store:
+        if not self.keys:
             raise Exception("User was deleted")
 
         body = str(json.dumps(data, separators=(",", ":"))) if data else ""
 
-        timestamp, signature = self.store.key.sign(body)
+        timestamp, signature = self.keys.key.sign(body)
 
         response = request(method, "%s/1/%s" % (self.api, path), data=body,
             headers={
@@ -402,7 +402,7 @@ class Pssst:
         timestamp, signature = head.split(";", 1)
         timestamp, signature = int(timestamp), _decode64(signature)
 
-        pssst = Pssst._Key(self.store.load(self.api))
+        pssst = Pssst._Key(self.keys.load(self.api))
 
         if not pssst.verify(body, timestamp, signature):
             raise Exception("Verification failed")
@@ -461,11 +461,11 @@ class Pssst:
 
         """
         if not box:
-            body = {"key": self.store.key.public()}
+            body = {"key": self.keys.key.public()}
         else:
             body = None
 
-        self.__api("POST", Pssst.Name(self.store.user, box).path, body)
+        self.__api("POST", Pssst.Name(self.keys.user, box).path, body)
 
     def delete(self, box=None):
         """
@@ -479,13 +479,13 @@ class Pssst:
         Notes
         -----
         If the user was deleted, the object can not be used any further and
-        any API call wil result in an error. The key store is also deleted.
+        any API call wil result in an error. The key storage is also deleted.
 
         """
-        self.__api("DELETE", Pssst.Name(self.store.user, box).path)
+        self.__api("DELETE", Pssst.Name(self.keys.user, box).path)
 
         if not box:
-            self.store.delete()
+            self.keys.delete()
 
     def find(self, user):
         """
@@ -519,7 +519,7 @@ class Pssst:
             List of user boxes.
 
         """
-        return self.__api("GET", self.store.user + "/list")
+        return self.__api("GET", self.keys.user + "/list")
 
     def pull(self, box=None):
         """
@@ -536,7 +536,7 @@ class Pssst:
             The user name, time and message, None if empty.
 
         """
-        data = self.__api("GET", Pssst.Name(self.store.user, box).path)
+        data = self.__api("GET", Pssst.Name(self.keys.user, box).path)
 
         if not data:
             return None # Box is empty
@@ -549,7 +549,7 @@ class Pssst:
         nonce = _decode64(head["nonce"])
         body  = _decode64(data["body"])
 
-        message = self.store.key.decrypt(body, nonce)
+        message = self.keys.key.decrypt(body, nonce)
 
         return (user, time, message)
 
@@ -567,16 +567,16 @@ class Pssst:
         """
         for user, box in [Pssst.Name(name).full for name in usernames]:
 
-            if user not in self.store.list():
-                self.store.save(user, self.find(user)) # Add public key
+            if user not in self.keys.list():
+                self.keys.save(user, self.find(user)) # Add public key
 
-            data, nonce = Pssst._Key(self.store.load(user)).encrypt(message)
+            data, nonce = Pssst._Key(self.keys.load(user)).encrypt(message)
 
             nonce = _encode64(nonce)
             body  = _encode64(data)
 
             head = {
-                "user": self.store.user,
+                "user": self.keys.user,
                 "nonce": nonce
             }
 

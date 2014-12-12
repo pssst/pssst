@@ -1,8 +1,10 @@
 0.2.36
 * Added Windows PE build script
 * Fixed user name bug in GUI
+* Changed CLI documentation
 * Changed GUI favicon
 * Changed README.md
+* Renamed class KeyStore
 
 0.2.35
 * Fixed bug with non ASCII characters
