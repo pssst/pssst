@@ -117,12 +117,11 @@ class Pssst:
 
             self.user = user.lower()
             self.box = box.lower() if box else box
+            self.all = (self.user, self.box)
             self.password = password
 
-            self.full = (self.user, self.box)
-
             if self.box:
-                self.path = "%s/%s/" % self.full
+                self.path = "%s/%s/" % self.all
             else:
                 self.path = "%s/" % self.user
 
@@ -132,7 +131,7 @@ class Pssst:
 
             """
             if self.box:
-                return str("pssst.%s.%s" % self.full)
+                return str("pssst.%s.%s" % self.all)
             else:
                 return str("pssst.%s" % self.user)
 
@@ -565,7 +564,7 @@ class Pssst:
             The message.
 
         """
-        for user, box in [Pssst.Name(name).full for name in usernames]:
+        for user, box in [Pssst.Name(name).all for name in usernames]:
 
             if user not in self.keys.list():
                 self.keys.save(user, self.find(user)) # Add public key

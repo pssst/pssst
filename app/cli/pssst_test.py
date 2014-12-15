@@ -124,7 +124,7 @@ class TestName:
         assert name.path == "user/box/"
         assert name.user == "user"
         assert name.box == "box"
-        assert name.full == ("user", "box")
+        assert name.all == ("user", "box")
         assert name.password == "Pa55w0rd"
         assert str(name) == "pssst.user.box"
 
@@ -138,7 +138,7 @@ class TestName:
         assert name.path == "user/"
         assert name.user == "user"
         assert name.box == None
-        assert name.full == ("user", None)
+        assert name.all == ("user", None)
         assert name.password == None
         assert str(name) == "pssst.user"
 

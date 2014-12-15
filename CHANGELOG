@@ -4,6 +4,8 @@
 * Changed CLI documentation
 * Changed GUI favicon
 * Changed README.md
+* Changed unit tests
+* Renamed name token all
 * Renamed class KeyStore
 
 0.2.35
