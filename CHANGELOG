@@ -1,6 +1,6 @@
 0.2.36
 * Added Windows PE build script
-* Fixed new key bug in Heroku script
+* Fixed key bug in Heroku script
 * Fixed user name bug in GUI
 * Changed CLI documentation
 * Changed GUI favicon
