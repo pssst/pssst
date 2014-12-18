@@ -3,12 +3,12 @@ set -o errexit
 set -o nounset
 
 if [[ -z ${1:-} ]] && [[ -z ${2:-} ]]; then
-    echo Usage: $(basename $0) BRANCH APP
+    echo Usage: $(basename $0) APP BRANCH
     exit 2
 fi
 
-BRANCH=$1
-HEROKU=$2
+HEROKU=$1
+BRANCH=$2
 
 TMP=/tmp/pssst-update-$(date +%s)
 
@@ -19,13 +19,16 @@ fi
 git clone https://github.com/pssst/pssst -b $BRANCH $TMP
 
 if [[ ! -d $HEROKU ]]; then
-    mkdir -p $HEROKU
+    mkdir -p $HEROKU/www
 
     cd $HEROKU
 
     git init
     git remote add heroku git@heroku.com:$HEROKU.git
     git pull heroku master
+
+    openssl genrsa -out ./app/pssst.key 4096
+    openssl rsa -in ./app/pssst.key -pubout > ./www/key
 else
     cd $HEROKU
 
