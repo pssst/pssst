@@ -138,7 +138,7 @@ class Pssst:
 
     class _KeyStorage:
         """
-        Storage class for public and private keys.
+        Internal storage class for public and private keys.
 
         Methods
         -------
@@ -195,7 +195,7 @@ class Pssst:
 
     class _Key:
         """
-        Key class providing cryptographic methods.
+        Internal key class providing cryptographic methods.
 
         Methods
         -------
