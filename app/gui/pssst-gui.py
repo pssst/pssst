@@ -52,7 +52,7 @@ class CLI:
         Calls the CLI and returns the result.
     pull(box=None)
         Pulls a message from a box.
-    push(usernames, message)
+    push(receivers, message)
         Pushes a message into a box.
     login(username, password)
         Creates the Pssst instance.
@@ -195,19 +195,19 @@ class CLI:
             user, time, message = data
             return (repr(Pssst.Name(user)), time, message.decode("utf-8"))
 
-    def push(self, usernames, message):
+    def push(self, receivers, message):
         """
         Pushes a message into a box (override).
 
         Parameters
         ----------
-        param usernames : list of strings
+        param receivers : list of strings
             List of user names.
         param message : byte string
             The message.
 
         """
-        self.pssst.push(usernames, message.encode("utf-8"))
+        self.pssst.push(receivers, message.encode("utf-8"))
 
     def login(self, create, username, password):
         """

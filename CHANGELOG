@@ -3,6 +3,7 @@
 * Fixed key bug in Heroku script
 * Fixed user name bug in GUI
 * Changed CLI documentation
+* Changed CLI parameters
 * Changed GUI favicon
 * Changed README.md
 * Changed unit tests

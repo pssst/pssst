@@ -78,7 +78,7 @@ class Pssst:
         Returns all boxes of an user.
     pull(box=None)
         Pulls a message from a box.
-    push(usernames, message)
+    push(receivers, message)
         Pushes a message into a box.
 
     """
@@ -552,19 +552,19 @@ class Pssst:
 
         return (user, time, message)
 
-    def push(self, usernames, message):
+    def push(self, receivers, message):
         """
         Pushes a message into a box.
 
         Parameters
         ----------
-        param usernames : list of strings
+        param receivers : list of strings
             List of user names.
         param message : byte string
             The message.
 
         """
-        for user, box in [Pssst.Name(name).all for name in usernames]:
+        for user, box in [Pssst.Name(name).all for name in receivers]:
 
             if user not in self.keys.list():
                 self.keys.save(user, self.find(user)) # Add public key
