@@ -145,10 +145,10 @@ class Pssst:
         delete()
             Deletes the users key storage.
         list()
-            Returns an alphabetical list of all key names.
-        load(name)
+            Returns an alphabetical list of all key entries.
+        load(entry)
             Returns a key.
-        save(name, key)
+        save(entry, key)
             Saves a key.
 
         Notes
@@ -184,13 +184,13 @@ class Pssst:
             with ZipFile(self.file, "r") as file:
                 return file.namelist()
 
-        def load(self, name):
+        def load(self, entry):
             with ZipFile(self.file, "r") as file:
-                return file.read(name)
+                return file.read(entry)
 
-        def save(self, name, key):
+        def save(self, entry, key):
             with ZipFile(self.file, "a") as file:
-                file.writestr(name, key)
+                file.writestr(entry, key)
 
 
     class _Key:
