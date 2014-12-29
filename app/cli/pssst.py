@@ -305,7 +305,7 @@ class Pssst:
         in fingerprint.
 
         """
-        FINGERPRINT = "5a749f99dbc2a03b0cde327bafcf9bd7dc616830"
+        FINGERPRINT, GRACE = "5a749f99dbc2a03b0cde327bafcf9bd7dc616830", 30
 
         config = os.path.join(os.path.expanduser("~"), ".pssst")
 
@@ -319,7 +319,7 @@ class Pssst:
         if verify and not FINGERPRINT == SHA.new(key).hexdigest():
             raise Exception("Server could not be authenticated")
 
-        if verify and not abs(sync - int(round(time.time()))) <= 30:
+        if verify and abs(sync - int(round(time.time()))) > GRACE:
             raise Exception("Client time is not synchronized")
 
         if verify and not password:
