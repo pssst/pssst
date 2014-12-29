@@ -332,12 +332,12 @@ class Pssst:
 
     def __repr__(self):
         """
-        Returns the module identifier.
+        Returns the client identifier.
 
         Returns
         -------
         string
-            The module identifier.
+            The client identifier.
 
         """
         return "Pssst " + __version__
