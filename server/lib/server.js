@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
+ *
  * HTTP(S) server with authentication.
  *
  * @param {Object} express app
@@ -24,22 +25,23 @@ module.exports = function Server(app, config, callback) {
 
   // Required imports
   var fs = require('fs');
-  var http  = require('http');
+  var http = require('http');
   var https = require('https');
-  var mime  = require('mime');
-  var util  = require('util');
+  var mime = require('mime');
+  var util = require('util');
 
   // Required libraries
-  var info   = require('../package.json');
-  var pssst  = require('../app/pssst.js');
-  var redis  = require('../lib/redis.js');
+  var info = require('../package.json');
+  var pssst = require('../app/pssst.js');
+  var redis = require('../lib/redis.js');
   var crypto = require('../lib/crypto.js');
 
   // Required constants
+  var ENCODING = 'utf8';
   var HEADER = 'content-hash';
 
-  var KEY  = __dirname + '/../app/pssst.key';
-  var CERT = __dirname + '/../app/pssst.cert';
+  var ID_RSA = __dirname + '/../id_rsa';
+  var ID_CRT = __dirname + '/../id_rsa.cert';
 
   mime.default_type = 'text/plain';
 
@@ -173,7 +175,7 @@ module.exports = function Server(app, config, callback) {
     var path = util.format('%s/../www/%s', __dirname, file);
 
     // Send signed file content with mime type
-    fs.readFile(path, 'utf8', function(err, data) {
+    fs.readFile(path, ENCODING, function(err, data) {
       if (!err) {
         res.setHeader('content-type', mime.lookup(file));
         res.sign(200, data);
@@ -212,12 +214,12 @@ module.exports = function Server(app, config, callback) {
       var port = Number(process.env.PORT || config.port);
 
       // Create HTTP(S) server
-      if (!fs.existsSync(CERT)) {
+      if (!fs.existsSync(ID_CRT)) {
         http.createServer(app).listen(port, callback);
       } else {
         https.createServer({
-          key: fs.readFileSync(KEY, 'utf8'),
-          cert: fs.readFileSync(CERT, 'utf8')
+          key: fs.readFileSync(ID_RSA, ENCODING),
+          cert: fs.readFileSync(ID_CRT, ENCODING)
         }, app).listen(port, callback);
       }
     } else {

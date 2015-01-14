@@ -1,3 +1,17 @@
+0.2.37
+* Refactored server
+* Refactored user file structure
+* Added support for multi API users
+* Added Moment.js date parser to GUI
+* Added link to official site to GUI
+* Changed key names to UNIX standard
+* Changed package.json versions
+* Changed bower.json versions
+* Changed copyright notice
+* Changed unit tests
+* Changed gitignore file
+* Renamed makeexe script
+
 0.2.36
 * Added Windows PE build script
 * Fixed key bug in Heroku script

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ define(['js/pssst.api.js'], function (api) {
       },
 
       /**
-       * Sets the CLI version.
+       * Shows the CLI version.
        */
       version: function version() {
         app.call('version', null, function call(data) {
@@ -198,7 +198,7 @@ define(['js/pssst.api.js'], function (api) {
             , {
               text: data[2].split('\n'),
               user: data[0],
-              time: new Date(data[1] * 1000)
+              time: moment.unix(data[1]).format('YYYY-MM-DD HH:mm:ss')
             }));
             $('#box-' + box + ' article:last-child').fadeIn(200);
             $('html,body').animate({scrollTop: $(document).height()}, 'slow');

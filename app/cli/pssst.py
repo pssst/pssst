@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.36"
+__all__, __version__ = ["Pssst"], "0.2.37"
 
 
 def _encode64(data): # Utility shortcut
@@ -156,17 +156,18 @@ class Pssst:
         This class is not meant to be called externally.
 
         """
-        def __init__(self, user, password):
+        def __init__(self, api, user, password):
+            self.scheme = "%s"
             self.user = user
             self.file = os.path.join(os.path.expanduser("~"), repr(self))
 
             if os.path.exists(self.file):
-                self.key = Pssst._Key(self.load(user + ".private"), password)
+                self.key = Pssst._Key(self.load("id_rsa"), password)
             else:
                 self.key = Pssst._Key()
+                self.save("id_rsa", self.key.private(password))
 
-                self.save(user + ".private", self.key.private(password))
-                self.save(user, self.key.public())
+            self.scheme = re.sub("^(?i)https?://(.+)", "\g<1>/%s.pub", api)
 
         def __repr__(self):
             return ".pssst." + self.user
@@ -182,15 +183,22 @@ class Pssst:
 
         def list(self):
             with ZipFile(self.file, "r") as file:
-                return file.namelist()
+                keys = []
+
+                # Filter API
+                for key in file.namelist():
+                    if key.startswith(self.scheme.rsplit("/")[0]):
+                        keys.append(re.sub("^.+/(.+)\.pub$", "\g<1>", key))
+
+                return keys
 
         def load(self, entry):
             with ZipFile(self.file, "r") as file:
-                return file.read(entry)
+                return file.read(self.scheme % entry)
 
         def save(self, entry, key):
             with ZipFile(self.file, "a") as file:
-                file.writestr(entry, key)
+                file.writestr(self.scheme % entry, key)
 
 
     class _Key:
@@ -217,14 +225,14 @@ class Pssst:
         This class is not meant to be called externally.
 
         """
-        size = 4096 # RSA key strengh
+        RSA_SIZE, NONCE_SIZE = 4096, 32 + AES.block_size
 
         def __init__(self, key=None, password=None):
             try:
                 if key:
                     self.key = RSA.importKey(key, password)
                 else:
-                    self.key = RSA.generate(Pssst._Key.size)
+                    self.key = RSA.generate(Pssst._Key.RSA_SIZE)
 
             except (IndexError, TypeError, ValueError) as ex:
                 raise Exception("Password wrong")
@@ -236,7 +244,7 @@ class Pssst:
             return self.key.publickey().exportKey("PEM").decode("ascii")
 
         def encrypt(self, data):
-            nonce = Random.get_random_bytes(32 + AES.block_size) # 256 bit key
+            nonce = Random.get_random_bytes(Pssst._Key.NONCE_SIZE)
 
             data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).encrypt(data)
             nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
@@ -325,10 +333,11 @@ class Pssst:
         if verify and not password:
             raise Exception("Password is required")
 
-        self.keys = Pssst._KeyStorage(Pssst.Name(username).user, password)
+        self.user = Pssst.Name(username).user
+        self.keys = Pssst._KeyStorage(self.api, self.user, password)
 
-        if self.api not in self.keys.list():
-            self.keys.save(self.api, key)
+        if "id_api" not in self.keys.list():
+            self.keys.save("id_api", key)
 
     def __repr__(self):
         """
@@ -401,7 +410,7 @@ class Pssst:
         timestamp, signature = head.split(";", 1)
         timestamp, signature = int(timestamp), _decode64(signature)
 
-        pssst = Pssst._Key(self.keys.load(self.api))
+        pssst = Pssst._Key(self.keys.load("id_api"))
 
         if not pssst.verify(body, timestamp, signature):
             raise Exception("Verification failed")
@@ -464,7 +473,7 @@ class Pssst:
         else:
             body = None
 
-        self.__api("POST", Pssst.Name(self.keys.user, box).path, body)
+        self.__api("POST", Pssst.Name(self.user, box).path, body)
 
     def delete(self, box=None):
         """
@@ -481,7 +490,7 @@ class Pssst:
         any API call wil result in an error. The key storage is also deleted.
 
         """
-        self.__api("DELETE", Pssst.Name(self.keys.user, box).path)
+        self.__api("DELETE", Pssst.Name(self.user, box).path)
 
         if not box:
             self.keys.delete()
@@ -518,7 +527,7 @@ class Pssst:
             List of user boxes.
 
         """
-        return self.__api("GET", self.keys.user + "/list")
+        return self.__api("GET", self.user + "/list")
 
     def pull(self, box=None):
         """
@@ -535,22 +544,20 @@ class Pssst:
             The user name, time and message, None if empty.
 
         """
-        data = self.__api("GET", Pssst.Name(self.keys.user, box).path)
+        data = self.__api("GET", Pssst.Name(self.user, box).path)
 
-        if not data:
-            return None # Box is empty
+        if data:
+            head = data["head"]
 
-        head = data["head"]
+            user = str(head["user"])
+            time = int(head["time"])
 
-        user = str(head["user"])
-        time = int(head["time"])
+            nonce = _decode64(head["nonce"])
+            body = _decode64(data["body"])
 
-        nonce = _decode64(head["nonce"])
-        body  = _decode64(data["body"])
+            message = self.keys.key.decrypt(body, nonce)
 
-        message = self.keys.key.decrypt(body, nonce)
-
-        return (user, time, message)
+            return (user, time, message)
 
     def push(self, receivers, message):
         """
@@ -566,23 +573,17 @@ class Pssst:
         """
         for user, box in [Pssst.Name(name).all for name in receivers]:
 
+            # Cache public key
             if user not in self.keys.list():
-                self.keys.save(user, self.find(user)) # Add public key
+                self.keys.save(user, self.find(user))
 
             data, nonce = Pssst._Key(self.keys.load(user)).encrypt(message)
 
             nonce = _encode64(nonce)
-            body  = _encode64(data)
+            body = _encode64(data)
 
-            head = {
-                "user": self.keys.user,
-                "nonce": nonce
-            }
-
-            data = {
-                "head": head,
-                "body": body
-            }
+            head = {"user": self.user, "nonce": nonce}
+            data = {"head": head, "body": body}
 
             self.__api("PUT", Pssst.Name(user, box).path, data)
 

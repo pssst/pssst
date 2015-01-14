@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,27 +30,31 @@ try {
     }
   }, null, 2);
 
+  // Required constants
+  var CONFIG = __dirname + '/config.json'
+  var PUBLIC = __dirname + '/www'
+
   // Check given options
   if (process.argv.length <= 2) {
 
     // Create the default config
-    if (!fs.existsSync(__dirname + '/config.json')) {
-      fs.writeFileSync(__dirname + '/config.json', config);
+    if (!fs.existsSync(CONFIG)) {
+      fs.writeFileSync(CONFIG, config);
     }
 
     // Create the static directory
-    if (!fs.existsSync(__dirname + '/www')) {
-      fs.mkdirSync(__dirname + '/www');
+    if (!fs.existsSync(PUBLIC)) {
+      fs.mkdirSync(PUBLIC);
     }
 
     // Required imports
     var express = require('express');
-    var parser  = require('body-parser');
-    var config  = require('./config.json');
+    var parser = require('body-parser');
+    var config = require('./config.json');
 
     // Required libraries
     var server = require('./lib/server.js');
-    var debug  = require('./lib/debug.js');
+    var debug = require('./lib/debug.js');
 
     app = express();
     app.set('json spaces', 0);
@@ -73,7 +77,7 @@ try {
       }
     });
 
-    server = server(app, config, function ready(err) {
+    server(app, config, function ready(err) {
       if (!err) {
         console.log('Pssst', info['version'], 'ready');
       } else {

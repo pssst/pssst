@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
+ */
+var DENY = '!?(^name$)';
+
+/**
  * Returns a new user.
  *
  * @param {String} the key (PEM format)
@@ -56,5 +59,5 @@ exports.isDeleted = function isDeleted(user) {
  * @return {Boolean} true if denied
  */
 exports.isDenied = function isDenied(name, deny) {
-  return new RegExp(deny || '!?(^name$)').test(name);
+  return new RegExp(deny || DENY).test(name);
 };

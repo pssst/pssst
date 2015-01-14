@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,7 +13,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
- *
+ */
+var DENY = '^(box)|(key)|(list)$';
+
+/**
  * Creates a new box.
  *
  * @param {Object} the user
@@ -90,5 +93,5 @@ exports.find = function find(user, box) {
  * @return {Boolean} true if denied
  */
 exports.isDenied = function isDenied(box) {
-  return new RegExp('^(box)|(key)|(list)$').test(box);
+  return new RegExp(DENY).test(box);
 };

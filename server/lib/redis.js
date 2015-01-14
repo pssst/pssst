@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
+ *
  * A simple Redis wrapper with Heroku support.
  *
  * @param {Object} the config
@@ -25,22 +26,22 @@ module.exports = function Redis(config, callback) {
   var url = require('url');
   var redis = require('redis');
 
-  // Heroku Open Redis add-on
+  // Using the Heroku Open Redis add-on
   if (process.env.OPENREDIS_URL) {
     heroku = url.parse(process.env.OPENREDIS_URL);
   }
 
-  // Heroku Redis Cloud add-on
+  // Using the Heroku Redis Cloud add-on
   if (process.env.REDISCLOUD_URL) {
     heroku = url.parse(process.env.REDISCLOUD_URL);
   }
 
-  // Heroku Redis Green add-on
+  // Using the Heroku Redis Green add-on
   if (process.env.REDISGREEN_URL) {
     heroku = url.parse(process.env.REDISGREEN_URL);
   }
 
-  // Heroku Redis To Go add-on
+  // Using the Heroku Redis To Go add-on
   if (process.env.REDISTOGO_URL) {
     heroku = url.parse(process.env.REDISTOGO_URL);
   }

@@ -1,5 +1,5 @@
-  /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+/**
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
+ *
  * Pssst rounting and handling.
  *
  * @param {Object} express app
@@ -24,7 +25,10 @@ module.exports = function Pssst(app, db, deny) {
 
   // Required static classes
   var User = require('./pssst.user.js');
-  var Box  = require('./pssst.box.js');
+  var Box = require('./pssst.box.js');
+
+  // Required constants
+  var BOX = 'box';
 
   // Pssst API version 1
   var api = {
@@ -37,7 +41,7 @@ module.exports = function Pssst(app, db, deny) {
      * @param {Mixed} verify sender
      */
     request: function request(req, res, callback, auth) {
-      req.params.box = req.params.box || 'box'; // Default
+      req.params.box = req.params.box || BOX; // Default
 
       // Assert valid user name
       if (!new RegExp('^[a-z0-9]{2,63}$').test(req.params.user)) {

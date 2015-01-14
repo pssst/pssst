@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ def setup_module(module):
     files = [os.path.join(os.path.expanduser("~"), ".pssst.name")]
 
     # Only for testing
-    Pssst._Key.size = 1024
+    Pssst._Key.RSA_SIZE = 1024
 
 
 def teardown_module(module):
@@ -119,28 +119,28 @@ class TestName:
         Tests if name is parsed correctly.
 
         """
-        name = Pssst.Name(" pssst.User.Box:Pa55w0rd ")
+        name = Pssst.Name(" pssst.UserName.Box:Pa55w0rd! ")
 
-        assert name.path == "user/box/"
-        assert name.user == "user"
+        assert name.path == "username/box/"
+        assert name.user == "username"
         assert name.box == "box"
-        assert name.all == ("user", "box")
-        assert name.password == "Pa55w0rd"
-        assert str(name) == "pssst.user.box"
+        assert name.all == ("username", "box")
+        assert name.password == "Pa55w0rd!"
+        assert str(name) == "pssst.username.box"
 
     def test_name_minimum(self):
         """
         Tests if name is parsed correctly.
 
         """
-        name = Pssst.Name("user")
+        name = Pssst.Name("me")
 
-        assert name.path == "user/"
-        assert name.user == "user"
+        assert name.path == "me/"
+        assert name.user == "me"
         assert name.box == None
-        assert name.all == ("user", None)
+        assert name.all == ("me", None)
         assert name.password == None
-        assert str(name) == "pssst.user"
+        assert str(name) == "pssst.me"
 
     def test_name_invalid(self):
         """
@@ -148,7 +148,7 @@ class TestName:
 
         """
         with pytest.raises(Exception) as ex:
-            Pssst.Name("Invalid user.name !")
+            Pssst.Name("Invalid.User.Name")
 
         assert str(ex.value) == "User name invalid"
 
@@ -179,11 +179,10 @@ class TestKeyStorage:
         pssst2 = Pssst(name2)
         pssst2.create()
 
+        pssst1.push([name1], "Hello World !")
         pssst1.push([name2], "Hello World !")
 
-        content = [pssst1.api, name1 + ".private", name1, name2]
-
-        assert sorted(pssst1.keys.list()) == sorted(content)
+        assert sorted(pssst1.keys.list()) == sorted(["id_api", name1, name2])
 
 
 class TestCrypto:
