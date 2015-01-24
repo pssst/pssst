@@ -19,20 +19,20 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using pssst.Api.Interface;
 using Rhino.Mocks;
 using Org.BouncyCastle.Security;
 using System.IO;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Crypto;
+using NUnit.Framework;
 
 namespace pssst.Api.Tests.Unit
 {
     /// <summary>
     /// Summary description for CryptographyTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class CryptographyTests
     {
         #region TestKeys
@@ -310,7 +310,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
 
         #region CreateKeyPair
 
-        [TestMethod]
+        [Test]
         public void CreateKeyPair_ValidLength_ResultContainsValidPrivateKey()
         {
             // Arrange
@@ -320,11 +320,11 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             Keypair result = crypto.CreateKeyPair(1024);
 
             // Assert
-            StringAssert.StartsWith(result.PrivateKey, "-----BEGIN RSA PRIVATE KEY-----\n");
-            StringAssert.EndsWith(result.PrivateKey, "\n-----END RSA PRIVATE KEY-----\n");
+            StringAssert.StartsWith("-----BEGIN RSA PRIVATE KEY-----\n", result.PrivateKey);
+            StringAssert.EndsWith("\n-----END RSA PRIVATE KEY-----\n", result.PrivateKey);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateKeyPair_ValidLength_ResultContainsValidPublicKey()
         {
             // Arrange
@@ -334,11 +334,11 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             Keypair result = crypto.CreateKeyPair(1024);
 
             // Assert
-            StringAssert.StartsWith(result.PublicKey, "-----BEGIN PUBLIC KEY-----\n");
-            StringAssert.EndsWith(result.PublicKey, "\n-----END PUBLIC KEY-----\n");
+            StringAssert.StartsWith("-----BEGIN PUBLIC KEY-----\n", result.PublicKey);
+            StringAssert.EndsWith("\n-----END PUBLIC KEY-----\n", result.PublicKey);
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateKeyPair_LengthShorterThan1024_ThrowsArgumentException()
         {
@@ -356,7 +356,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
 
         #region EncryptMessage
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void EncryptMessage_InvalidReceiverKey_ThrowsArgumentException()
         {
@@ -370,7 +370,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             // see method attribute
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void EncryptMessage_InvalidMessage_ThrowsArgumentException()
         {
@@ -384,7 +384,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             // see method attribute
         }
 
-        [TestMethod]
+        [Test]
         public void EncryptMessage_ShortMessageToEncrypt_ReturnsEncryptedNonce()
         {
             // Arrange
@@ -408,7 +408,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             CollectionAssert.AreNotEqual(expectedEncryptedNonce, encryptedNonce);
         }
 
-        [TestMethod]
+        [Test]
         public void EncryptMessage_ShortMessageToEncrypt_ReturnsEncryptedMessage()
         {
             // Arrange
@@ -434,7 +434,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
 
         #region DecryptMessage
 
-        //[TestMethod]
+        //[Test]
         //[ExpectedException(typeof(ArgumentException))]
         //public void DecryptMessage_NoKeySpecified_ThrowsArgumentException()
         //{
@@ -456,7 +456,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
         //    // see method attribute
         //}
 
-        [TestMethod]
+        [Test]
         public void DecryptMessage_NoMessageToDecrypt_ReturnsEmptyString()
         {
             // Arrange
@@ -471,7 +471,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             Assert.AreEqual(string.Empty, decryptedMessage);
         }
 
-        [TestMethod]
+        [Test]
         public void DecryptMessage_CompleteMessageToDecrypt_ReturnsDecryptedMessage()
         {
             // Arrange
@@ -502,7 +502,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
 
         #region SignData
 
-        [TestMethod]
+        [Test]
         public void SignData_DataSetNull_ReturnsEmptyArray()
         {
             // Arrange
@@ -517,7 +517,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             Assert.AreEqual(0, result.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void SignData_EmptyStringAsData_ReturnsSignature()
         {
             // Arrange
@@ -532,7 +532,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
             Assert.AreNotEqual(0, result.Length);
         }
 
-        [TestMethod]
+        [Test]
         public void SignData_DataToSign_ReturnsExpectedSignature()
         {
             // Arrange
@@ -548,7 +548,7 @@ pxxEBgxJkrT/H2YqWyunKomHjnTRfcBO
         }
 
         /*
-        [TestMethod]
+        [Test]
         public void SignData_NoDataToSign_ReturnsEmptyArray()
         {
             // Arrange

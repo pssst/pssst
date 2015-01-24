@@ -20,16 +20,16 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using pssst.Api.Interface;
 using Rhino.Mocks;
+using NUnit.Framework;
 
 namespace pssst.Api.Tests.Unit
 {
     /// <summary>
     /// Summary description for PssstClientTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class PssstClientTests
     {
         #region Additional test attributes
@@ -66,7 +66,7 @@ namespace pssst.Api.Tests.Unit
 
         #region Configure
 
-        [TestMethod]
+        [Test]
         public void Configure_ProvideValidHost_HostIsSet()
         {
             // Arrange
@@ -81,7 +81,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedHost, client.Host);
         }
 
-        [TestMethod]
+        [Test]
         public void Configure_ProvideHostAndPortSeperatly_HostIsSet()
         {
             // Arrange
@@ -103,7 +103,7 @@ namespace pssst.Api.Tests.Unit
 
         #region CreateUser
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateUser_ProvideEmptyString_ThrowsArgumentException()
         {
@@ -117,7 +117,7 @@ namespace pssst.Api.Tests.Unit
             // see method attribute
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentException))]
         public void CreateUser_ProvideNull_ThrowsArgumentException()
         {
@@ -131,7 +131,7 @@ namespace pssst.Api.Tests.Unit
             // see method attribute
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ProvideValidUsernames_ReturnsUser()
         {
             // Arrange
@@ -165,7 +165,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result.Contains(null));
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ProvideInvalidUsernames_ReturnsNull()
         {
             // Arrange
@@ -196,7 +196,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result.Any(u => u != null));
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ProvideValidUserName_ReturnsFilledUser()
         {
             // Arrange
@@ -216,7 +216,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedPassword, result.Password);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ProvideUserAndBoxWithoutPassword_ReturnsUser()
         {
             // Arrange
@@ -236,7 +236,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedPassword, result.Password);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ProvideUserWithoutBoxAndPassword_ReturnsUserWithDefaultBox()
         {
             // Arrange
@@ -256,7 +256,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedPassword, result.Password);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ProvideValidUser_CreatesKeyPair()
         {
             // Arrange
@@ -284,7 +284,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedPublicKey, result.PublicKey);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ProvideValidUser_CreatesUserAtServer()
         {
             // Arrange
@@ -325,7 +325,7 @@ namespace pssst.Api.Tests.Unit
 
         #region SendMessage
 
-        [TestMethod]
+        [Test]
         public void SendMessage_NoSenderDefined_ReturnsFalse()
         {
             // Arrange
@@ -342,7 +342,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result);
         }
 
-        [TestMethod]
+        [Test]
         public void SendMessage_EmptySenderName_ReturnsFalse()
         {
             // Arrange
@@ -361,7 +361,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result);
         }
 
-        [TestMethod]
+        [Test]
         public void SendMessage_NoReceiverDefined_ReturnsFalse()
         {
             // Arrange
@@ -378,7 +378,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result);
         }
 
-        [TestMethod]
+        [Test]
         public void SendMessage_EmptyReceiverName_ReturnsFalse()
         {
             // Arrange
@@ -397,7 +397,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result);
         }
 
-        [TestMethod]
+        [Test]
         public void SendMessage_NoMessageDefined_ReturnsFalse()
         {
             // Arrange
@@ -415,7 +415,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result);
         }
 
-        [TestMethod]
+        [Test]
         public void SendMessage_ValidDataProvided_MessageGetsEncryptedAndReturnsTrue()
         {
             // Arrange
@@ -442,7 +442,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsTrue(result);
         }
 
-        [TestMethod]
+        [Test]
         public void SendMessage_ValidDataProvided_MessageGetsSendToServerAndReturnsTrue()
         {
             // Arrange
@@ -487,7 +487,7 @@ namespace pssst.Api.Tests.Unit
 
         #region ReceiveMessage
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ReceiveMessage_NoReceiverDefined_ThrowsArgumentException()
         {
@@ -501,7 +501,7 @@ namespace pssst.Api.Tests.Unit
             // See method Attribute
         }
 
-        [TestMethod]
+        [Test]
         public void ReceiveMessage_ServerHasOneMessageForUser_ReturnsTheMessage()
         {
             // Arrange
@@ -538,7 +538,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedMessage, result.Value);
         }
 
-        [TestMethod]
+        [Test]
         public void ReceiveMessage_ServerHasNoMessageForUser_ReturnsNull()
         {
             // Arrange
@@ -559,7 +559,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsFalse(result.HasValue);
         }
 
-        [TestMethod]
+        [Test]
         public void ReceiveMessage_ReceivedMessageGetsDecryptedWithCorrectKeys_ReturnsDecryptedMessage()
         {
             // Arrange
@@ -592,7 +592,7 @@ namespace pssst.Api.Tests.Unit
 
         #region GetUser
 
-        [TestMethod]
+        [Test]
         public void GetUser_ProvideExistingUserName_ReturnsUserWithPublicKey()
         {
             // Arrange
@@ -618,7 +618,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedPublicKey, result.PublicKey);
         }
 
-        [TestMethod]
+        [Test]
         public void GetUser_ProvideNotExistingUserName_ReturnsNull()
         {
             // Arrange
@@ -643,7 +643,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsNull(result);
         }
 
-        [TestMethod]
+        [Test]
         public void GetUser_ProvideNoUserName_ReturnsNull()
         {
             // Arrange

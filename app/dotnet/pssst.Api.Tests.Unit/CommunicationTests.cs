@@ -19,7 +19,6 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.IO;
@@ -29,18 +28,19 @@ using pssst.Api.Interface;
 using System.Linq;
 using Rhino.Mocks;
 using Newtonsoft.Json;
+using NUnit.Framework;
 
 namespace pssst.Api.Tests.Unit
 {
     /// <summary>
     /// Summary description for CommunicationTests
     /// </summary>
-    [TestClass]
+    [TestFixture]
     public class CommunicationTests
     {
         #region CreateUser Tests
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ValidUserData_SendsPublicKeyToCorrectUri()
         {
             // Arrange
@@ -71,7 +71,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual("application/json", message.Content.Headers.ContentType.MediaType);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ValidUserData_AddsSignatureToMessage()
         {
             // Arrange
@@ -101,7 +101,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(expectedHash, contentHashValues[1].Trim());
         }
 
-        [TestMethod]
+        [Test]
         public void CreateUser_ValidUserData_SendsKeyAsJson()
         {
             // Arrange
@@ -134,7 +134,7 @@ namespace pssst.Api.Tests.Unit
 
         #region SendMessage Tests
 
-        [TestMethod]
+        [Test]
         public void SendMessage_SendMessageWithNoBoxSpecified_SendsMessageToServer()
         {
             // Arrange
@@ -180,7 +180,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual("application/json", message.Content.Headers.ContentType.MediaType);
         }
 
-        [TestMethod]
+        [Test]
         public void SendMessage_SendValidMessage_AddsSignatureToMessage()
         {
             // Arrange
@@ -215,7 +215,7 @@ namespace pssst.Api.Tests.Unit
 
         #region GetPublicKey Tests
 
-        [TestMethod]
+        [Test]
         public void GetPublicKey_RetrieveKeyOfExistingUser_SendsExpectedMessage()
         {
             // Arrange
@@ -236,7 +236,7 @@ namespace pssst.Api.Tests.Unit
             Assert.IsNull(((FakeHttpMessageHandler)fakeHttpMessageHandler).RequestContent);
         }
 
-        [TestMethod]
+        [Test]
         public void GetPublicKey_RetrieveKeyOfExistingUser_ReturnsExpectedKey()
         {
             // Arrange
@@ -256,7 +256,7 @@ namespace pssst.Api.Tests.Unit
 
         #endregion GetPublicKey Tests
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ReceiveMessage_CallWithoutUserSpecified_ThrowsArgumentNullException()
         {
@@ -271,7 +271,7 @@ namespace pssst.Api.Tests.Unit
             // See Method Attribute
         }
 
-        [TestMethod]
+        [Test]
         [ExpectedException(typeof(ArgumentNullException))]
         public void ReceiveMessage_CallWithoutServerSpecified_ThrowsArgumentNullException()
         {
@@ -286,7 +286,7 @@ namespace pssst.Api.Tests.Unit
             // See Method Attribute
         }
 
-        [TestMethod]
+        [Test]
         public void ReceiveMessage_CallWithValidServerAndUser_CallsExpectedUri()
         {
             // Arrange
@@ -312,7 +312,7 @@ namespace pssst.Api.Tests.Unit
             Assert.AreEqual(HttpMethod.Get, message.Method);            
         }
 
-        [TestMethod]
+        [Test]
         public void ReceiveMessage_ServerHasOneMessageForUser_ReturnsMessage()
         {
             // Arrange
