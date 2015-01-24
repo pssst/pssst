@@ -1,4 +1,4 @@
-Pssst ![Build](https://travis-ci.org/pssst/pssst.png?branch=master) [![Build Status](https://travis-ci.org/pssst/pssst.svg?branch=app%2Fwindows)](https://travis-ci.org/pssst/pssst)
+Pssst ![Build](https://travis-ci.org/pssst/pssst.png?branch=master)
 =====
 Pssst is a simple and secure way to exchange information. We do not provide
 services by our self, but we provide you with the tools to start your own
