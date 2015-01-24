@@ -1,29 +1,26 @@
 ﻿/**
  * Pssst!
  * Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  **/
 
-using Newtonsoft.Json;
-using pssst.Api.Interface;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using pssst.Api.Interface;
 
 namespace pssst.Api
 {
@@ -35,7 +32,7 @@ namespace pssst.Api
         private const string RelativeUriReceiveMessage = "/1/{0}";
 
         private readonly ICryptography _cryptography;
-        
+
         // Todo: Dispose HttpClient
         private HttpClient _http;
 
@@ -56,7 +53,7 @@ namespace pssst.Api
             Uri requestUri = new Uri(server, string.Format(RelativeUriCreateUser, user.Name));
 
             string content = string.Format("{{\"key\":\"{0}\"}}", user.PublicKey);
-            
+
             // Newline must be escaped to handle it correct in JSON
             content = content.Replace("\n", "\\n");
 
@@ -139,7 +136,7 @@ namespace pssst.Api
             string contentHash = CreateContentHash(sender, content);
 
             HttpRequestMessage message = CreateMessage(requestUri, method);
-            
+
             if (!string.IsNullOrEmpty(content))
             {
                 message.Content = new StringContent(content);
@@ -154,7 +151,7 @@ namespace pssst.Api
         private HttpRequestMessage CreateMessage(Uri requestUri, HttpMethod method)
         {
             HttpRequestMessage message = new HttpRequestMessage(method, requestUri);
-            
+
             return message;
         }
 
