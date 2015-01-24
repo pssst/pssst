@@ -3,4 +3,4 @@ branches:
   only:
     - app/windows
 
-solution: pssst.sln
+solution: ./app/dotnet/pssst.sln
