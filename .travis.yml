@@ -1,22 +1,6 @@
-language: python
+language: csharp
 branches:
   only:
-    - develop
-    - master
-python:
-  - "2.7"
-  - "3.3"
-services:
-  - redis-server
-install:
-  - "pip install pycrypto requests"
-before_script:
-  - echo 'http://localhost:62421' > ~/.pssst
-  - export PYTHON=`which python2`
-  - cd server
-  - npm install
-  - node start &
-  - cd ..
-  - sleep 10
-script:
-  - python app/cli/pssst_test.py
+    - app/windows
+
+solution: pssst.sln
