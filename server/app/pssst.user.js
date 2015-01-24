@@ -1,6 +1,5 @@
 /**
- * Pssst!
- * Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
+ * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,51 +14,47 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
+ * Returns a new user.
  *
- * Data structure workings of an user object.
- */
-
-/**
- * Creates an new user.
- *
- * @param {String} key in PEM format
+ * @param {String} the key (PEM format)
  * @return {Object} the new user
  */
 exports.create = function create(key) {
   return {
     key: key,
     box: {
-      all: [] // default box
+      box: [] // Default box
     }
   };
 };
 
 /**
- * Disables an user.
+ * Deletes an user.
  *
  * @param {Object} the user
  */
-exports.disable = function disable(user) {
+exports.erase = function erase(user) {
   user.key = null;
   user.box = null;
 };
 
 /**
- * Checks if the user name is blocked.
+ * Returns if the user is deleted.
  *
- * @param {String} the user name
- * @return {Boolean} true if blocked
+ * @param {Object} the user
+ * @return {Boolean} true if deleted
  */
-exports.isBlocked = function isBlocked(name) {
-  return new RegExp('!?(name)').test(name);
+exports.isDeleted = function isDeleted(user) {
+  return (user.key === null);
 };
 
 /**
- * Checks if the user is disabled.
+ * Returns if the user name is denied.
  *
- * @param {Object} the user
- * @return {Boolean} true if disabled
+ * @param {String} the user name
+ * @param {String} the regular expression
+ * @return {Boolean} true if denied
  */
-exports.isDisabled = function isDisabled(user) {
-  return (user.key === null);
+exports.isDenied = function isDenied(name, deny) {
+  return new RegExp(deny || '!?(^name$)').test(name);
 };

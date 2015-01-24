@@ -1,9 +1,0 @@
-// Please remove this line and rename the file to 'config.json'
-{
-  "debug": 0,
-  "port": <pssst port>,
-  "db": {
-    "socket": "<socket path>",
-    "number": 0
-  }
-}

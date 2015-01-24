@@ -1,6 +1,5 @@
 /**
- * Pssst!
- * Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
+ * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- *
- * Data structure workings of an box object.
- */
-
-/**
  * Creates a new box.
  *
  * @param {Object} the user
@@ -30,7 +24,7 @@ exports.create = function create(user, box) {
 };
 
 /**
- * Erases an box.
+ * Deletes a box.
  *
  * @param {Object} the user
  * @param {String} the box name
@@ -59,9 +53,15 @@ exports.list = function list(user) {
 exports.find = function find(user, box) {
   if (box in user.box) {
     return {
+      /**
+       * The associated user.
+       *
+       * @type {Object} the user
+       */
+      user: user,
 
       /**
-       * Pulls the top message from the box.
+       * Pulls the first message from the box.
        *
        * @return {Object} the message
        */
@@ -70,20 +70,13 @@ exports.find = function find(user, box) {
       },
 
       /**
-       * Pushes a message onto the box.
+       * Pushes a message into the box.
        *
        * @param {Object} the message
        */
       push: function push(message) {
         user.box[box].push(message);
-      },
-
-      /**
-       * The associated user.
-       *
-       * @type {Object}
-       */
-      user: user
+      }
     };
   } else {
     return null; // Box not found
@@ -91,11 +84,11 @@ exports.find = function find(user, box) {
 };
 
 /**
- * Checks if the box name is blocked.
+ * Returns if the box name is denied.
  *
  * @param {String} the box name
- * @return {Boolean} true if blocked
+ * @return {Boolean} true if denied
  */
-exports.isBlocked = function isBlocked(box) {
-  return new RegExp('^(all)|(key)|(list)$').test(box);
+exports.isDenied = function isDenied(box) {
+  return new RegExp('^(box)|(key)|(list)$').test(box);
 };

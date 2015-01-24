@@ -1,6 +1,5 @@
 /**
- * Pssst!
- * Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
+ * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
- *
  * Debug middleware. Available debug levels:
  *
  *   Request
  *
  *   0 = off
- *   1 = print request method and url
+ *   1 = print request method and URL
  *   2 = print request headers also
  *   3 = print request body also
  *
@@ -37,34 +35,34 @@
  * @param {Object} next handler
  */
 module.exports = function debug(level, req, res, next) {
-  var time = '[' + new Date().getTime().toString().slice(-6) + ']';
-  var name = 'Pssst!';
-  var end = res.end;
+  var time = new Date().getTime();
 
   if (level > 0) {
-    console.info(name, time, req.method, req.url);
+    console.info(time, req.method, req.url);
   }
 
   if (level > 1) {
-    console.info(name, time, req.headers);
+    console.info(time, req.headers);
   }
 
   if (level > 2) {
-    console.info(name, time, req.body);
+    console.info(time, req.body);
   }
 
   // Monkey patching
+  var end = res.end;
   res.end = function patch(chunk, encoding) {
-    res.end = end;
+    var time = new Date().getTime();
 
     if (level > 0) {
-      console.info(name, time, res.statusCode);
+      console.info(time, res.statusCode);
     }
 
     if (level > 2) {
-      console.info(name, time, chunk);
+      console.info(time, chunk.toString(encoding));
     }
 
+    res.end = end;
     res.end(chunk, encoding);
   };
 

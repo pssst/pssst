@@ -1,14 +1,2 @@
-*.crt
-*.key
-*.log
-*.pyc
-*.pyd
-*.pyo
-*.save
 .pssst
 .pssst.*
-config.json
-env
-key
-node_modules
-npm-debug.log

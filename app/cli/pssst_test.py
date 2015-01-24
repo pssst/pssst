@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-Pssst!
-Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
+Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,18 +15,18 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
+import io
 import os
 import random
 import string
 import sys
 
 
-from pssst import Pssst, Name
+from pssst import Pssst
 
 
 try:
     import pytest
-
 except ImportError:
     sys.exit("Requires py.test (https://pytest.org)")
 
@@ -41,10 +40,18 @@ def setup_module(module):
     param module : string
         The module name.
 
+    Notes
+    -----
+    Smaller keys are only used for tests. DO NOT DO THIS IN PRODUCTION CODE!
+
     """
     global files
 
-    files = [".pssst.name"] # Fix invalid name
+    # Clean up invalid name test
+    files = [os.path.join(os.path.expanduser("~"), ".pssst.name")]
+
+    # Only for testing
+    Pssst._Key.size = 1024
 
 
 def teardown_module(module):
@@ -83,47 +90,50 @@ def createUserName(length=16):
 
     pool = string.ascii_lowercase + string.digits
     name = "".join([random.choice(pool) for x in range(length)])
-    files.append(".pssst." + name)
+
+    files.append(os.path.join(os.path.expanduser("~"), ".pssst." + name))
 
     return name
 
 
 class TestName:
     """
-    Tests Name parsing with the test cases:
+    Tests name parsing with the test cases:
 
-    * User name and box name
-    * User name alone
+    * User name parse maximum
+    * User name parse minimum
     * User name is invalid
 
     Methods
     -------
-    test_name_with_all()
-        Tests if name is parsed correctly.
-    test_name_without_all()
-        Tests if name is parsed correctly.
-    test_user_name_invalid()
-        Tests if name is invalid.
+    test_name_maximum()
+        Tests if a maximum name is parsed correctly.
+    test_name_minimum()
+        Tests if a minimum name is parsed correctly.
+    test_name_invalid()
+        Tests if a name is invalid.
 
     """
-    def test_name_with_all(self):
+    def test_name_maximum(self):
         """
         Tests if name is parsed correctly.
+
         """
-        name = Name(" pssst.User.Box:P455w0rd ")
+        name = Pssst.Name(" pssst.User.Box:Pa55w0rd ")
 
         assert name.path == "user/box/"
         assert name.user == "user"
         assert name.box == "box"
         assert name.all == ("user", "box")
-        assert name.password == "P455w0rd"
+        assert name.password == "Pa55w0rd"
         assert str(name) == "pssst.user.box"
 
-    def test_name_without_all(self):
+    def test_name_minimum(self):
         """
         Tests if name is parsed correctly.
+
         """
-        name = Name("user")
+        name = Pssst.Name("user")
 
         assert name.path == "user/"
         assert name.user == "user"
@@ -132,14 +142,48 @@ class TestName:
         assert name.password == None
         assert str(name) == "pssst.user"
 
-    def test_user_name_invalid(self):
+    def test_name_invalid(self):
         """
         Tests if name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
-            Name("Invalid user.name !")
+            Pssst.Name("Invalid user.name !")
 
-        assert ex.value.message == "User name invalid"
+        assert str(ex.value) == "User name invalid"
+
+
+class TestKeyStorage:
+    """
+    Tests key storage with the test cases:
+
+    * Key list
+
+    Methods
+    -------
+    test_key_list()
+        Tests if file is created correctly.
+
+    """
+    def test_key_list(self):
+        """
+        Tests if file is created correctly.
+
+        """
+        name1 = createUserName()
+        name2 = createUserName()
+
+        pssst1 = Pssst(name1)
+        pssst1.create()
+
+        pssst2 = Pssst(name2)
+        pssst2.create()
+
+        pssst1.push([name2], "Hello World !")
+
+        content = [pssst1.api, name1 + ".private", name1, name2]
+
+        assert sorted(pssst1.keys.list()) == sorted(content)
 
 
 class TestCrypto:
@@ -163,51 +207,54 @@ class TestCrypto:
     def test_request_verify_user_not_found(self):
         """
         Tests if request user is not found.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.pull()
 
-        assert ex.value.message == "Verification failed"
+        assert str(ex.value) == "Verification failed"
 
     def test_request_verify_signature_invalid(self):
         """
         Tests if request signature is invalid.
+
         """
-        original = Pssst.Key.sign
+        original = Pssst._Key.sign
 
         with pytest.raises(Exception) as ex:
-            Pssst.Key.sign = lambda self, data: ("!", "!")
+            Pssst._Key.sign = lambda self, data: ("!", b"!")
 
             pssst = Pssst(createUserName())
             pssst.create()
             pssst.pull()
 
-        Pssst.Key.sign = original
+        Pssst._Key.sign = original
 
-        assert ex.value.message == "Verification failed"
+        assert str(ex.value) == "Verification failed"
 
     def test_request_verify_signature_wrong(self):
         """
         Tests if request verification signature is correct.
+
         """
-        original = Pssst.Key.sign
+        original = Pssst._Key.sign
 
         with pytest.raises(Exception) as ex:
-            Pssst.Key.sign = lambda self, data: original(self, "test")
+            Pssst._Key.sign = lambda self, data: original(self, "Test")
 
             pssst = Pssst(createUserName())
             pssst.create()
             pssst.pull()
 
-        Pssst.Key.sign = original
+        Pssst._Key.sign = original
 
-        assert ex.value.message == "Verification failed"
+        assert str(ex.value) == "Verification failed"
 
 
 class TestUser:
     """
-    Tests user with this test cases:
+    Tests user commands with this test cases:
 
     * User create
     * User create failed, name restricted
@@ -247,6 +294,7 @@ class TestUser:
     def test_create_user(self):
         """
         Tests if an user can be created.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -254,30 +302,30 @@ class TestUser:
     def test_create_user_name_restricted(self):
         """
         Tests if an user name is restricted.
-        """
-        if os.path.exists(".pssst.name"):
-            os.remove(".pssst.name")
 
+        """
         with pytest.raises(Exception) as ex:
             pssst = Pssst("name")
             pssst.create()
 
-        assert ex.value.message == "User name restricted"
+        assert str(ex.value) == "User name restricted"
 
     def test_create_user_already_exists(self):
         """
         Tests if an user already exists.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.create()
             pssst.create()
 
-        assert ex.value.message == "User already exists"
+        assert str(ex.value) == "User already exists"
 
     def test_delete_user(self):
         """
         Tests if an user can be deleted.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -286,6 +334,7 @@ class TestUser:
     def test_delete_user(self):
         """
         Tests if an user was deleted.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -293,11 +342,12 @@ class TestUser:
             pssst.delete()
             pssst.pull()
 
-        assert ex.value.message == "User was deleted"
+        assert str(ex.value) == "User was deleted"
 
     def test_find_user(self):
         """
         Tests if an user public can be found.
+
         """
         name = createUserName()
         pssst = Pssst(name)
@@ -307,6 +357,7 @@ class TestUser:
     def test_find_user_was_deleted(self):
         """
         Tests if an user was deleted.
+
         """
         with pytest.raises(Exception) as ex:
             name = createUserName()
@@ -317,42 +368,45 @@ class TestUser:
             pssst = Pssst(createUserName())
             pssst.find(name)
 
-        assert ex.value.message == "User was deleted"
+        assert str(ex.value) == "User was deleted"
 
     def test_find_user_not_found(self):
         """
         Tests if an user is not found.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.find("usernotfound")
 
-        assert ex.value.message == "User not found"
+        assert str(ex.value) == "User not found"
 
     def test_list(self):
         """
         Tests if an user boxes can be listed.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
-        pssst.create("xyz")
+        pssst.create("test")
 
-        assert pssst.list() == ["all", "xyz"]
+        assert pssst.list() == ["box", "test"]
 
     def test_user_name_invalid(self):
         """
         Tests if an user name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.find("test !")
 
-        assert ex.value.message == "User name invalid"
+        assert str(ex.value) == "User name invalid"
 
 
 class TestBox:
     """
-    Tests box with this test cases:
+    Tests box commands with this test cases:
 
     * Box create
     * Box create failed, name restricted
@@ -392,6 +446,7 @@ class TestBox:
     def test_create_box(self):
         """
         Tests if a box can be created.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -400,17 +455,19 @@ class TestBox:
     def test_create_box_name_restricted(self):
         """
         Tests if a box name is restricted.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.create()
-            pssst.create("all")
+            pssst.create("box")
 
-        assert ex.value.message == "Box name restricted"
+        assert str(ex.value) == "Box name restricted"
 
     def test_create_box_already_exists(self):
         """
         Tests if a box already exists.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
@@ -418,11 +475,12 @@ class TestBox:
             pssst.create("test")
             pssst.create("test")
 
-        assert ex.value.message == "Box already exists"
+        assert str(ex.value) == "Box already exists"
 
     def test_delete_box(self):
         """
         Tests if a box can be deleted.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -432,17 +490,19 @@ class TestBox:
     def test_delete_box_name_restricted(self):
         """
         Tests if a box name is restricted.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.create()
-            pssst.delete("all")
+            pssst.delete("box")
 
-        assert ex.value.message == "Box name restricted"
+        assert str(ex.value) == "Box name restricted"
 
     def test_push_box(self):
         """
         Tests if message could be pushed.
+
         """
         name1 = createUserName()
         name2 = createUserName()
@@ -457,6 +517,7 @@ class TestBox:
     def test_pull_box(self):
         """
         Tests if message could be pulled.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
@@ -465,6 +526,7 @@ class TestBox:
     def test_box_was_deleted(self):
         """
         Tests if a box was deleted.
+
         """
         with pytest.raises(Exception) as ex:
             name1 = createUserName()
@@ -478,38 +540,40 @@ class TestBox:
             pssst2.create()
             pssst2.push([name1], "test")
 
-        assert ex.value.message == "User was deleted"
+        assert str(ex.value) == "User was deleted"
 
     def test_box_not_found(self):
         """
         Tests if a box is not found.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.create()
             pssst.pull("test")
 
-        assert ex.value.message == "Box not found"
+        assert str(ex.value) == "Box not found"
 
     def test_box_name_invalid(self):
         """
         Tests if a box name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.create()
             pssst.pull("test !")
 
-        assert ex.value.message == "Box name invalid"
+        assert str(ex.value) == "Box name invalid"
 
 
 class TestPssst:
     """
-    Tests pssst with this test cases:
+    Tests client with this test cases:
 
     * Push self
-    * Push single
-    * Push multi
+    * Push single user
+    * Push multi users
     * Push failed, user name invalid
     * Pull empty
     * Password wrong
@@ -518,9 +582,9 @@ class TestPssst:
     -------
     test_push_self()
         Tests if a message could be pushed to sender.
-    test_push_single()
-        Tests if a message could be pushed to receiver.
-    test_push_multi()
+    test_push_single_user()
+        Tests if a message could be pushed to one receiver.
+    test_push_multi_users()
         Tests if a message could be pushed to many receivers.
     test_push_user_name_invalid()
         Tests if user name is invalid.
@@ -529,29 +593,34 @@ class TestPssst:
     test_pull_empty()
         Tests if box is empty.
     test_password_wrong()
-        Tests if password is wrong.
+        Tests if a password is wrong.
 
     """
     def test_push_self(self):
         """
         Tests if a message could be pushed to sender.
+
         """
         name = createUserName()
-        text = "Hello World !"
+        text = b"Echo"
 
         pssst = Pssst(name)
         pssst.create()
         pssst.push([name], text)
 
-        assert text == pssst.pull()
+        data = pssst.pull()
 
-    def test_push_single(self):
+        assert data[0] == name
+        assert data[2] == text
+
+    def test_push_single_user(self):
         """
-        Tests if a message could be pushed to receiver.
+        Tests if a message could be pushed to one receiver.
+
         """
         name1 = createUserName()
         name2 = createUserName()
-        text = "Hello World !"
+        text = b"Hello World !"
 
         pssst1 = Pssst(name1)
         pssst1.create()
@@ -560,14 +629,18 @@ class TestPssst:
         pssst2.create()
         pssst2.push([name1], text)
 
-        assert text == pssst1.pull()
+        data = pssst1.pull()
 
-    def test_push_multi(self):
+        assert data[0] == name2
+        assert data[2] == text
+
+    def test_push_multi_users(self):
         """
         Tests if a message could be pushed to many receivers.
+
         """
         send = createUserName()
-        text = "Hello World !"
+        text = b"Hello World !"
 
         names = [createUserName() for i in range(5)]
 
@@ -582,51 +655,58 @@ class TestPssst:
         for name in names:
             pssst = Pssst(name)
 
-            assert text == pssst.pull()
+            data = pssst.pull()
+
+            assert data[0] == send
+            assert data[2] == text
 
     def test_push_user_name_invalid(self):
         """
         Tests if user name is invalid.
+
         """
         with pytest.raises(Exception) as ex:
             pssst = Pssst(createUserName())
             pssst.push(["test !"], "test")
 
-        assert ex.value.message == "User name invalid"
+        assert str(ex.value) == "User name invalid"
 
     def test_push_pull_empty(self):
         """
         Tests if box is empty.
+
         """
         name = createUserName()
-        text = "Hello World !"
+        text = b"Hello World !"
 
         pssst = Pssst(name)
         pssst.create()
         pssst.push([name], text)
+        pssst.pull()
 
-        assert text == pssst.pull()
-        assert None == pssst.pull()
+        assert pssst.pull() == None
 
     def test_pull_empty(self):
         """
         Tests if box is empty.
+
         """
         pssst = Pssst(createUserName())
         pssst.create()
 
-        assert None == pssst.pull()
+        assert pssst.pull() == None
 
     def test_password_wrong(self):
         """
-        Tests if password is wrong.
+        Tests if a password is wrong.
+
         """
         with pytest.raises(Exception) as ex:
             name = createUserName()
-            Pssst(name, "right")
-            Pssst(name, "wrong")
+            Pssst(name, "RightPassword1234")
+            Pssst(name, "WrongPassword0000")
 
-        assert ex.value.message == "Password wrong"
+        assert str(ex.value) == "Password wrong"
 
 
 class TestFuzzy:
@@ -643,19 +723,20 @@ class TestFuzzy:
         """
         Tests if fuzzy data is returned correctly.
 
-        * Test 1K random data
-        * Test 2K random data
-        * Test 4K random data
-        * Test 8K random data
+        Notes
+        -----
+        The data will be generated with random content in sizes from zero
+        bytes up to 8 kilobytes.
+
         """
-        for size in [2 ** n for n in range(10, 13)]:
+        for size in [2 ** n for n in range(0, 13)]:
             blob = os.urandom(size)
             name = createUserName()
             pssst = Pssst(name)
             pssst.create()
             pssst.push([name], blob)
 
-            assert blob == pssst.pull()
+            assert blob == pssst.pull()[2]
 
 
 def main(script, *args):
@@ -667,10 +748,25 @@ def main(script, *args):
     param script : string
         Full script path.
     param args : tuple of strings, optional
-        All remaining arguments.
+        Arguments passed to py.test.
+
+    Notes
+    -----
+    Testing against the live API should not be done, because
+    it slows the server down and clutters up the database.
 
     """
-    pytest.main(["-x", script])
+    master = api = "https://api.pssst.name"
+    config = os.path.join(os.path.expanduser("~"), ".pssst")
+
+    if os.path.exists(config):
+        api = io.open(config).read().strip()
+
+    if api == master:
+        return "Tests against the live API are not allowed"
+
+    print("Using API: " + api)
+    return pytest.main([script] + list(args))
 
 
 if __name__ == "__main__":

@@ -1,18 +1,27 @@
 {
   "name": "pssst",
-  "license": "GPLv3",
-  "version": "0.2.4",
-  "homepage": "https://www.pssst.name",
-  "bugs": "https://github.com/pssst/pssst/issues",
+  "version": "0.2.36",
+  "homepage": "https://pssst.name",
   "repository": {
     "type": "git",
     "url": "https://github.com/pssst/pssst.git"
   },
-  "dependencies": {
-    "express": "*",
-    "redis": "*",
-    "mime": "*",
-    "ursa": "*"
+  "bugs": {
+    "url": "https://github.com/pssst/pssst/issues"
   },
+  "dependencies": {
+    "body-parser": "1.5.x",
+    "express": "4.7.x",
+    "redis": "0.10.x",
+    "mime": "1.2.x",
+    "ursa": "0.8.x"
+  },
+  "engines": {
+    "node": ">=0.10.x"
+  },
+  "scripts": {
+    "start": "node start.js"
+  },
+  "license": "GPL-3.0+",
   "private": true
 }
