@@ -23,6 +23,9 @@ using pssst.Api.Interface;
 
 namespace pssst.Api
 {
+    /// <summary>
+    /// Implements a pssst client.
+    /// </summary>
     public sealed class PssstClient : IPssstClient
     {
         private const int KeyLength = 2048;
@@ -32,12 +35,20 @@ namespace pssst.Api
         private readonly ICryptography cryptoProvider;
         private readonly ICommunication server;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PssstClient"/> class.
+        /// </summary>
         public PssstClient()
         {
             this.cryptoProvider = new Cryptography();
             this.server = new HttpCommunication();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PssstClient"/> class.
+        /// </summary>
+        /// <param name="cryptoProvider">The crypto provider.</param>
+        /// <param name="server">The server.</param>
         public PssstClient(ICryptography cryptoProvider,
             ICommunication server)
             : this()
@@ -46,16 +57,32 @@ namespace pssst.Api
             this.server = server;
         }
 
+        /// <summary>
+        /// Sets the needed configuration for communicating with the server.
+        /// </summary>
+        /// <param name="host">The host.</param>
         public void Configure(Uri host)
         {
             Host = host;
         }
 
+        /// <summary>
+        /// Sets the needed configuration for communicating with the server.
+        /// </summary>
+        /// <param name="host">The host uri.</param>
+        /// <param name="port">The port of the host.</param>
         public void Configure(string host, int port)
         {
             Configure(new Uri(String.Format("{0}:{1}", host, port)));
         }
 
+        /// <summary>
+        /// Creates a new user.
+        /// </summary>
+        /// <param name="userName">The name of the user.</param>
+        /// <returns>
+        /// The new user.
+        /// </returns>
         public User CreateUser(string userName)
         {
             if (string.IsNullOrEmpty(userName))
@@ -84,6 +111,15 @@ namespace pssst.Api
             return user;
         }
 
+        /// <summary>
+        /// Sends a message to the specified receiver.
+        /// </summary>
+        /// <param name="sender">The sender of the message.</param>
+        /// <param name="receiver">The receiver of the message.</param>
+        /// <param name="message">The message.</param>
+        /// <returns>
+        /// A boolean indicating whethter the message was succesfully sent.
+        /// </returns>
         public bool SendMessage(User sender, User receiver, string message)
         {
             if (sender == null || string.IsNullOrEmpty(sender.Name))
@@ -109,6 +145,13 @@ namespace pssst.Api
             return true;
         }
 
+        /// <summary>
+        /// Gets the public key of an user from the server.
+        /// </summary>
+        /// <param name="userName">The Name of the user.</param>
+        /// <returns>
+        /// The retrieved user information.
+        /// </returns>
         public User GetUser(string userName)
         {
             if (string.IsNullOrEmpty(userName))
@@ -125,6 +168,14 @@ namespace pssst.Api
             return result;
         }
 
+        /// <summary>
+        /// Receives a message for the user.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <returns>
+        /// The received message or null if there was no message on the server.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">user</exception>
         public ReceivedMessageBody? ReceiveMessage(User user)
         {
             if (user == null)
