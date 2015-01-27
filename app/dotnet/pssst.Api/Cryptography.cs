@@ -31,22 +31,40 @@ using pssst.Api.Interface;
 
 namespace pssst.Api
 {
+    /// <summary>
+    /// Provides cryptographic functionality using the BouncyCastle libraray.
+    /// </summary>
     public sealed class Cryptography : ICryptography
     {
         private const int MinimumKeyLength = 1024;
 
         private readonly SecureRandom _random;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Cryptography"/> class.
+        /// </summary>
         public Cryptography()
         {
             _random = new SecureRandom();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Cryptography"/> class.
+        /// </summary>
+        /// <param name="random">The random.</param>
         public Cryptography(SecureRandom random)
         {
             _random = random;
         }
 
+        /// <summary>
+        /// Creates a new RSA keypair with the given length. The minimum length
+        /// of the key must be 1024.
+        /// </summary>
+        /// <param name="keyLength">The Length of the key (min 1024).</param>
+        /// <returns>
+        /// The new keypair.
+        /// </returns>
         public Keypair CreateKeyPair(int keyLength)
         {
             if (keyLength < MinimumKeyLength)
@@ -126,24 +144,16 @@ namespace pssst.Api
             return privateKeyParameter;
         }
 
-        /*
-        private RsaPrivateCrtKeyParameters ImportKeyPair(Keypair keyPair)
-        {
-            // Todo: Handling of encrypted key's doesnt' work until now
-
-            //StringReader strReader = new StringReader(keyPair.PrivateKey + keyPair.PublicKey);
-            StringReader strReader = new StringReader(keyPair.PrivateKey);
-
-            PemReader reader = null;
-
-            reader = new PemReader(strReader);
-
-            RsaPrivateCrtKeyParameters privateKeyParameter = (RsaPrivateCrtKeyParameters)reader.ReadObject();
-
-            return privateKeyParameter;
-        }
-        */
-
+        /// <summary>
+        /// Encrypts the message with the receivers public key. The message is
+        /// encrypted using AES/CFB8/NoPadding and a salt. After this the salt
+        /// is encrypted using RSA/ECB/OAEPWithSHA1AndMGF1Padding algorithm.
+        /// </summary>
+        /// <param name="receiverKey">The receivers public key.</param>
+        /// <param name="message">The message to encrypt.</param>
+        /// <returns>
+        /// The encrypted message.
+        /// </returns>
         public MessageBody EncryptMessage(string receiverKey, string message)
         {
             if (string.IsNullOrEmpty(receiverKey))
@@ -171,13 +181,16 @@ namespace pssst.Api
             return body;
         }
 
+        /// <summary>
+        /// Decrypts the message using the private key.
+        /// </summary>
+        /// <param name="keyPair">The key pair.</param>
+        /// <param name="message">The encrypted message.</param>
+        /// <returns>
+        /// The decrypted message
+        /// </returns>
         public string DecryptMessage(Keypair keyPair, ReceivedMessageBody message)
         {
-            /*
-            if (string.IsNullOrEmpty(privateKey))
-                throw new ArgumentException("Parameter must not be null or empty.", "privateKey");
-            */
-
             if (string.IsNullOrEmpty(message.body))
                 return string.Empty;
 
@@ -274,6 +287,17 @@ namespace pssst.Api
             return privateKeyParameter;
         }
 
+        /// <summary>
+        /// Creates the signature for the data using the given keypair. The
+        /// signature is created by computing a SHA512 hash and signing the hash
+        /// with the private key.
+        /// </summary>
+        /// <param name="data">The data for which the signature should be created.</param>
+        /// <param name="keypair">The keypair.</param>
+        /// <param name="timestamp">The timestamp.</param>
+        /// <returns>
+        /// The signature.
+        /// </returns>
         public byte[] SignData(string data, Keypair keypair, long timestamp)
         {
             if (data == null)
