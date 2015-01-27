@@ -21,14 +21,51 @@ using System.Linq;
 
 namespace pssst.Api.Interface
 {
+    /// <summary>
+    /// Describes the interface of the communication module that provides methods
+    /// to communicate with the pssst server.
+    /// </summary>
     public interface ICommunication
     {
+        /// <summary>
+        /// Creates a new user on the server.
+        /// </summary>
+        /// <param name="server">
+        /// The server on which the user should be crated.
+        /// </param>
+        /// <param name="user">The user that should be created.</param>
         void CreateUser(Uri server, User user);
 
+        /// <summary>
+        /// Sends a message from one user (sender) to another (receiver).
+        /// </summary>
+        /// <param name="server">The server which should be used.</param>
+        /// <param name="sender">The sender of the message.</param>
+        /// <param name="receiver">The receiver of the message.</param>
+        /// <param name="message">The encrypted message.</param>
         void SendMessage(Uri server, User sender, User receiver, MessageBody message);
 
+        /// <summary>
+        /// Receives a message for the user.
+        /// </summary>
+        /// <param name="server">The server which should be used.</param>
+        /// <param name="user">The user.</param>
+        /// <returns>
+        /// The encrypted message or null if the server has no message for the
+        /// user.
+        /// </returns>
         ReceivedMessageBody? ReceiveMessage(Uri server, User user);
 
+        /// <summary>
+        /// Gets the public key of a user.
+        /// </summary>
+        /// <param name="server">The server which should be used.</param>
+        /// <param name="user">
+        /// The user whose public key should be retrieved.
+        /// </param>
+        /// <returns>
+        /// The public key of the user.
+        /// </returns>
         string GetPublicKey(Uri server, string user);
     }
 }

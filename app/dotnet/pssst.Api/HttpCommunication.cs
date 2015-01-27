@@ -24,7 +24,7 @@ using pssst.Api.Interface;
 
 namespace pssst.Api
 {
-    public sealed class Communication : ICommunication
+    public sealed class HttpCommunication : ICommunication
     {
         private const string RelativeUriCreateUser = "/1/{0}";
         private const string RelativeUriSendMessage = "/1/{0}/{1}";
@@ -36,18 +36,31 @@ namespace pssst.Api
         // Todo: Dispose HttpClient
         private HttpClient _http;
 
-        public Communication()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpCommunication"/> class.
+        /// </summary>
+        public HttpCommunication()
         {
             _http = new HttpClient();
             _cryptography = new Cryptography();
         }
 
-        public Communication(HttpClient http, ICryptography cryptography)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpCommunication"/> class.
+        /// </summary>
+        /// <param name="http">The HTTP client.</param>
+        /// <param name="cryptography">The crypto provider.</param>
+        public HttpCommunication(HttpClient http, ICryptography cryptography)
         {
             _http = http;
             _cryptography = cryptography;
         }
 
+        /// <summary>
+        /// Creates a new user on the server.
+        /// </summary>
+        /// <param name="server">The server on which the user should be crated.</param>
+        /// <param name="user">The user that should be created.</param>
         public void CreateUser(Uri server, User user)
         {
             Uri requestUri = new Uri(server, string.Format(RelativeUriCreateUser, user.Name));
@@ -62,6 +75,13 @@ namespace pssst.Api
             HttpResponseMessage response = _http.SendAsync(message).Result;
         }
 
+        /// <summary>
+        /// Sends a message from one user (sender) to another (receiver).
+        /// </summary>
+        /// <param name="server">The server which should be used.</param>
+        /// <param name="sender">The sender of the message.</param>
+        /// <param name="receiver">The receiver of the message.</param>
+        /// <param name="message">The encrypted message.</param>
         public void SendMessage(Uri server, User sender, User receiver, MessageBody message)
         {
             Uri requestUri = new Uri(server, string.Format(RelativeUriSendMessage, receiver.Name, "box"));
@@ -73,6 +93,15 @@ namespace pssst.Api
             HttpResponseMessage response = _http.SendAsync(httpMessage).Result;
         }
 
+        /// <summary>
+        /// Receives a message for the user.
+        /// </summary>
+        /// <param name="server">The server which should be used.</param>
+        /// <param name="user">The user.</param>
+        /// <returns>
+        /// The encrypted message or null if the server has no message for the
+        /// user.
+        /// </returns>
         public ReceivedMessageBody? ReceiveMessage(Uri server, User user)
         {
             if (server == null)
@@ -94,6 +123,14 @@ namespace pssst.Api
             return result;
         }
 
+        /// <summary>
+        /// Gets the public key of a user.
+        /// </summary>
+        /// <param name="server">The server which should be used.</param>
+        /// <param name="user">The user whose public key should be retrieved.</param>
+        /// <returns>
+        /// The public key of the user.
+        /// </returns>
         public string GetPublicKey(Uri server, string user)
         {
             Uri requestUri = new Uri(server, string.Format(RelativeUriFind, user));

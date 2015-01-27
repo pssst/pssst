@@ -58,7 +58,7 @@ namespace pssst.Api.Tests.Unit
                 .IgnoreArguments()
                 .Return(new byte[7]);
 
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), crypto);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), crypto);
 
             // Act
             communication.CreateUser(server, user);
@@ -87,7 +87,7 @@ namespace pssst.Api.Tests.Unit
                 .Return(signature);
 
             HttpMessageHandler fakeHttpMessageHandler = FakeHttpMessageHandler.GetHttpMessageHandler(null, HttpStatusCode.Accepted);
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), crypto);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), crypto);
 
             // Act
             communication.CreateUser(server, user);
@@ -120,7 +120,7 @@ namespace pssst.Api.Tests.Unit
                 .IgnoreArguments()
                 .Return(new byte[7]);
 
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), crypto);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), crypto);
 
             // Act
             communication.CreateUser(server, user);
@@ -167,7 +167,7 @@ namespace pssst.Api.Tests.Unit
 
             HttpMessageHandler fakeHttpMessageHandler = FakeHttpMessageHandler.GetHttpMessageHandler(null, HttpStatusCode.Accepted);
             
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), crypto);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), crypto);
 
             // Act
             communication.SendMessage(server, sender, receiver, messageBody);
@@ -197,7 +197,7 @@ namespace pssst.Api.Tests.Unit
                 .Return(signature);
 
             HttpMessageHandler fakeHttpMessageHandler = FakeHttpMessageHandler.GetHttpMessageHandler(null, HttpStatusCode.Accepted);
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), crypto);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), crypto);
 
             // Act
             communication.SendMessage(server, sender, receiver, new MessageBody());
@@ -224,7 +224,7 @@ namespace pssst.Api.Tests.Unit
             Uri expectedUri = new Uri(server, string.Format("/1/{0}/key", requestedUser));
 
             HttpMessageHandler fakeHttpMessageHandler = FakeHttpMessageHandler.GetHttpMessageHandler(null, HttpStatusCode.Accepted);
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), null);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), null);
 
             // Act
             communication.GetPublicKey(server, requestedUser);
@@ -245,7 +245,7 @@ namespace pssst.Api.Tests.Unit
             string expectedKey = "TestKey";
 
             HttpMessageHandler fakeHttpMessageHandler = FakeHttpMessageHandler.GetHttpMessageHandler(expectedKey, HttpStatusCode.Accepted);
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), null);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), null);
 
             // Act
             string result = communication.GetPublicKey(server, requestedUser);
@@ -262,7 +262,7 @@ namespace pssst.Api.Tests.Unit
         {
             // Arrange
             Uri server = new Uri("http://api.pssst.name");
-            ICommunication communication = new Communication(null, null);
+            ICommunication communication = new HttpCommunication(null, null);
 
             // Act
             communication.ReceiveMessage(server, null);
@@ -277,7 +277,7 @@ namespace pssst.Api.Tests.Unit
         {
             // Arrange
             User user = new User("User", string.Empty, string.Empty, string.Empty, string.Empty);
-            ICommunication communication = new Communication(null, null);
+            ICommunication communication = new HttpCommunication(null, null);
 
             // Act
             communication.ReceiveMessage(null, user);
@@ -301,7 +301,7 @@ namespace pssst.Api.Tests.Unit
 
             HttpMessageHandler fakeHttpMessageHandler = FakeHttpMessageHandler.GetHttpMessageHandler(JsonConvert.SerializeObject(new ReceivedMessageBody()), HttpStatusCode.Accepted);
 
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), crypto);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), crypto);
 
             // Act
             communication.ReceiveMessage(server, user);
@@ -337,7 +337,7 @@ namespace pssst.Api.Tests.Unit
 
             HttpMessageHandler fakeHttpMessageHandler = FakeHttpMessageHandler.GetHttpMessageHandler(JsonConvert.SerializeObject(encryptedMessage), HttpStatusCode.Accepted);
 
-            ICommunication communication = new Communication(new HttpClient(fakeHttpMessageHandler), crypto);
+            ICommunication communication = new HttpCommunication(new HttpClient(fakeHttpMessageHandler), crypto);
 
             // Act
             ReceivedMessageBody? messageBody = communication.ReceiveMessage(server, user);

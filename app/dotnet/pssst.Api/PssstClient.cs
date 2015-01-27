@@ -35,7 +35,7 @@ namespace pssst.Api
         public PssstClient()
         {
             this.cryptoProvider = new Cryptography();
-            this.server = new Communication();
+            this.server = new HttpCommunication();
         }
 
         public PssstClient(ICryptography cryptoProvider,
