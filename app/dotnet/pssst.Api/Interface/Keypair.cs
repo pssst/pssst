@@ -21,10 +21,19 @@ using System.Linq;
 
 namespace pssst.Api.Interface
 {
+    /// <summary>
+    /// Represents a keypair containing a public and a private key.
+    /// </summary>
     public struct Keypair
     {
+        /// <summary>
+        /// Gets or sets the public key.
+        /// </summary>
         public string PublicKey { get; set; }
 
+        /// <summary>
+        /// Gets or sets the private key.
+        /// </summary>
         public string PrivateKey { get; set; }
     }
 }

@@ -21,18 +21,38 @@ using System.Linq;
 
 namespace pssst.Api.Interface
 {
+    /// <summary>
+    /// Represents a pssst user.
+    /// </summary>
     public sealed class User
     {
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
         public string Name { get; private set; }
 
         public string Box { get; private set; }
 
         public string Password { get; private set; }
 
+        /// <summary>
+        /// Gets the private key.
+        /// </summary>
         public string PrivateKey { get; private set; }
 
+        /// <summary>
+        /// Gets the public key.
+        /// </summary>
         public string PublicKey { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="User"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="box">The box.</param>
+        /// <param name="password">The password.</param>
+        /// <param name="privateKey">The private key.</param>
+        /// <param name="publicKey">The public key.</param>
         public User(string name,
             string box,
             string password,
@@ -46,6 +66,16 @@ namespace pssst.Api.Interface
             PublicKey = publicKey;
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object" />, 
+        /// is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with 
+        /// this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is 
+        ///   equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Equals(object obj)
         {
             User userObj = obj as User;
@@ -60,6 +90,13 @@ namespace pssst.Api.Interface
                 && (PublicKey == userObj.PublicKey);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing 
+        /// algorithms and data structures like a hash table.
+        /// </returns>
         public override int GetHashCode()
         {
             unchecked // Overflow is fine, just wrap

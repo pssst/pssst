@@ -21,33 +21,78 @@ using System.Linq;
 
 namespace pssst.Api.Interface
 {
+    /* 
+     * !!! Attention: The property names of the structs in this class must not
+     * be changed. They are used for serializing the data that is sent to the
+     * server. Only if the protocol changes, the property names should be changed.
+     */
+
+    /// <summary>
+    /// Represents the body of a message.
+    /// </summary>
     public struct MessageBody
     {
+        /// <summary>
+        /// Gets or sets the head.
+        /// </summary>
         public MessageHead head { get; set; }
 
+        /// <summary>
+        /// Gets or sets the body.
+        /// </summary>
         public string body { get; set; }
     }
 
+    /// <summary>
+    /// Represents the head of a message.
+    /// </summary>
     public struct MessageHead
     {
+        /// <summary>
+        /// Gets or sets the name of the sender.
+        /// </summary>
         public string user { get; set; }
 
+        /// <summary>
+        /// Gets or sets the nonce.
+        /// </summary>
         public string nonce { get; set; }
     }
 
+    /// <summary>
+    /// Represents the body of a received message.
+    /// </summary>
     public struct ReceivedMessageBody
     {
+        /// <summary>
+        /// Gets or sets the head.
+        /// </summary>
         public ReceivedMessageHead head { get; set; }
 
+        /// <summary>
+        /// Gets or sets the body.
+        /// </summary>
         public string body { get; set; }
     }
 
+    /// <summary>
+    /// Represents the head of a received message.
+    /// </summary>
     public struct ReceivedMessageHead
     {
+        /// <summary>
+        /// Gets or sets the name of the sender.
+        /// </summary>
         public string user { get; set; }
 
+        /// <summary>
+        /// Gets or sets the nonce.
+        /// </summary>
         public string nonce { get; set; }
 
+        /// <summary>
+        /// Gets or sets the time when this message was sent.
+        /// </summary>
         public long time { get; set; }
     }
 }
