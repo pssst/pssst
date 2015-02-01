@@ -27,8 +27,8 @@ if [[ ! -d $HEROKU ]]; then
     git remote add heroku git@heroku.com:$HEROKU.git
     git pull heroku master
 
-    openssl genrsa -out ./app/pssst.key 4096
-    openssl rsa -in ./app/pssst.key -pubout > ./www/key
+    openssl genrsa -out ./id_rsa 4096
+    openssl rsa -in ./id_rsa -pubout > ./www/key
 else
     cd $HEROKU
 

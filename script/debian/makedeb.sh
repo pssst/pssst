@@ -41,7 +41,7 @@ cat > $DEB/copyright <<EOF
 Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
 
 Files: *
-Copyright: 2013-2014 Christian & Christian <hello@pssst.name>
+Copyright: 2013-2015 Christian & Christian <hello@pssst.name>
 License: GPL-3+
 
 License: GPL-3+

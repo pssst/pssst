@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+ * Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
+ *
  * Cryptographical functions for signing and verifying data.
  */
 module.exports = function Crypto() {
@@ -24,25 +25,33 @@ module.exports = function Crypto() {
   var crypto = require('crypto');
 
   // Required constants
-  var APP = __dirname + '/../app/pssst.key';
-  var WWW = __dirname + '/../www/key';
+  var GRACE = 30;
+
+  var BINARY = 'base64';
+  var ENCODING = 'utf8';
+
+  var RSA_SIZE = 4096;
+  var RSA_HASH = 'sha512';
+
+  var ID_RSA = __dirname + '/../id_rsa';
+  var ID_PUB = __dirname + '/../www/key';
 
   // Generate reasonable strong RSA keys
-  if (!fs.existsSync(APP) || !fs.existsSync(WWW)) {
-    var key = ursa.generatePrivateKey(4096);
+  if (!fs.existsSync(ID_RSA) || !fs.existsSync(ID_PUB)) {
+    var key = ursa.generatePrivateKey(RSA_SIZE);
 
-    fs.writeFileSync(APP, key.toPrivatePem('utf8'));
-    fs.writeFileSync(WWW, key.toPublicPem('utf8'));
+    fs.writeFileSync(ID_RSA, key.toPrivatePem(ENCODING));
+    fs.writeFileSync(ID_PUB, key.toPublicPem(ENCODING));
   }
 
   // Key bundle
   var key = {
     private: ursa.createPrivateKey(
-      fs.readFileSync(APP, {encoding: 'utf8'}), undefined, 'utf8'
+      fs.readFileSync(ID_RSA, {encoding: ENCODING}), undefined, ENCODING
     ),
 
     public: ursa.createPublicKey(
-      fs.readFileSync(WWW, {encoding: 'utf8'}), 'utf8'
+      fs.readFileSync(ID_PUB, {encoding: ENCODING}), ENCODING
     )
   };
 
@@ -56,9 +65,9 @@ module.exports = function Crypto() {
     throw new Error('Public key invalid');
   }
 
-  // Assert matching private/public key pair
+  // Assert matching key bundle
   if (!ursa.matchingPublicKeys(key.private, key.public)) {
-    throw new Error('Private/Public key invalid');
+    throw new Error('Key bundle invalid');
   }
 
   /**
@@ -71,12 +80,12 @@ module.exports = function Crypto() {
   function createHMAC(data, timestamp) {
     var hmac, timestamp = timestamp || now();
 
-    hmac = crypto.createHmac('sha512', timestamp.toString());
+    hmac = crypto.createHmac(RSA_HASH, timestamp.toString());
     hmac.update(data.toString());
 
     return {
       timestamp: timestamp,
-      signature: hmac.digest('base64')
+      signature: hmac.digest(BINARY)
     };
   };
 
@@ -105,7 +114,7 @@ module.exports = function Crypto() {
 
     return {
       timestamp: hmac.timestamp,
-      signature: prv.hashAndSign('sha512', hmac.signature, 'base64', 'base64')
+      signature: prv.hashAndSign(RSA_HASH, hmac.signature, BINARY, BINARY)
     };
   };
 
@@ -125,12 +134,12 @@ module.exports = function Crypto() {
     var time = parseInt(hmac.timestamp, 10);
     var sig = hmac.signature;
 
-    if (Math.abs(time - now()) <= 30) {
+    if (Math.abs(time - now()) <= GRACE) {
       var hmac = createHMAC(data, time);
-      var pub = ursa.createPublicKey(pem, 'utf8');
+      var pub = ursa.createPublicKey(pem, ENCODING);
 
       try {
-        return pub.hashAndVerify('sha512', hmac.signature, sig, 'base64');
+        return pub.hashAndVerify(RSA_HASH, hmac.signature, sig, BINARY);
       } catch (err) {
         return false; // OpenSSL error
       }

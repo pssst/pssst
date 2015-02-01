@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ class CLI:
         Calls the CLI and returns the result.
     pull(box=None)
         Pulls a message from a box.
-    push(usernames, message)
+    push(receivers, message)
         Pushes a message into a box.
     login(username, password)
         Creates the Pssst instance.
@@ -195,19 +195,19 @@ class CLI:
             user, time, message = data
             return (repr(Pssst.Name(user)), time, message.decode("utf-8"))
 
-    def push(self, usernames, message):
+    def push(self, receivers, message):
         """
         Pushes a message into a box (override).
 
         Parameters
         ----------
-        param usernames : list of strings
+        param receivers : list of strings
             List of user names.
         param message : byte string
             The message.
 
         """
-        self.pssst.push(usernames, message.encode("utf-8"))
+        self.pssst.push(receivers, message.encode("utf-8"))
 
     def login(self, create, username, password):
         """
@@ -267,10 +267,10 @@ class CLI:
 def main(script, option="8211", usepipe=False):
     """
           ________               ___
-         /  ___  /______________/  /_
-        /  /__/ / ___/ ___/ ___/  __/
-       /  _____/__  /__  /__  /  /_
-      /__/    /____/____/____/\___/
+         /  ___  /______________/  /__
+        /  /__/ / ___/ ___/ ___/  ___/
+       /  _____/__  /__  /__  /  /__
+      /__/    /____/____/____/\____/
 
       GUI version %s
 

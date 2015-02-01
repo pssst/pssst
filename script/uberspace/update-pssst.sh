@@ -46,8 +46,7 @@ mkdir $DIR/www
 
 cd $DIR && npm install
 cp $CFG/$CONFIG/* .
-mv pssst.key app/pssst.key
-mv pssst.pub www/key
+mv id_rsa.pub www/key
 
 uberspace-setup-service pssst.$SERVER node $DIR/start
 

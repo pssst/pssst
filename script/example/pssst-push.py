@@ -21,8 +21,10 @@ def main(script, username=None, receiver=None, filename=None):
     """
     Usage: %s USERNAME RECEIVER FILENAME
     """
+    script = os.path.basename(script)
+
     if not username:
-        return main.__doc__.strip() % os.path.basename(script)
+        return main.__doc__.strip() % script
 
     try:
         name = Pssst.Name(username)
@@ -37,7 +39,7 @@ def main(script, username=None, receiver=None, filename=None):
         print("Pushed %s" % filename)
 
     except Exception as ex:
-        return "Error: %s" % ex
+        return "%s error: %s" % (script, ex)
 
 
 if __name__ == "__main__":

@@ -22,8 +22,10 @@ def main(script, username=None, path="."):
     """
     Usage: %s USERNAME [PATH]
     """
+    script = os.path.basename(script)
+
     if not username:
-        return main.__doc__.strip() % os.path.basename(script)
+        return main.__doc__.strip() % script
 
     try:
         name = Pssst.Name(username)
@@ -45,7 +47,7 @@ def main(script, username=None, path="."):
             print("%s, %s" % (Pssst.Name(user), datetime.fromtimestamp(time)))
 
     except Exception as ex:
-        return "Error: %s" % ex
+        return "%s error: %s" % (script, ex)
 
 
 if __name__ == "__main__":

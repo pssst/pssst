@@ -1,8 +1,31 @@
+0.2.38
+* Fixed optimize bug in makeexe script
+* Changed CLI unit test command line handling
+* Changed CLI/GUI usage text
+* Changed CLI error handling
+* Changed example scripts error handling
+* Updated Travis CI Python version
+
+0.2.37
+* Refactored server
+* Refactored user file structure
+* Added support for multi API users
+* Added Moment.js date parser to GUI
+* Added link to official site to GUI
+* Changed key names to UNIX standard
+* Changed package.json versions
+* Changed bower.json versions
+* Changed copyright notice
+* Changed unit tests
+* Changed gitignore file
+* Renamed makeexe script
+
 0.2.36
 * Added Windows PE build script
 * Fixed key bug in Heroku script
 * Fixed user name bug in GUI
 * Changed CLI documentation
+* Changed CLI parameters
 * Changed GUI favicon
 * Changed README.md
 * Changed unit tests
