@@ -738,14 +738,12 @@ class TestFuzzy:
             assert blob == pssst.pull()[2]
 
 
-def main(script, *args):
+def main(*args):
     """
     Starts unit testing.
 
     Parameters
     ----------
-    param script : string
-        Full script path.
     param args : tuple of strings, optional
         Arguments passed to py.test.
 
@@ -765,7 +763,8 @@ def main(script, *args):
         return "Tests against the live API are not allowed"
 
     print("Using API: " + api)
-    return pytest.main([script] + list(args))
+
+    return pytest.main(list(args))
 
 
 if __name__ == "__main__":

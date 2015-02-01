@@ -27,7 +27,6 @@ from datetime import datetime
 from getpass import getpass
 from zipfile import ZipFile
 
-
 try:
 	import readline
 except ImportError:
@@ -51,7 +50,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.37"
+__all__, __version__ = ["Pssst"], "0.2.38"
 
 
 def _encode64(data): # Utility shortcut
@@ -328,7 +327,7 @@ class Pssst:
             raise Exception("Server could not be authenticated")
 
         if verify and abs(sync - int(round(time.time()))) > GRACE:
-            raise Exception("Client time is not synchronized")
+            raise Exception("Server could not be authenticated")
 
         if verify and not password:
             raise Exception("Password is required")
@@ -660,10 +659,10 @@ def usage(text, *args):
 def main(script, command="--help", username=None, receiver=None, *message):
     """
           ________               ___
-         /  ___  /______________/  /_
-        /  /__/ / ___/ ___/ ___/  __/
-       /  _____/__  /__  /__  /  /_
-      /__/    /____/____/____/\___/
+         /  ___  /______________/  /__
+        /  /__/ / ___/ ___/ ___/  ___/
+       /  _____/__  /__  /__  /  /__
+      /__/    /____/____/____/\____/
 
       CLI version %s
 
@@ -737,10 +736,10 @@ def main(script, command="--help", username=None, receiver=None, *message):
         print("exit")
 
     except ConnectionError:
-        return "API connection failed"
+        return "Error: API connection failed"
 
     except Timeout:
-        return "API connection timeout"
+        return "Error: API connection timeout"
 
     except Exception as ex:
         return "Error: %s" % ex

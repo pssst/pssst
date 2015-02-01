@@ -30,7 +30,7 @@ distutils.core.setup(
                 "powrprof.dll",
                 "w9xpopen.exe"
             ],
-            "optimize": 2,
+            "optimize": 1,
             "compressed": True,
             "unbuffered": True,
             "bundle_files": 1,

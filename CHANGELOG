@@ -1,3 +1,11 @@
+0.2.38
+* Fixed optimize bug in makeexe script
+* Changed CLI unit test command line handling
+* Changed CLI/GUI usage text
+* Changed CLI error handling
+* Changed example scripts error handling
+* Updated Travis CI Python version
+
 0.2.37
 * Refactored server
 * Refactored user file structure
