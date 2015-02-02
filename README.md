@@ -156,12 +156,11 @@ Cryptography
 ------------
 ### Encoding
 
-All data is encoded in ASCII and exchanged in either JSON or plain text format
-with HTTPS requests / responses. Except served static files, which are encoded
-in UTF-8. Please refer to the mime type in the HTTP `content-type` header to
-decide which format and encoding is returned. Server errors will always be
-returned in plain text. Line endings must only consists of a `Line Feed`
-character.
+All data are encoded in UTF-8 and exchanged in either JSON or plain text
+format with HTTPS requests / responses. Please refer to the mime type in the
+HTTP `content-type` header to decide which format is returned. Server errors
+will always be returned in plain text. Line endings must only consists of a
+`Line Feed` character.
 
 ### Encryption
 
