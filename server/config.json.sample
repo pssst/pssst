@@ -1,0 +1,9 @@
+{
+  "debug": <Level 0 (none) to 3 (full)>,
+  "deny":  <Regex of denied user names>,
+  "port":  <Pssst server port>,
+  "db": {
+    "source": <Redis port or socket path>,
+    "number": <Redis database number>
+  }
+}

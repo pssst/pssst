@@ -1,3 +1,180 @@
+0.2.38
+* Fixed optimize bug in makeexe script
+* Changed CLI unit test command line handling
+* Changed CLI/GUI usage text
+* Changed CLI error handling
+* Changed CLI default encoding
+* Changed example scripts error handling
+* Updated Travis CI Python version
+* Updated README.md
+
+0.2.37
+* Refactored server
+* Refactored user file structure
+* Added support for multi API users
+* Added Moment.js date parser to GUI
+* Added link to official site to GUI
+* Changed key names to UNIX standard
+* Changed package.json versions
+* Changed bower.json versions
+* Changed copyright notice
+* Changed unit tests
+* Changed gitignore file
+* Renamed makeexe script
+
+0.2.36
+* Added Windows PE build script
+* Fixed key bug in Heroku script
+* Fixed user name bug in GUI
+* Changed CLI documentation
+* Changed CLI parameters
+* Changed GUI favicon
+* Changed README.md
+* Changed unit tests
+* Renamed name token all
+* Renamed class KeyStore
+
+0.2.35
+* Fixed bug with non ASCII characters
+* Fixed example pull script box bug
+* Merged notify and persist scripts
+* Changed example notice
+* Changed README.md
+
+0.2.34
+* Added example file transfer scripts
+* Added Debian persistence script
+* Changed CLI shell internals
+* Changed README.md
+* Renamed Debian notify script
+* Removed GitHub push webhook (unused)
+
+0.2.33
+* Fixed user name handling in GUI
+* Fixed wrong CLI version number
+* Changed name parser structure
+* Changed CLI exports
+
+0.2.32
+* Added summary to notify script
+* Changed expire time in notify script
+* Changed server error handling
+* Changed server usage text
+
+0.2.31
+* Changed GUI app
+* Changed GUI style
+* Removed LESS dependency
+
+0.2.30
+* Added experimental AWS support
+* Added Animate.css to GUI app
+* Added mustache.js to GUI app
+* Added autofocus to GUI app
+* Fixed GUI message line breaks
+* Fixed GUI message encoding
+* Changed Uberspace configs
+* Changed Dockerfile
+* Changed GUI style
+* Changed README.md
+
+0.2.29
+* Refactored GUI app
+* Added basic manpage for CLI
+* Added basic manpage for GUI
+* Added support for Bower to GUI
+* Added less file for GUI style
+* Added version to server protocol
+* Added directory creation to server
+* Added Windows start file for GUI
+* Fixed Firefox bug in GUI style
+* Fixed Python 3 support for GUI
+* Fixed typo in test vectors
+* Changed Debian makedeb script
+* Changed CLI usage text
+* Changed gitignore files
+* Changed README.md
+* Removed server branch information
+
+0.2.28
+* Added GitHub push webhook to scripts
+* Fixed makeiso user handling
+* Fixed CLI Windows compatibility
+* Fixed CLI unit test user prefix
+* Fixed CLI unit test API output
+* Fixed server public key fingerprint
+* Changed CLI config file location to $HOME
+* Changed CLI message output format
+* Changed Heroku checkout script
+* Changed Debian install script
+* Changed Debian package script
+* Changed some script names
+* Changed script rights
+* Changed README.md
+
+0.2.27
+* Added check for OpenSSL errors to server
+* Changed message structure
+* Changed README.md
+
+0.2.26
+* Added unit test user prefix
+* Fixed CLI usage error output
+* Fixed heroku checkout script
+* Removed check for weak passwords
+* Changed user file location to $HOME
+* Changed server code to be more readable
+* Changed CLI shell code
+* Changed CLI usage text
+* Changed README.md
+* Upgraded to Font Awesome 4.2.0
+
+0.2.25
+* Changed HTML5 GUI to new website style
+* Changed Uberspace live Redis output
+* Changed Uberspace test Redis output
+* Changed Dockerfile Redis config
+* Changed README.md texts
+* Fixed wrong dependency in README.md
+
+0.2.24
+* Refactored whole server
+* Added basic HTML5 GUI
+* Added basic test vectors
+* Added interactive CLI shell
+* Added server Docker support
+* Added server config file auto creation
+* Added some performance optimizations
+* Fixed some bugs in unit tests
+* Fixed wrong server debug timestamp
+* Fixed wrong server usage text
+* Fixed wrong method documentation
+* Adapted Travis CI script
+* Adapted checkout scripts
+* Adapted README.md
+* Changed install script to comply with FHS
+* Changed data exchange structure
+* Changed server package.json
+* Changed server default port
+* Changed server log format
+* Removed unused code from CLI unit tests
+* Removed unsafe file transfer from CLI
+* Removed use of deprecated methods
+* Upgrated to Express 4.7.x
+
+0.2.23
+* Added config from repository
+* Added script from repository
+* Fixed some typos
+
+0.2.22
+* Added API version to URLs
+* Added SSL verification to CLI
+* Added Limits section to README.md
+* Fixed typo in unit tests
+* Changed CLI output format
+* Removed API redirect to website in server
+
 0.2.21
 * Added server support for OpenRedis
 * Added server support for Redis Green

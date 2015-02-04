@@ -1,4 +1,5 @@
 *.pyc
 *.pyd
 *.pyo
-env
+pssst.py
+bower/

@@ -2,22 +2,20 @@ language: python
 branches:
   only:
     - develop
-    - release
     - master
 python:
   - "2.7"
-  - "3.3"
+  - "3.4"
 services:
   - redis-server
 install:
   - "pip install pycrypto requests"
 before_script:
-  - echo 'http://localhost:62421' > .pssst
-  - echo '{"debug":0,"port":62421,"deny":null,"db":{"source":6379,"number":0}}' > server/config/config.json
+  - echo 'http://localhost:62421' > ~/.pssst
   - export PYTHON=`which python2`
   - cd server
   - npm install
-  - node start.js &
+  - node start &
   - cd ..
   - sleep 10
 script:

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Copyright (C) 2013-2014  Christian & Christian  <hello@pssst.name>
+Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -27,6 +27,11 @@ from datetime import datetime
 from getpass import getpass
 from zipfile import ZipFile
 
+try:
+	import readline
+except ImportError:
+	pass # Windows doesn't support this
+
 
 try:
     from requests import request
@@ -45,75 +50,20 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst", "Name"], "0.2.21"
+__all__, __version__ = ["Pssst"], "0.2.38"
 
 
 def _encode64(data): # Utility shortcut
-    return base64.b64encode(data).decode("ascii")
+    return base64.b64encode(data).decode("utf-8")
 
 
 def _decode64(data): # Utility shortcut
-    return base64.b64decode(data.encode("ascii"))
-
-
-class Name:
-    """
-    Pssst canonical name parser.
-
-    """
-    def __init__(self, user, box=None, password=None):
-        """
-        Initializes the instance with the parsed name.
-
-        Parameters
-        ----------
-        param user : string
-            User name (full or partly).
-        param box : string, optional (default is None)
-            Box name.
-        param password : string, optional (default is None)
-            User private key password.
-
-        """
-        user = user.strip()
-
-        if not re.match("^(pssst\.)?\w{2,63}(\.\w{2,63})?(:\S*)?$", user):
-            raise Exception("User name invalid")
-
-        if user.startswith("pssst."):
-            user = user[6:]
-
-        if ":" in user and not password:
-            user, password = user.rsplit(":", 1)
-
-        if "." in user and not box:
-            user, box = user.rsplit(".", 1)
-
-        self.user = user.lower()
-        self.box = box.lower() if box else box
-        self.password = password
-
-        self.full = (self.user, self.box)
-
-        if self.box:
-            self.path = "%s/%s/" % self.full
-        else:
-            self.path = "%s/" % self.user
-
-    def __repr__(self):
-        """
-        Returns the full name in canonical notation.
-
-        """
-        if self.box:
-            return str("pssst.%s.%s" % self.full)
-        else:
-            return str("pssst.%s" % self.user)
+    return base64.b64decode(data.encode("utf-8"))
 
 
 class Pssst:
     """
-    Pssst class for API communication.
+    Pssst API low level communication class.
 
     Methods
     -------
@@ -127,23 +77,77 @@ class Pssst:
         Returns all boxes of an user.
     pull(box=None)
         Pulls a message from a box.
-    push(names, message)
-        Pushes a message onto a box.
+    push(receivers, message)
+        Pushes a message into a box.
 
     """
-    class KeyStore:
+    class Name:
         """
-        Class for storing public and private keys.
+        Canonical name parser.
+
+        """
+        def __init__(self, user, box=None, password=None):
+            """
+            Initializes the instance with the parsed name.
+
+            Parameters
+            ----------
+            param user : string
+                User name (full or partly).
+            param box : string, optional (default is None)
+                Box name.
+            param password : string, optional (default is None)
+                User private key password.
+
+            """
+            user = user.strip()
+
+            if not re.match("^(pssst\.)?\w{2,63}(\.\w{2,63})?(:\S*)?$", user):
+                raise Exception("User name invalid")
+
+            if user.startswith("pssst."):
+                user = user[6:]
+
+            if ":" in user and not password:
+                user, password = user.rsplit(":", 1)
+
+            if "." in user and not box:
+                user, box = user.rsplit(".", 1)
+
+            self.user = user.lower()
+            self.box = box.lower() if box else box
+            self.all = (self.user, self.box)
+            self.password = password
+
+            if self.box:
+                self.path = "%s/%s/" % self.all
+            else:
+                self.path = "%s/" % self.user
+
+        def __repr__(self):
+            """
+            Returns the full name in canonical notation.
+
+            """
+            if self.box:
+                return str("pssst.%s.%s" % self.all)
+            else:
+                return str("pssst.%s" % self.user)
+
+
+    class _KeyStorage:
+        """
+        Internal storage class for public and private keys.
 
         Methods
         -------
         delete()
-            Deletes the key store.
+            Deletes the users key storage.
         list()
-            Returns an alphabetical list of all key names.
-        load(name)
+            Returns an alphabetical list of all key entries.
+        load(entry)
             Returns a key.
-        save(name, key)
+        save(entry, key)
             Saves a key.
 
         Notes
@@ -151,20 +155,18 @@ class Pssst:
         This class is not meant to be called externally.
 
         """
-        def __init__(self, user, password):
-            self.user, test = user, password or "Password1" # Only for tests
-            self.file = repr(self)
-
-            if not re.match("^((?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,})$", test):
-                raise Exception("Password weak")
+        def __init__(self, api, user, password):
+            self.scheme = "%s"
+            self.user = user
+            self.file = os.path.join(os.path.expanduser("~"), repr(self))
 
             if os.path.exists(self.file):
-                self.key = Pssst.Key(self.load(user + ".private"), password)
+                self.key = Pssst._Key(self.load("id_rsa"), password)
             else:
-                self.key = Pssst.Key()
+                self.key = Pssst._Key()
+                self.save("id_rsa", self.key.private(password))
 
-                self.save(user + ".private", self.key.private(password))
-                self.save(user, self.key.public())
+            self.scheme = re.sub("^(?i)https?://(.+)", "\g<1>/%s.pub", api)
 
         def __repr__(self):
             return ".pssst." + self.user
@@ -180,20 +182,27 @@ class Pssst:
 
         def list(self):
             with ZipFile(self.file, "r") as file:
-                return file.namelist()
+                keys = []
 
-        def load(self, name):
+                # Filter API
+                for key in file.namelist():
+                    if key.startswith(self.scheme.rsplit("/")[0]):
+                        keys.append(re.sub("^.+/(.+)\.pub$", "\g<1>", key))
+
+                return keys
+
+        def load(self, entry):
             with ZipFile(self.file, "r") as file:
-                return file.read(name)
+                return file.read(self.scheme % entry)
 
-        def save(self, name, key):
+        def save(self, entry, key):
             with ZipFile(self.file, "a") as file:
-                file.writestr(name, key)
+                file.writestr(self.scheme % entry, key)
 
 
-    class Key:
+    class _Key:
         """
-        Class for providing cryptographic methods.
+        Internal key class providing cryptographic methods.
 
         Methods
         -------
@@ -202,8 +211,8 @@ class Pssst:
         public()
             Returns the users public key (PEM format).
         encrypt(data)
-            Returns the encrypted data and once.
-        decrypt(data, once)
+            Returns the encrypted data and nonce.
+        decrypt(data, nonce)
             Returns the decrypted data.
         verify(data, timestamp, signature)
             Returns if data could be verified with timestamp and signature.
@@ -215,14 +224,14 @@ class Pssst:
         This class is not meant to be called externally.
 
         """
-        size = 4096 # RSA key strengh
+        RSA_SIZE, NONCE_SIZE = 4096, 32 + AES.block_size
 
         def __init__(self, key=None, password=None):
             try:
                 if key:
                     self.key = RSA.importKey(key, password)
                 else:
-                    self.key = RSA.generate(Pssst.Key.size)
+                    self.key = RSA.generate(Pssst._Key.RSA_SIZE)
 
             except (IndexError, TypeError, ValueError) as ex:
                 raise Exception("Password wrong")
@@ -234,21 +243,21 @@ class Pssst:
             return self.key.publickey().exportKey("PEM").decode("ascii")
 
         def encrypt(self, data):
-            once = Random.get_random_bytes(32 + AES.block_size) # 256 bit key
+            nonce = Random.get_random_bytes(Pssst._Key.NONCE_SIZE)
 
-            data = AES.new(once[:32], AES.MODE_CFB, once[32:]).encrypt(data)
-            once = PKCS1_OAEP.new(self.key).encrypt(once)
+            data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).encrypt(data)
+            nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
 
-            return (data, once)
+            return (data, nonce)
 
-        def decrypt(self, data, once):
-            once = PKCS1_OAEP.new(self.key).decrypt(once)
-            data = AES.new(once[:32], AES.MODE_CFB, once[32:]).decrypt(data)
+        def decrypt(self, data, nonce):
+            nonce = PKCS1_OAEP.new(self.key).decrypt(nonce)
+            data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).decrypt(data)
 
             return data
 
         def verify(self, data, timestamp, signature):
-            current, data = int(round(time.time())), data.encode("ascii")
+            current, data = int(round(time.time())), data.encode("utf-8")
 
             hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
@@ -259,7 +268,7 @@ class Pssst:
                 return False
 
         def sign(self, data):
-            current, data = int(round(time.time())), data.encode("ascii")
+            current, data = int(round(time.time())), data.encode("utf-8")
 
             hmac = HMAC.new(str(current).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
@@ -293,26 +302,22 @@ class Pssst:
         -----
         If a file in the current directory with the name '.pssst' exists, the
         content of this file is parsed and used as the API server address and
-        port. In this case, the servers SSL certificate will not be verified.
-
-        Because Requests uses a different CA store, which does not has our CA
-        stored, the server will not be verified if the official API address is
-        used. This is also not necessary, because all server responses will be
-        signed and verified in the HTTP 'content-hash' header with the servers
-        private key.
-
-        The public key of the official API will be verified against the built-
-        in fingerprint.
+        port.
 
         A valid password must consist of upper and lower case letters and also
         numbers. The required minimum length of a password is 8 characters. If
         you use the offical API, a password is mandatory.
 
-        """
-        FINGERPRINT = "563cb9031992f503a21f3fa7be160567f1380467"
+        The public key of the official API will be verified against the built-
+        in fingerprint.
 
-        if os.path.exists(".pssst"):
-            verify, self.api = False, io.open(".pssst").read().strip()
+        """
+        FINGERPRINT, GRACE = "5a749f99dbc2a03b0cde327bafcf9bd7dc616830", 30
+
+        config = os.path.join(os.path.expanduser("~"), ".pssst")
+
+        if os.path.exists(config):
+            verify, self.api = False, io.open(config).read().strip()
         else:
             verify, self.api = True, "https://api.pssst.name"
 
@@ -321,25 +326,26 @@ class Pssst:
         if verify and not FINGERPRINT == SHA.new(key).hexdigest():
             raise Exception("Server could not be authenticated")
 
-        if verify and not abs(sync - int(round(time.time()))) <= 30:
-            raise Exception("Client time is not synchronized")
+        if verify and abs(sync - int(round(time.time()))) > GRACE:
+            raise Exception("Server could not be authenticated")
 
         if verify and not password:
             raise Exception("Password is required")
 
-        self.store = Pssst.KeyStore(Name(username).user, password)
+        self.user = Pssst.Name(username).user
+        self.keys = Pssst._KeyStorage(self.api, self.user, password)
 
-        if self.api not in self.store.list():
-            self.store.save(self.api, key)
+        if "id_api" not in self.keys.list():
+            self.keys.save("id_api", key)
 
     def __repr__(self):
         """
-        Returns the module identifier.
+        Returns the client identifier.
 
         Returns
         -------
         string
-            The module identifier.
+            The client identifier.
 
         """
         return "Pssst " + __version__
@@ -378,21 +384,19 @@ class Pssst:
         Please see __init__ method.
 
         """
-        if not self.store:
+        if not self.keys:
             raise Exception("User was deleted")
 
         body = str(json.dumps(data, separators=(",", ":"))) if data else ""
 
-        timestamp, signature = self.store.key.sign(body)
+        timestamp, signature = self.keys.key.sign(body)
 
-        response = request(method, "%s/user/%s" % (self.api, path),
-            data=body,
+        response = request(method, "%s/1/%s" % (self.api, path), data=body,
             headers={
                 "content-hash": "%s; %s" % (timestamp, _encode64(signature)),
                 "content-type": "application/json" if data else "text/plain",
                 "user-agent": repr(self)
-            },
-            verify=False
+            }
         )
 
         mime = response.headers.get("content-type", "text/plain")
@@ -405,7 +409,7 @@ class Pssst:
         timestamp, signature = head.split(";", 1)
         timestamp, signature = int(timestamp), _decode64(signature)
 
-        pssst = Pssst.Key(self.store.load(self.api))
+        pssst = Pssst._Key(self.keys.load("id_api"))
 
         if not pssst.verify(body, timestamp, signature):
             raise Exception("Verification failed")
@@ -443,8 +447,9 @@ class Pssst:
 
         """
         response = request("GET", "%s/%s" % (self.api, path),
-            headers={"user-agent": repr(self)},
-            verify=False
+            headers={
+                "user-agent": repr(self)
+            }
         )
 
         if response.status_code != 200:
@@ -463,11 +468,11 @@ class Pssst:
 
         """
         if not box:
-            body = {"key": self.store.key.public()}
+            body = {"key": self.keys.key.public()}
         else:
             body = None
 
-        self.__api("POST", Name(self.store.user, box).path, body)
+        self.__api("POST", Pssst.Name(self.user, box).path, body)
 
     def delete(self, box=None):
         """
@@ -481,13 +486,13 @@ class Pssst:
         Notes
         -----
         If the user was deleted, the object can not be used any further and
-        any API call wil result in an error. The key store is also deleted.
+        any API call wil result in an error. The key storage is also deleted.
 
         """
-        self.__api("DELETE", Name(self.store.user, box).path)
+        self.__api("DELETE", Pssst.Name(self.user, box).path)
 
         if not box:
-            self.store.delete()
+            self.keys.delete()
 
     def find(self, user):
         """
@@ -521,7 +526,7 @@ class Pssst:
             List of user boxes.
 
         """
-        return self.__api("GET", self.store.user + "/list")
+        return self.__api("GET", self.user + "/list")
 
     def pull(self, box=None):
         """
@@ -535,59 +540,82 @@ class Pssst:
         Returns
         -------
         tuple or None
-            The name, time and message, None if empty.
+            The user name, time and message, None if empty.
 
         """
-        body = self.__api("GET", Name(self.store.user, box).path)
+        data = self.__api("GET", Pssst.Name(self.user, box).path)
 
-        if not body:
-            return None # Box is empty
+        if data:
+            head = data["head"]
 
-        meta = body["meta"]
+            user = str(head["user"])
+            time = int(head["time"])
 
-        name = str(meta["name"])
-        time = int(meta["time"])
+            nonce = _decode64(head["nonce"])
+            body = _decode64(data["body"])
 
-        data = _decode64(body["data"])
-        once = _decode64(meta["once"])
+            message = self.keys.key.decrypt(body, nonce)
 
-        message = self.store.key.decrypt(data, once)
+            return (user, time, message)
 
-        return (name, time, message)
-
-    def push(self, usernames, message):
+    def push(self, receivers, message):
         """
         Pushes a message into a box.
 
         Parameters
         ----------
-        param usernames : list of strings
+        param receivers : list of strings
             List of user names.
         param message : byte string
             The message.
 
         """
-        for user, box in [Name(username).full for username in usernames]:
+        for user, box in [Pssst.Name(name).all for name in receivers]:
 
-            if user not in self.store.list():
-                self.store.save(user, self.find(user)) # Add public key
+            # Cache public key
+            if user not in self.keys.list():
+                self.keys.save(user, self.find(user))
 
-            data, once = Pssst.Key(self.store.load(user)).encrypt(message)
+            data, nonce = Pssst._Key(self.keys.load(user)).encrypt(message)
 
-            once = _encode64(once)
-            data = _encode64(data)
+            nonce = _encode64(nonce)
+            body = _encode64(data)
 
-            meta = {
-                "name": self.store.user,
-                "once": once
-            }
+            head = {"user": self.user, "nonce": nonce}
+            data = {"head": head, "body": body}
 
-            body = {
-                "meta": meta,
-                "data": data
-            }
+            self.__api("PUT", Pssst.Name(user, box).path, data)
 
-            self.__api("PUT", Name(user, box).path, body)
+
+def shell(intro, prompt="pssst"):
+    """
+    Starts an interactive shell.
+
+    Parameters
+    ----------
+    param intro : string
+        The shell intro.
+    param prompt : string, optional (default is pssst)
+        The shell prompt.
+
+    """
+    print(intro)
+    print('Use "exit" to close the shell.')
+
+    while True:
+        line = raw_input("> %s " % prompt)
+        args = line.split()
+
+        if not line:
+            continue
+
+        if args[0] in ("exit", "quit"):
+            break
+
+        result = main(prompt, *args)
+
+        if not isinstance(result or 0, int):
+            print(result)
 
 
 def usage(text, *args):
@@ -612,7 +640,7 @@ def usage(text, *args):
         if os.name in ["posix"]:
 
             # Color description
-            if re.match("^  CLI", line):
+            if re.match("^.* version \d+\.\d+\.\d+$", line):
                 line = line.replace("version", "version\x1B[34;1m")
                 line = "\x1B[39;1m%s\x1B[0m" % line
 
@@ -631,17 +659,18 @@ def usage(text, *args):
 def main(script, command="--help", username=None, receiver=None, *message):
     """
           ________               ___
-         /  ___  /______________/  /_
-        /  /__/ / ___/ ___/ ___/  __/
-       /  _____/__  /__  /__  /  /_
-      /__/    /____/____/____/\___/
+         /  ___  /______________/  /__
+        /  /__/ / ___/ ___/ ___/  ___/
+       /  _____/__  /__  /__  /  /__
+      /__/    /____/____/____/\____/
 
       CLI version %s
 
     Usage:
-      %s [option|command] [username:password] [receiver] [message|filename]
+      %s [option|command] [username:password] [receiver message...]
 
     Options:
+      -s --shell     Run as interactive shell
       -h --help      Shows this text
       -l --license   Shows license
       -v --version   Shows version
@@ -657,12 +686,12 @@ def main(script, command="--help", username=None, receiver=None, *message):
     """
     try:
         if username:
-            name = Name(username)
+            name = Pssst.Name(username)
 
-        if username and not name.password:
-            name.password = getpass("Password (will be hidden): ")
+        if username and not hasattr(Pssst, "cli"):
+            Pssst.cli = Pssst(name.user, name.password or getpass())
 
-        if command in ("/?", "-h", "--help"):
+        if command in ("/?", "-h", "--help", "help"):
             usage(main.__doc__, __version__, os.path.basename(script))
 
         elif command in ("-l", "--license"):
@@ -671,49 +700,46 @@ def main(script, command="--help", username=None, receiver=None, *message):
         elif command in ("-v", "--version"):
             print("Pssst CLI " + __version__)
 
+        elif command in ("-s", "--shell") and username:
+            shell("Pssst Shell " + __version__ + " for " + name.user)
+
         elif command in ("--create", "create") and username:
-            Pssst(name.user, name.password).create(name.box)
+            Pssst.cli.create(name.box)
             print("Created %s" % name)
 
         elif command in ("--delete", "delete") and username:
-            Pssst(name.user, name.password).delete(name.box)
+            Pssst.cli.delete(name.box)
             print("Deleted %s" % name)
 
         elif command in ("--list", "list") and username:
-            print("\n".join(Pssst(name.user, name.password).list()))
+            print("\n".join(Pssst.cli.list()))
 
         elif command in ("--pull", "pull") and username:
-            data = Pssst(name.user, name.password).pull(name.box)
+            data = Pssst.cli.pull(name.box)
 
             if data:
-                name, time, message = data
-                print("%s -- %s, %s" % (
-                    message.decode("utf-8"), Name(name),
-                    datetime.fromtimestamp(time)
-                ))
+                user, time, message = data
+                username = Pssst.Name(user)
+                print(message.decode("utf-8"))
+                print("%s, %s" % (username, datetime.fromtimestamp(time)))
 
         elif command in ("--push", "push") and username and receiver:
-            data = " ".join(message)
-
-            if os.path.exists(data):
-                data = io.open(data, "rb").read()
-
-            Pssst(name.user, name.password).push([receiver], data)
+            Pssst.cli.push([receiver], " ".join(message))
             print("Message pushed")
 
         else:
-            print("Unknown command: " + command)
-            print("Please use -h for help on commands.")
+            print("Unknown command or username not given: " + command)
+            print("Please use --help for help on commands.")
             return 2 # Incorrect usage
 
     except KeyboardInterrupt:
-        print("Exit")
+        print("exit")
 
     except ConnectionError:
-        return "Could not connect to API"
+        return "Error: API connection failed"
 
     except Timeout:
-        return "Connection timeout"
+        return "Error: API connection timeout"
 
     except Exception as ex:
         return "Error: %s" % ex

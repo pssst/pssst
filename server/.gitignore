@@ -1,7 +1,6 @@
-*.crt
-*.key
+id_rsa
+id_rsa.cert
 *.log
-*.pub
-key
 config.json
 node_modules/
+www/
