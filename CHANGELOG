@@ -3,8 +3,10 @@
 * Changed CLI unit test command line handling
 * Changed CLI/GUI usage text
 * Changed CLI error handling
+* Changed CLI default encoding
 * Changed example scripts error handling
 * Updated Travis CI Python version
+* Updated README.md
 
 0.2.37
 * Refactored server

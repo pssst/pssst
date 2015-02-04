@@ -54,11 +54,11 @@ __all__, __version__ = ["Pssst"], "0.2.38"
 
 
 def _encode64(data): # Utility shortcut
-    return base64.b64encode(data).decode("ascii")
+    return base64.b64encode(data).decode("utf-8")
 
 
 def _decode64(data): # Utility shortcut
-    return base64.b64decode(data.encode("ascii"))
+    return base64.b64decode(data.encode("utf-8"))
 
 
 class Pssst:
@@ -257,7 +257,7 @@ class Pssst:
             return data
 
         def verify(self, data, timestamp, signature):
-            current, data = int(round(time.time())), data.encode("ascii")
+            current, data = int(round(time.time())), data.encode("utf-8")
 
             hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
@@ -268,7 +268,7 @@ class Pssst:
                 return False
 
         def sign(self, data):
-            current, data = int(round(time.time())), data.encode("ascii")
+            current, data = int(round(time.time())), data.encode("utf-8")
 
             hmac = HMAC.new(str(current).encode("ascii"), data, SHA512)
             hmac = SHA512.new(hmac.digest())
