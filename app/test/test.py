@@ -114,16 +114,16 @@ def test_aes_decrypt(data=DATA, nonce=NONCE):
     """
     AES Decrypt (256 Bit, CFB8 Mode, No Padding)
     """
-    data = base64.b64decode(test_aes_encrypt(data, once)[0])
+    data = base64.b64decode(test_aes_encrypt(data, nonce)[0])
     return AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).decrypt(data)
 
 
-def test_rsa_private(key=KEY):
+def test_rsa_private(key=KEY, password=NONCE):
     """
-    RSA Private Key (1024 Bit, PEM format)
+    RSA Private Key (1024 Bit, PEM format, PKCS #8)
     """
     key = RSA.importKey(key)
-    key = key.exportKey("PEM", None)
+    key = key.exportKey("PEM", password, 8)
     return key, len(key)
 
 
@@ -136,7 +136,7 @@ def test_rsa_public(key=KEY):
     return key, len(key)
 
 
-def test_rsa_encrypt(key=KEY, nonce=ONCE):
+def test_rsa_encrypt(key=KEY, nonce=NONCE):
     """
     RSA Encrypt (PKCS #1, OAEP)
     """
