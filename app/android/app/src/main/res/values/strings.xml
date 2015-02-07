@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Pssst</string>
+    <string name="action_write">Send Message</string>
+    <string name="action_create_box">Create Box</string>
+    <string name="action_delete_box">Delete Box</string>
+    <string name="action_delete_user">Delete User</string>
+    <string name="action_logout">Logout</string>
+    <string name="button_create">Create</string>
+    <string name="button_login">Login</string>
+    <string name="button_send">Send</string>
+    <string name="hint_username">Username</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_receiver">Username</string>
+    <string name="hint_message">…</string>
+    <string name="alert_delete_box">Delete this box?</string>
+    <string name="alert_delete_user">Delete this user?</string>
+</resources>
