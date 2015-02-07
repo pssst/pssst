@@ -1,5 +1,6 @@
 0.2.38
 * Refactored Android app
+* Fixed bug in test.py script
 * Fixed optimize bug in makeexe script
 * Changed CLI unit test command line handling
 * Changed CLI/GUI usage text
