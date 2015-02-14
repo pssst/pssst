@@ -29,21 +29,28 @@ namespace pssst.Api.Interface
         /// <summary>
         /// Gets the name.
         /// </summary>
-        public string Name { get; private set; }
+        public string Name { get; set; }
 
-        public string Box { get; private set; }
+        public string Box { get; set; }
 
-        public string Password { get; private set; }
+        public string Password { get; set; }
 
         /// <summary>
         /// Gets the private key.
         /// </summary>
-        public string PrivateKey { get; private set; }
+        public string PrivateKey { get; set; }
 
         /// <summary>
         /// Gets the public key.
         /// </summary>
-        public string PublicKey { get; private set; }
+        public string PublicKey { get; set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="User"/> class.
+        /// </summary>
+        public User()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="User"/> class.
