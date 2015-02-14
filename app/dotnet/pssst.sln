@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pssst.Api", "pssst.Api\psss
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pssst.Api.Tests.Unit", "pssst.Api.Tests.Unit\pssst.Api.Tests.Unit.csproj", "{0B3EB0AB-A3EC-45E1-96B2-3D6E6FE82F5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pssst.Cli", "pssst.Cli\pssst.Cli.csproj", "{397955D7-511E-4F82-9400-75E547B83370}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{0B3EB0AB-A3EC-45E1-96B2-3D6E6FE82F5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B3EB0AB-A3EC-45E1-96B2-3D6E6FE82F5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B3EB0AB-A3EC-45E1-96B2-3D6E6FE82F5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{397955D7-511E-4F82-9400-75E547B83370}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{397955D7-511E-4F82-9400-75E547B83370}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{397955D7-511E-4F82-9400-75E547B83370}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{397955D7-511E-4F82-9400-75E547B83370}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
