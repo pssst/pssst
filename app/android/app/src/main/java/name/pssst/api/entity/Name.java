@@ -23,7 +23,7 @@ import name.pssst.api.PssstException;
  * Pssst canonical name parser.
  */
 public final class Name {
-    private static final String PATTERN = "^(pssst\\.)?\\w{2,63}(\\.\\w{2,63})?(:\\S*)?$";
+    private static final String PATTERN = "^(pssst\\.)?\\w{2,63}(\\.\\w{2,63})?$";
     private static final String SERVICE = "pssst";
 
     protected final String mUser;
@@ -76,7 +76,7 @@ public final class Name {
      */
     @Override
     public final String toString() {
-        if (mBox != null && !mBox.isEmpty()) {
+        if (!mBox.isEmpty()) {
             return String.format(SERVICE + ".%s.%s", mUser, mBox);
         } else {
             return String.format(SERVICE + ".%s", mUser);

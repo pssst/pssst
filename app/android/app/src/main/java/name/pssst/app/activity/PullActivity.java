@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package name.pssst.app;
+package name.pssst.app.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,11 +26,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,7 +44,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,23 +51,27 @@ import java.util.Calendar;
 import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
 import name.pssst.api.entity.Message;
+import name.pssst.api.entity.Name;
+import name.pssst.app.App;
+import name.pssst.app.R;
 
-import static name.pssst.app.R.layout.activity_list;
+import static name.pssst.app.R.layout.activity_pull;
 import static name.pssst.app.R.layout.fragment_message;
 
 /**
  * List messages activity.
  */
-public class ListActivity extends Activity {
-    private static final int PULL_DELAY_ACTIVE = 3000; // Milliseconds
-    private static final int PULL_DELAY_PAUSED = 3000; // Milliseconds
+public class PullActivity extends Activity {
+    private String mBox;
 
-    private final ArrayList<Message> mMessages = new ArrayList<>();
-
+    private App mApp;
     private Pssst mPssst;
     private Handler mHandler;
     private MessageAdapter mAdapter;
-    private int delay = PULL_DELAY_ACTIVE;
+
+    private int pull_interval_active;
+    private int pull_interval_paused;
+    private int delay;
 
     private NotificationManager mNotificationManager;
     private ConnectivityManager mConnectivityManager;
@@ -78,25 +83,27 @@ public class ListActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(activity_list);
+        setContentView(activity_pull);
 
-        mPssst = ((App) getApplication()).getPssstInstance();
-        mAdapter = new MessageAdapter(this, mMessages);
+        mApp = (App) getApplication();
+        mPssst = mApp.getPssstInstance();
+        mAdapter = new MessageAdapter(this, mApp.getPssstMessages());
 
         //noinspection ConstantConditions
         getActionBar().setTitle(mPssst.getUsername());
+        getActionBar().setDisplayShowHomeEnabled(true);
+        getActionBar().setIcon(R.mipmap.ic_launcher);
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mConnectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
-        final ListView content = (ListView) findViewById(R.id.content);
-        content.setAdapter(mAdapter);
-        content.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
+        final ListView messages = (ListView) findViewById(R.id.messages);
+        messages.setAdapter(mAdapter);
+        messages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                final Message message = (Message) content.getItemAtPosition(position);
-                final Intent intent = new Intent(ListActivity.this, SendActivity.class);
+                final Message message = (Message) messages.getItemAtPosition(position);
+                final Intent intent = new Intent(PullActivity.this, PushActivity.class);
 
                 try {
                     intent.putExtra("receiver", message.getUsername());
@@ -108,41 +115,91 @@ public class ListActivity extends Activity {
             }
         });
 
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        pull_interval_active = Integer.parseInt(preferences.getString("APP_PULL_INTERVAL_ACTIVE", "")) * 1000;
+        pull_interval_paused = Integer.parseInt(preferences.getString("APP_PULL_INTERVAL_PAUSED", "")) * 1000;
+        mBox = preferences.getString("APP_DEFAULT_BOX", Pssst.getDefaultBox());
+
+        if (!mBox.equals(Pssst.getDefaultBox())) {
+            try {
+                getActionBar().setTitle(new Name(mPssst.getUsername(), mBox).toString());
+            } catch (PssstException e) {
+                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+
+        delay = pull_interval_active;
+
         mHandler = new Handler();
         mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                pullMessage();
-                mHandler.postDelayed(this, delay);
+                if (mPssst != null) {
+                    mHandler.postDelayed(this, delay);
+                    pullMessage();
+                }
             }
         }, delay);
     }
 
+    /**
+     * Creates the options menu.
+     * @param menu Menu
+     * @return True
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_pull, menu);
         return true;
     }
 
+    /**
+     * Stops the message pull handler.
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mHandler.removeCallbacks(null);
+    }
+
+    /**
+     * Sets the paused pull interval.
+     */
     @Override
     public void onPause() {
-        App.setIsVisible(false);
-        delay = PULL_DELAY_PAUSED;
         super.onPause();
+        mApp.setIsVisible(false);
+        delay = pull_interval_paused;
     }
 
+    /**
+     * Sets the active pull interval.
+     */
     @Override
     public void onResume() {
-        App.setIsVisible(true);
-        delay = PULL_DELAY_ACTIVE;
         super.onResume();
+        mApp.setIsVisible(true);
+        delay = pull_interval_active;
     }
 
+    /**
+     * Logs out the current user.
+     */
+    @Override
+    public void onBackPressed() {
+        confirmLogout();
+    }
+
+    /**
+     * Handles the selected menu option.
+     * @param item Menu item
+     * @return Result
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_write:
-                startActivity(new Intent(this, SendActivity.class));
+                startActivity(new Intent(this, PushActivity.class));
                 return true;
 
             case R.id.action_delete_user:
@@ -164,10 +221,10 @@ public class ListActivity extends Activity {
     private void addMessage(Message message) {
         mAdapter.addMessage(message);
 
-        if (!App.getIsVisible()) {
+        if (!mApp.getIsVisible()) {
             try {
-                final Intent intent = new Intent(this, StartActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                final Intent intent = new Intent(this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
                 final Notification newMessage = new Notification.Builder(this)
                         .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
@@ -198,7 +255,7 @@ public class ListActivity extends Activity {
     }
 
     /**
-     * Confirm the deletion of the logged in user.
+     * Confirm the deletion of the current user.
      */
     private void confirmDeleteUser() {
         new AlertDialog.Builder(this)
@@ -215,11 +272,31 @@ public class ListActivity extends Activity {
     }
 
     /**
+     * Confirm the logout of the current user.
+     */
+    private void confirmLogout() {
+        new AlertDialog.Builder(this)
+                .setTitle(getResources().getString(R.string.app_name))
+                .setMessage(getResources().getString(R.string.alert_logout))
+                .setNegativeButton("No", null)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        logout();
+                    }
+                })
+                .show();
+    }
+
+    /**
      * Logs out the user and closes the application.
      */
     private void logout() {
-        ((App) getApplication()).setPssstInstance(null);
-        finish();
+        mNotificationManager.cancelAll();
+        mApp.clearPssstData();
+        mPssst = null;
+
+        finishAffinity();
     }
 
     /**
@@ -258,16 +335,18 @@ public class ListActivity extends Activity {
                 convertView = inflater.inflate(fragment_message, null);
             }
 
-            final TextView head = (TextView) convertView.findViewById(R.id.head);
-            final TextView body = (TextView) convertView.findViewById(R.id.body);
+            final TextView data = (TextView) convertView.findViewById(R.id.data);
+            final TextView user = (TextView) convertView.findViewById(R.id.user);
+            final TextView time = (TextView) convertView.findViewById(R.id.time);
 
             final SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
             format.setTimeZone(Calendar.getInstance().getTimeZone());
 
             try {
-                head.setText(String.format("%s, %s", message.getUsername(), format.format(message.getTimestamp())));
-                body.setText(message.getText());
-            } catch (PssstException | UnsupportedEncodingException e) {
+                data.setText(message.getMessage());
+                user.setText(message.getUsername());
+                time.setText(format.format(message.getTimestamp()));
+            } catch (PssstException e) {
                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
             }
 
@@ -284,12 +363,14 @@ public class ListActivity extends Activity {
      * Delete user task.
      */
     private class DeleteUserTask extends AsyncTask<Pssst, Void, Boolean> {
+        private final String mUser = mPssst.getUsername();
+
         private ProgressDialog mProgress;
         private String mResult = null;
 
         @Override
         protected void onPreExecute() {
-            mProgress = ProgressDialog.show(ListActivity.this, null, "Deleting...", true);
+            mProgress = ProgressDialog.show(PullActivity.this, null, String.format("Deleting %s", mUser), true);
         }
 
         @Override
@@ -326,7 +407,7 @@ public class ListActivity extends Activity {
         @Override
         protected Message doInBackground(Pssst... pssst) {
             try {
-                return pssst[0].pull();
+                return pssst[0].pull(mBox);
             } catch (PssstException e) {
                 mResult = e.getMessage();
                 return null;

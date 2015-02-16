@@ -22,53 +22,110 @@ import android.test.AndroidTestCase;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
-import name.pssst.api.internal.RequestProvider;
 
 /**
  * API unit tests
  */
-public class ApiTest extends AndroidTestCase {
-    @SuppressLint("SdCardPath")
-    private final static String DIRECTORY = "/data/data/name.pssst.app/files/";
-    private final static String ALPHABET = "abcdefghijklmnopqrstuvwxyz0123456789";
+@SuppressLint("SdCardPath")
+public final class ApiTest extends AndroidTestCase {
+    private final static String USER_DIRECTORY = "/data/data/name.pssst.app/files"; // TODO: Create own test directory
+    private final static String SERVER_ADDRESS = "https://dev.pssst.name";
 
     private final List<String> usernames = new ArrayList<>();
 
     /**
-     * Generic API test.
+     * Generic test for the API create command.
      * @throws PssstException
      */
-    public void test_api() throws PssstException {
-        final String username = createUsername();
-        final String password = createPassword();
+    public void test_api_command_create() throws PssstException {
+        final Pssst pssst = createInstance();
 
-        final Pssst pssst = new Pssst(username, password);
-
-        // Command CREATE
         pssst.create();
         pssst.create("test");
+    }
 
-        // Command FIND
-        pssst.find(username);
+    /**
+     * Generic test for the API delete command.
+     * @throws PssstException
+     */
+    public void test_api_command_delete() throws PssstException {
+        final Pssst pssst = createInstance();
 
-        // Command LIST
-        pssst.list();
-
-        // Command PUSH
-        pssst.push(username, "Test Android");
-
-        // Command PULL
-        pssst.pull();
-        pssst.pull();
-
-        // Command DELETE
+        pssst.create();
+        pssst.create("test");
         pssst.delete("test");
         pssst.delete();
+    }
+
+    /**
+     * Generic test for the API find command.
+     * @throws PssstException
+     */
+    public void test_api_command_find() throws PssstException {
+        final Pssst pssst = createInstance();
+
+        pssst.create();
+        pssst.find(pssst.getUsername());
+    }
+
+    /**
+     * Generic test for the API list command.
+     * @throws PssstException
+     */
+    public void test_api_command_list() throws PssstException {
+        final Pssst pssst = createInstance();
+
+        pssst.create();
+        pssst.list();
+    }
+
+    /**
+     * Generic test for the API push command.
+     * @throws PssstException
+     */
+    public void test_api_command_push() throws PssstException {
+        final Pssst pssst = createInstance();
+
+        pssst.create();
+        pssst.push(pssst.getUsername(), "test");
+    }
+
+    /**
+     * Generic test for the API pull command.
+     * @throws PssstException
+     */
+    public void test_api_command_pull() throws PssstException {
+        final Pssst pssst = createInstance();
+
+        pssst.create();
+        pssst.push(pssst.getUsername(), "test");
+        pssst.pull();
+        pssst.pull();
+    }
+
+    /**
+     * Generic test with fuzzy binary data.
+     * @throws PssstException
+     */
+    public void test_api_fuzzy() throws PssstException {
+        final Pssst pssst = createInstance();
+        final Random random = new Random();
+
+        pssst.create();
+
+        for (double exp = 0; exp <= 13; exp++) {
+            final byte[] blob = new byte[(int) Math.pow(2.0, exp)];
+
+            random.nextBytes(blob);
+            pssst.push(pssst.getUsername(), blob);
+            assertTrue(Arrays.equals(blob, pssst.pull().getRawData()));
+        }
     }
 
     /**
@@ -77,12 +134,8 @@ public class ApiTest extends AndroidTestCase {
      */
     @Override
     protected void setUp() throws Exception {
-        Pssst.setServer("http://dev.pssst.name");
-
-        // Warm up RequestProvider
-        while (true) {
-            if (!(RequestProvider.requestUrl("key").getText().isEmpty())) break;
-        }
+        Pssst.setServer(SERVER_ADDRESS);
+        Pssst.setDirectory(USER_DIRECTORY);
     }
 
     /**
@@ -92,44 +145,40 @@ public class ApiTest extends AndroidTestCase {
     @Override
     protected void tearDown() throws Exception {
         for (String username: usernames) {
-            final File file = new File(String.format("%s.pssst.%s", DIRECTORY, username));
+            final File file = new File(String.format("%s/.pssst.%s", USER_DIRECTORY, username));
 
             if (file.exists() && !file.delete()) {
-                throw new Exception("File could not deleted");
+                throw new Exception("File could not be deleted");
             }
         }
     }
 
     /**
-     * Returns a new random user name.
-     * @return User name
+     * Returns a new Pssst instance.
+     * @return Pssst instance
+     * @throws PssstException
      */
-    private String createUsername() {
-        final String username = randomString(16);
+    private Pssst createInstance() throws PssstException {
+        final String username = getRandomString(16);
+        final String password = getRandomString(16);
 
         usernames.add(username);
 
-        return username;
-    }
-
-    /**
-     * Returns a new random password.
-     * @return Password
-     */
-    private String createPassword() {
-        return randomString(16);
+        return new Pssst(username, password);
     }
 
     /**
      * Returns a new random string.
+     * @param length String length
      * @return String
      */
-    private String randomString(int length) {
+    private String getRandomString(int length) {
+        final String alphabet = "abcdefghijklmnopqrstuvwxyz0123456789";
         final StringBuilder builder = new StringBuilder();
         final Random random = new Random();
 
         for (int i = 0; i < length; i++) {
-            builder.append(ALPHABET.charAt(random.nextInt(ALPHABET.length())));
+            builder.append(alphabet.charAt(random.nextInt(alphabet.length())));
         }
 
         return builder.toString();

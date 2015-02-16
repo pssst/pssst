@@ -17,8 +17,6 @@
 
 package name.pssst.api.entity;
 
-import org.apache.http.protocol.HTTP;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
 
@@ -28,6 +26,8 @@ import name.pssst.api.PssstException;
  * Pssst message.
  */
 public final class Message {
+    private static final String DEFAULT_ENCODING = "UTF_8";
+
     protected final byte[] mData;
     protected final String mUser;
     protected final long mTime;
@@ -45,12 +45,26 @@ public final class Message {
     }
 
     /**
-     * Returns the message data as text.
+     * Returns the message data as text with the given encoding.
+     * @param encoding Encoding
      * @return Message text
-     * @throws UnsupportedEncodingException
+     * @throws PssstException
      */
-    public final String getText() throws UnsupportedEncodingException {
-        return new String(mData, HTTP.UTF_8);
+    public final String getMessage(String encoding) throws PssstException {
+        try {
+            return new String(mData, encoding);
+        } catch (UnsupportedEncodingException e) {
+            throw new PssstException("Encoding invalid", e);
+        }
+    }
+
+    /**
+     * Returns the message data as text with the default encoding.
+     * @return Message text
+     * @throws PssstException
+     */
+    public final String getMessage() throws PssstException {
+        return getMessage(DEFAULT_ENCODING);
     }
 
     /**
@@ -68,5 +82,29 @@ public final class Message {
      */
     public final Date getTimestamp() {
         return new Date(mTime * 1000);
+    }
+
+    /**
+     * Returns the message raw data.
+     * @return Raw data
+     */
+    public final byte[] getRawData() {
+        return mData;
+    }
+
+    /**
+     * Returns the message raw user.
+     * @return Raw user
+     */
+    public final String getRawUser() {
+        return mUser;
+    }
+
+    /**
+     * Returns the message raw time.
+     * @return Raw time
+     */
+    public final long getRawTime() {
+        return mTime;
     }
 }

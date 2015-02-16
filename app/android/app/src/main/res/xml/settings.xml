@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/pref_app_title"
+        android:key="APP_SETTINGS">
+        <EditTextPreference
+            android:key="APP_DEFAULT_BOX"
+            android:icon="@drawable/ic_action_box"
+            android:title="@string/pref_app_default_box"
+            android:summary=""
+            android:defaultValue="box" />
+        <EditTextPreference
+            android:key="APP_PULL_INTERVAL_ACTIVE"
+            android:icon="@drawable/ic_action_interval"
+            android:title="@string/pref_app_pull_interval_active"
+            android:summary=""
+            android:numeric="integer"
+            android:defaultValue="2" />
+        <EditTextPreference
+            android:key="APP_PULL_INTERVAL_PAUSED"
+            android:icon="@drawable/ic_action_interval"
+            android:title="@string/pref_app_pull_interval_paused"
+            android:summary=""
+            android:numeric="integer"
+            android:defaultValue="5" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="@string/pref_api_title"
+        android:key="API_SETTINGS">
+        <EditTextPreference
+            android:key="API_SERVER_ADDRESS"
+            android:icon="@drawable/ic_action_server"
+            android:title="@string/pref_api_server_address"
+            android:summary=""
+            android:defaultValue="https://api.pssst.name" />
+    </PreferenceCategory>
+</PreferenceScreen>

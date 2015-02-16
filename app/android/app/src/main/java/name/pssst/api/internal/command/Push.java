@@ -30,7 +30,7 @@ import name.pssst.api.internal.entity.AesData;
 /**
  * Internal API push command.
  */
-public class Push {
+public final class Push {
     private final String mUser;
     private final String mReceiver;
     private final String mBox;

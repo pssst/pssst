@@ -32,7 +32,7 @@ import name.pssst.api.internal.entity.AesData;
 /**
  * Internal API pull command.
  */
-public class Pull {
+public final class Pull {
     private final String mUser;
     private final String mBox;
 

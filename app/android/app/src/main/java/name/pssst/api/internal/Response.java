@@ -17,50 +17,49 @@
 
 package name.pssst.api.internal;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 
 import name.pssst.api.PssstException;
 
 /**
  * Internal class for API responses.
  */
-public class Response {
-    private final HttpResponse mResponse;
-    private final HttpEntity mEntity;
-    private String mContent = null;
+public final class Response {
+    private static final String API_ENCODING = "UTF_8";
+    private static final int BUFFER_SIZE = 8192;
+
+    private HttpURLConnection mConnection;
+    private String mBody = "";
 
     /**
      * Constructs a new response.
-     * @param response Response
+     * @param connection HTTP/S connection
+     * @throws PssstException
      */
-    public Response(HttpResponse response) {
-        mResponse = response;
-        mEntity = response.getEntity();
-    }
+    public Response(HttpURLConnection connection) throws PssstException {
+        mConnection = connection;
 
-    /**
-     * Returns the header data.
-     * @param name Header name
-     * @return Content hash
-     */
-    public final String getHeader(String name) {
-        return mResponse.getFirstHeader(name).getValue();
-    }
-
-    /**
-     * Returns the response status code.
-     * @return Status code
-     */
-    public final int getStatusCode() {
-        return mResponse.getStatusLine().getStatusCode();
+        try {
+            try {
+                mBody = readStream(connection.getInputStream());
+            } catch (IOException e) {
+                mBody = readStream(connection.getErrorStream());
+                throw new PssstException(mBody, e);
+            } finally {
+                connection.disconnect();
+            }
+        } catch (IOException e) {
+            throw new PssstException("Connection failed", e);
+        }
     }
 
     /**
@@ -69,7 +68,29 @@ public class Response {
      * @throws PssstException
      */
     public final boolean isEmpty() throws PssstException {
-        return (mEntity == null || mEntity.getContentLength() == 0);
+        return mBody.isEmpty();
+    }
+
+    /**
+     * Returns the header data.
+     * @param field Header field
+     * @return Header data
+     */
+    public final String getHeader(String field) {
+        return mConnection.getHeaderField(field);
+    }
+
+    /**
+     * Returns the response status code.
+     * @return Status code
+     * @throws PssstException
+     */
+    public final int getStatusCode() throws PssstException {
+        try {
+            return mConnection.getResponseCode();
+        } catch (IOException e) {
+            throw new PssstException("Connection failed", e);
+        }
     }
 
     /**
@@ -78,7 +99,7 @@ public class Response {
      * @throws PssstException
      */
     public final String getText() throws PssstException {
-        return parserContent();
+        return mBody;
     }
 
     /**
@@ -88,7 +109,7 @@ public class Response {
      */
     public final byte[] getBytes() throws PssstException {
         try {
-            return parserContent().getBytes(HTTP.UTF_8);
+            return mBody.getBytes(API_ENCODING);
         } catch (UnsupportedEncodingException e) {
             throw new PssstException("Encoding invalid", e);
         }
@@ -101,27 +122,40 @@ public class Response {
      */
     public final JSONObject getJson() throws PssstException {
         try {
-            return new JSONObject(parserContent());
+            return new JSONObject(mBody);
         } catch (JSONException e) {
             throw new PssstException("JSON invalid", e);
         }
     }
 
     /**
-     * Returns the response buffered content.
-     * @return Content
+     * Returns the stream data as a string.
+     * @param inputStream Input stream
+     * @return Stream data
      * @throws PssstException
+     * @throws IOException
      */
-    private String parserContent() throws PssstException {
+    private String readStream(InputStream inputStream) throws PssstException, IOException {
+        final BufferedInputStream stream;
+        final BufferedReader reader;
+        final StringBuilder buffer;
+
         try {
-            if (mContent == null && mEntity != null) {
-                return mContent = EntityUtils.toString(mEntity, HTTP.UTF_8);
-            } else if (mContent == null) {
-                return mContent = "";
-            } else {
-                return mContent;
+            stream = new BufferedInputStream(inputStream);
+            reader = new BufferedReader(new InputStreamReader(stream, API_ENCODING));
+            buffer = new StringBuilder();
+
+            int count; char[] chunk = new char[BUFFER_SIZE];
+
+            while ((count = reader.read(chunk)) != -1) {
+                buffer.append(chunk, 0, count);
             }
-        } catch (IOException e) {
+
+            reader.close();
+            stream.close();
+
+            return buffer.toString();
+        } catch (UnsupportedEncodingException e) {
             throw new PssstException("Encoding invalid", e);
         }
     }

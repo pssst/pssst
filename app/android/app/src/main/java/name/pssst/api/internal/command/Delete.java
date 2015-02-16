@@ -24,7 +24,7 @@ import name.pssst.api.internal.RequestProvider;
 /**
  * Internal API delete command.
  */
-public class Delete {
+public final class Delete {
     private final String mUser;
     private final String mBox;
 

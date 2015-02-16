@@ -27,6 +27,7 @@ import org.spongycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.spongycastle.openssl.jcajce.JcaPEMWriter;
 import org.spongycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.spongycastle.openssl.jcajce.JcePEMEncryptorBuilder;
+import org.spongycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -35,6 +36,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.Signature;
@@ -61,6 +63,9 @@ public final class Key {
     private static final int AES_IV_SIZE = 16;
     private static final int NONCE_SIZE = AES_KEY_SIZE + AES_IV_SIZE;
 
+    private static final String RSA_ALGORITHM = "RSA";
+    private static final String AES_ALGORITHM = "AES";
+    private static final String SHA_ALGORITHM = "SHA1";
     private static final String RSA_SIGNATURE = "SHA512withRSA";
     private static final String RSA_CIPHER = "RSA/ECB/OAEPWithSHA1AndMGF1Padding";
     private static final String AES_CIPHER = "AES/CFB8/NOPADDING";
@@ -107,12 +112,26 @@ public final class Key {
         final KeyPairGenerator generator;
 
         try {
-            generator = KeyPairGenerator.getInstance("RSA");
+            generator = KeyPairGenerator.getInstance(RSA_ALGORITHM);
             generator.initialize(RSA_KEY_SIZE, new SecureRandom());
 
             return new Key(generator.generateKeyPair());
         } catch (NoSuchAlgorithmException e) {
             throw new PssstException("Generator not found", e);
+        }
+    }
+
+    /**
+     * Returns the key fingerprint.
+     * @param data Key data
+     * @return Fingerprint
+     * @throws PssstException
+     */
+    public static String fingerprint(String data) throws PssstException {
+        try {
+            return Hex.toHexString(MessageDigest.getInstance(SHA_ALGORITHM).digest(data.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new PssstException("Algorithm not found", e);
         }
     }
 
@@ -251,7 +270,7 @@ public final class Key {
 
         System.arraycopy(nonce, 0, key, 0, AES_KEY_SIZE);
 
-        return new SecretKeySpec(key, "AES");
+        return new SecretKeySpec(key, AES_ALGORITHM);
     }
 
     /**

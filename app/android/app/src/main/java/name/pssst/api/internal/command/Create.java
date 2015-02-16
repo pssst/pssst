@@ -28,7 +28,7 @@ import name.pssst.api.internal.RequestProvider;
 /**
  * Internal API create command.
  */
-public class Create {
+public final class Create {
     private final String mUser;
     private final String mBox;
     private final Key mKey;

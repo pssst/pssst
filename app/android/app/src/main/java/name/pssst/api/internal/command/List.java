@@ -31,7 +31,7 @@ import name.pssst.api.internal.Response;
 /**
  * Internal API list command.
  */
-public class List {
+public final class List {
     private final String mUser;
 
     /**

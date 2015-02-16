@@ -17,25 +17,23 @@
 
 package name.pssst.api.internal;
 
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.protocol.HTTP;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-
+import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
 
 /**
  * Internal class for API requests.
  */
-public class Request {
-    private final HttpRequestBase mRequest;
+public final class Request {
+    private static final String HEADER_USER_AGENT = "user-agent";
+    private static final int SOCKET_TIMEOUT = 60 * 1000;
+
+    private final HttpURLConnection mConnection;
+    private final String mContent;
 
     public static enum Method {
         POST, GET, PUT, DELETE
@@ -44,68 +42,90 @@ public class Request {
     /**
      * Constructs a new request.
      * @param method Request method
-     * @param uri Request URI
+     * @param url Request URL
      * @param content Request content
      * @throws PssstException
      */
-    public Request(Method method, URI uri, String content) throws PssstException {
-        switch (method) {
-            case POST:
-                mRequest = new HttpPost(uri);
-                break;
+    public Request(Method method, URL url, String content) throws PssstException {
+        mContent = content;
 
-            case GET:
-                mRequest = new HttpGet(uri);
-                break;
+        try {
+            mConnection = (HttpURLConnection) url.openConnection();
+            mConnection.addRequestProperty(HEADER_USER_AGENT, String.format("Pssst %s Android", Pssst.getVersion()));
+            mConnection.setConnectTimeout(SOCKET_TIMEOUT);
+            mConnection.setReadTimeout(SOCKET_TIMEOUT);
+            mConnection.setUseCaches(false);
+            mConnection.setDoInput(true);
 
-            case PUT:
-                mRequest = new HttpPut(uri);
-                break;
+            switch (method) {
+                case POST:
+                    mConnection.setRequestMethod("POST");
+                    break;
 
-            case DELETE:
-                mRequest = new HttpDelete(uri);
-                break;
+                case GET:
+                    mConnection.setRequestMethod("GET");
+                    break;
 
-            default:
-                throw new PssstException("Method unknown");
-        }
+                case PUT:
+                    mConnection.setRequestMethod("PUT");
+                    break;
 
-        // Sets the body for POST and PUT requests
-        if (mRequest instanceof HttpEntityEnclosingRequest && content != null) {
-            final HttpEntityEnclosingRequest request = (HttpEntityEnclosingRequest) mRequest;
+                case DELETE:
+                    mConnection.setRequestMethod("DELETE");
+                    break;
 
-            try {
-                request.setEntity(new StringEntity(content, HTTP.UTF_8));
-            } catch (UnsupportedEncodingException e) {
-                throw new PssstException("Encoding invalid", e);
+                default:
+                    throw new PssstException("Method unknown");
             }
+        } catch (IOException e) {
+            throw new PssstException("Connection failed", e);
         }
     }
 
     /**
      * Constructs a new request.
      * @param method Request method
-     * @param uri Request URI
+     * @param url Request URL
      * @throws PssstException
      */
-    public Request(Method method, URI uri) throws PssstException {
-        this(method, uri, null);
-    }
-
-    /**
-     * Returns the internal request object.
-     * @return Request object
-     */
-    public HttpRequestBase getRequestBase() {
-        return mRequest;
+    public Request(Method method, URL url) throws PssstException {
+        this(method, url, null);
     }
 
     /**
      * Set request header.
-     * @param name Header name
+     * @param field Header field
      * @param value Header value
      */
-    public void setHeader(String name, String value) {
-        mRequest.setHeader(name, value);
+    public void setHeader(String field, String value) {
+        mConnection.addRequestProperty(field, value);
+    }
+
+    /**
+     * Executes the request and returns the response.
+     * @return Response
+     * @throws PssstException
+     */
+    public Response execute() throws PssstException {
+        try {
+            if (mContent != null && !mContent.isEmpty()) {
+                final byte[] body = mContent.getBytes();
+
+                mConnection.setFixedLengthStreamingMode(body.length);
+                mConnection.setDoOutput(true);
+
+                final BufferedOutputStream stream = new BufferedOutputStream(mConnection.getOutputStream());
+
+                stream.write(body);
+                stream.flush();
+                stream.close();
+            }
+
+            mConnection.connect();
+
+            return new Response(mConnection);
+        } catch (IOException e) {
+            throw new PssstException("Connection failed", e);
+        }
     }
 }

@@ -24,7 +24,7 @@ import name.pssst.api.internal.RequestProvider;
 /**
  * Internal API find command.
  */
-public class Find {
+public final class Find {
     private final String mUser;
 
     /**

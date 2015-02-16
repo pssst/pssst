@@ -17,18 +17,13 @@
 
 package name.pssst.api.internal;
 
-import android.net.http.AndroidHttpClient;
-
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONObject;
 import org.spongycastle.util.encoders.Base64;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
@@ -38,9 +33,16 @@ import name.pssst.api.internal.entity.RsaData;
  * Internal class for API calls.
  */
 public final class RequestProvider {
-    private static final String USER_AGENT = String.format("Pssst %s Android", Pssst.getVersion());
-    private static final long GRACE_TIME = 30;
-    private static final int VERSION = 1;
+    private static final String MIME_TYPE_TEXT = "text/plain";
+    private static final String MIME_TYPE_JSON = "application/json";
+    private static final String MIME_TYPE_DATA = "application/octet-stream";
+
+    private static final String HEADER_CONTENT_TYPE = "content-type";
+    private static final String HEADER_CONTENT_HASH = "content-hash";
+
+    private static final String API_ENCODING = "UTF_8";
+    private static final long API_GRACE_TIME = 30;
+    private static final int API_VERSION = 1;
 
     private final KeyStorage mKeyStorage;
 
@@ -53,19 +55,23 @@ public final class RequestProvider {
     }
 
     /**
-     * Returns the grace time.
-     * @return Grace time
-     */
-    public static long getGraceTime() {
-        return GRACE_TIME;
-    }
-
-    /**
      * Returns the key storage.
      * @return Text
      */
     public final KeyStorage getKeyStorage() {
         return mKeyStorage;
+    }
+
+    /**
+     * Checks the server time.
+     * @return Success
+     * @throws PssstException
+     */
+    public static boolean checkServerTime() throws PssstException {
+        final long serverTime = Long.parseLong(requestUrl("time").getText());
+        final long systemTime = (System.currentTimeMillis() / 1000);
+
+        return (Math.abs(serverTime - systemTime) <= API_GRACE_TIME);
     }
 
     /**
@@ -75,22 +81,14 @@ public final class RequestProvider {
      * @throws PssstException
      */
     public static Response requestUrl(String path) throws PssstException {
-        final AndroidHttpClient client = AndroidHttpClient.newInstance(USER_AGENT);
+        final Response response = new Request(Request.Method.GET, getUrl(path)).execute();
 
-        try {
-            final HttpRequestBase request = new HttpGet(getUri(path));
-            final Response response = new Response(client.execute(request));
-
-            if (response.getStatusCode() != 200) {
-                throw new PssstException("Not Found");
-            }
-
-            return response;
-        } catch (IOException e) {
-            throw new PssstException("Request failed", e);
-        } finally {
-            client.close();
+        // Assert response is valid
+        if (response.getStatusCode() != HttpURLConnection.HTTP_OK) {
+            throw new PssstException("Not Found");
         }
+
+        return response;
     }
 
     /**
@@ -109,45 +107,46 @@ public final class RequestProvider {
             throw new PssstException("User was deleted", e);
         }
 
-        final AndroidHttpClient client = AndroidHttpClient.newInstance(USER_AGENT);
+        final URL url;
+        final String content;
+        final Request request;
 
-        try {
-            final URI uri;
-            final Request request;
-            final String content;
-
-            if (path != null && !path.isEmpty()) {
-                uri = getApiUri(user, path);
-            } else {
-                uri = getApiUri(user);
-            }
-
-            if (data != null) {
-                content = encodeJson(data);
-            } else {
-                content = "";
-            }
-
-            request = new Request(method, uri, content);
-            request.setHeader("content-type", getMimeType(data));
-            request.setHeader("content-hash", buildContentHash(content));
-
-            final Response response = new Response(client.execute(request.getRequestBase()));
-
-            if (!checkContentHash(response.getBytes(), response.getHeader("content-hash"))) {
-                throw new PssstException("Verification failed");
-            }
-
-            if (response.getStatusCode() != 200 && response.getStatusCode() != 204) {
-                throw new PssstException(response.getText());
-            }
-
-            return response;
-        } catch (IOException e) {
-            throw new PssstException("API connection failed", e);
-        } finally {
-            client.close();
+        // Check for empty path
+        if (path != null && !path.isEmpty()) {
+            url = getApiUrl(user, path);
+        } else {
+            url = getApiUrl(user);
         }
+
+        // Check for empty body
+        if (data != null) {
+            content = encodeJson(data);
+        } else {
+            content = "";
+        }
+
+        request = new Request(method, url, content);
+        request.setHeader(HEADER_CONTENT_TYPE, getMimeType(data));
+        request.setHeader(HEADER_CONTENT_HASH, buildContentHash(content));
+
+        final Response response = request.execute();
+
+        // Assert response could be verified
+        if (!checkContentHash(response.getBytes(), response.getHeader(HEADER_CONTENT_HASH))) {
+            throw new PssstException("Verification failed");
+        }
+
+        // Assert response is really empty
+        if (!response.isEmpty() && response.getStatusCode() == HttpURLConnection.HTTP_NO_CONTENT) {
+            throw new PssstException("Response not empty");
+        }
+
+        // Assert response is not an error
+        if (!response.isEmpty() && response.getStatusCode() != HttpURLConnection.HTTP_OK) {
+            throw new PssstException(response.getText());
+        }
+
+        return response;
     }
 
     /**
@@ -174,38 +173,38 @@ public final class RequestProvider {
     }
 
     /**
-     * Returns the web server URI.
+     * Returns the web server URL.
      * @param path User path
-     * @return URI
+     * @return URL
      * @throws PssstException
      */
-    private static URI getUri(String path) throws PssstException {
+    private static URL getUrl(String path) throws PssstException {
         try {
-            return new URI(String.format("%s/%s", Pssst.getServer(), path));
-        } catch (URISyntaxException e) {
-            throw new PssstException("URI invalid", e);
+            return new URL(String.format("%s/%s", Pssst.getServer(), path));
+        } catch (MalformedURLException e) {
+            throw new PssstException("URL invalid", e);
         }
     }
 
     /**
-     * Returns the API call URI.
+     * Returns the API call URL.
      * @param user User name
      * @param path User path
-     * @return URI
+     * @return URL
      * @throws PssstException
      */
-    private static URI getApiUri(String user, String path) throws PssstException {
-        return getUri(String.format("%s/%s/%s", VERSION, user, path));
+    private static URL getApiUrl(String user, String path) throws PssstException {
+        return getUrl(String.format("%s/%s/%s", API_VERSION, user, path));
     }
 
     /**
-     * Returns the API call URI.
+     * Returns the API call URL.
      * @param user User name
-     * @return URI
+     * @return URL
      * @throws PssstException
      */
-    private static URI getApiUri(String user) throws PssstException {
-        return getUri(String.format("%s/%s", VERSION, user));
+    private static URL getApiUrl(String user) throws PssstException {
+        return getUrl(String.format("%s/%s", API_VERSION, user));
     }
 
     /**
@@ -215,11 +214,11 @@ public final class RequestProvider {
      */
     private static String getMimeType(Object data) {
         if (data instanceof String) {
-            return HTTP.PLAIN_TEXT_TYPE;
+            return MIME_TYPE_TEXT;
         } else if (data instanceof JSONObject) {
-            return "application/json";
+            return MIME_TYPE_JSON;
         } else {
-            return "application/octet-stream";
+            return MIME_TYPE_DATA;
         }
     }
 
@@ -240,8 +239,8 @@ public final class RequestProvider {
      */
     private String buildContentHash(String data) throws PssstException {
         try {
-            final RsaData rsaData = mKeyStorage.getUserKey().sign(data.getBytes(HTTP.UTF_8));
-            final String signature = new String(Base64.encode(rsaData.getSignature()), HTTP.UTF_8);
+            final RsaData rsaData = mKeyStorage.getUserKey().sign(data.getBytes(API_ENCODING));
+            final String signature = new String(Base64.encode(rsaData.getSignature()), API_ENCODING);
 
             return String.format("%s; %s", rsaData.getTimestamp(), signature);
         } catch (UnsupportedEncodingException e) {
@@ -267,7 +266,7 @@ public final class RequestProvider {
         final long timestamp = (System.currentTimeMillis() / 1000);
 
         // Check if response time is with grace time
-        if ((Math.abs(rsaData.getTimestamp() - timestamp) > GRACE_TIME)) {
+        if ((Math.abs(rsaData.getTimestamp() - timestamp) > API_GRACE_TIME)) {
             return false;
         }
 

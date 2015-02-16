@@ -18,16 +18,15 @@
 package name.pssst.api;
 
 import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.spongycastle.util.encoders.Hex;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
 import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
 
 import name.pssst.api.entity.Message;
 import name.pssst.api.entity.Name;
+import name.pssst.api.internal.Key;
 import name.pssst.api.internal.KeyStorage;
 import name.pssst.api.internal.RequestProvider;
 import name.pssst.api.internal.command.Create;
@@ -42,7 +41,7 @@ import name.pssst.api.internal.command.Push;
  */
 public final class Pssst {
     private static final String FINGERPRINT = "5A749F99DBC2A03B0CDE327BAFCF9BD7DC616830";
-    private static final String DEFAULT_API = "http://api.pssst.name"; // Android HTTP client does not support SNI
+    private static final String DEFAULT_API = "https://api.pssst.name";
     private static final String DEFAULT_BOX = "box";
     private static final String VERSION = "0.2.38";
 
@@ -115,7 +114,7 @@ public final class Pssst {
      * @return Pssst directory
      */
     public static String getDirectory() {
-        return sDirectory;
+        return new File(sDirectory).getPath();
     }
 
     /**
@@ -176,14 +175,14 @@ public final class Pssst {
     }
 
     /**
-     * Returns all stored receiver names in alphabetical order.
+     * Returns all cached receiver names in alphabetical order.
      * @return Receiver names
      * @throws PssstException
      */
-    public final String[] getReceivers() throws PssstException {
+    public final String[] getCachedReceivers() throws PssstException {
         final ArrayList<String> names = new ArrayList<>();
 
-        // Get only user names
+        // Get only user name keys
         for (String key: mKeyStorage.listKeys()) {
             if (key.matches("^[A-Za-z0-9]+$")) {
                 names.add(new Name(key).toString());
@@ -196,7 +195,7 @@ public final class Pssst {
     }
 
     /**
-     * Create a new user.
+     * Creates a new user.
      * @throws PssstException
      */
     public final void create() throws PssstException {
@@ -204,7 +203,7 @@ public final class Pssst {
     }
 
     /**
-     * Create a new box.
+     * Creates a new box.
      * @param box Box name
      * @throws PssstException
      */
@@ -213,7 +212,7 @@ public final class Pssst {
     }
 
     /**
-     * Delete the user.
+     * Deletes the user.
      * @throws PssstException
      */
     public final void delete() throws PssstException {
@@ -223,7 +222,7 @@ public final class Pssst {
     }
 
     /**
-     * Delete the box.
+     * Deletes the box.
      * @param box Box name
      * @throws PssstException
      */
@@ -238,7 +237,7 @@ public final class Pssst {
      * @throws PssstException
      */
     public final String find(String user) throws PssstException {
-        return new Find(user).execute(mRequestProvider);
+        return new Find(new Name(user).getUser()).execute(mRequestProvider);
     }
 
     /**
@@ -269,32 +268,20 @@ public final class Pssst {
     }
 
     /**
-     * Push the message data into the receivers box.
-     * @param receivers User names
+     * Push the message text into the receivers box.
+     * @param receiver User name
      * @param data Message data
      * @throws PssstException
      */
-    public final void push(String[] receivers, byte[] data) throws PssstException {
-        for (String receiver: receivers) {
-            final Name name = new Name(receiver);
+    public final void push(String receiver, byte[] data) throws PssstException {
+        final Name name = new Name(receiver);
 
-            // Cache the receivers public key
-            if (!mRequestProvider.getKeyStorage().listKeys().contains(name.getUser())) {
-                mRequestProvider.getKeyStorage().saveKey(receiver, find(name.getUser()));
-            }
-
-            new Push(mUser.getUser(), name.getUser(), name.getBox(), data).execute(mRequestProvider);
+        // Cache the receivers public key
+        if (!mRequestProvider.getKeyStorage().listKeys().contains(name.getUser())) {
+            mRequestProvider.getKeyStorage().saveKey(name.getUser(), find(name.getUser()));
         }
-    }
 
-    /**
-     * Push the message text into the receivers box.
-     * @param receivers User names
-     * @param message Message text
-     * @throws PssstException
-     */
-    public final void push(String[] receivers, String message) throws PssstException {
-        push(receivers, message.getBytes());
+        new Push(mUser.getUser(), name.getUser(), name.getBox(), data).execute(mRequestProvider);
     }
 
     /**
@@ -304,35 +291,48 @@ public final class Pssst {
      * @throws PssstException
      */
     public final void push(String receiver, String message) throws PssstException {
-        push(new String[] { receiver }, message);
+        push(receiver, message.getBytes());
     }
 
     /**
-     * Asserts the servers public key hash is correct.
+     * Pushes the message data into the receivers box.
+     * @param receivers User names
+     * @param data Message data
+     * @throws PssstException
+     */
+    public final void push(String[] receivers, byte[] data) throws PssstException {
+        for (String receiver: receivers) {
+            push(receiver, data);
+        }
+    }
+
+    /**
+     * Pushes the message text into the receivers box.
+     * @param receivers User names
+     * @param message Message text
+     * @throws PssstException
+     */
+    public final void push(String[] receivers, String message) throws PssstException {
+        push(receivers, message.getBytes());
+    }
+
+    /**
+     * Asserts the servers public key is correct.
      * @param key API key
      * @throws PssstException
      */
     private void assertServerFingerprint(String key) throws PssstException {
-        try {
-            final byte[] hash = MessageDigest.getInstance("SHA1").digest(key.getBytes());
-
-            if (!FINGERPRINT.equals(Hex.toHexString(hash))) {
-                throw new PssstException("Server could not be authenticated");
-            }
-       } catch (NoSuchAlgorithmException e) {
-           throw new PssstException("Algorithm not found", e);
-       }
+        if (!FINGERPRINT.equalsIgnoreCase(Key.fingerprint(key))) {
+            throw new PssstException("Server could not be authenticated");
+        }
     }
 
     /**
-     * Asserts the servers timestamp is with in grace time.
+     * Asserts the servers timestamp is correct.
      * @throws PssstException
      */
     private void assertServerGraceTime() throws PssstException {
-        final long serverTime = Long.parseLong(RequestProvider.requestUrl("time").getText());
-        final long systemTime = (System.currentTimeMillis() / 1000);
-
-        if (Math.abs(serverTime - systemTime) > RequestProvider.getGraceTime()) {
+        if (!RequestProvider.checkServerTime()) {
             throw new PssstException("Server could not be authenticated");
         }
     }

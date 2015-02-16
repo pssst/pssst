@@ -17,46 +17,25 @@
 
 package name.pssst.app;
 
-import android.os.Debug;
+import java.util.ArrayList;
 
 import name.pssst.api.Pssst;
+import name.pssst.api.entity.Message;
 
 /**
  * Global application state.
  */
 public class App extends android.app.Application {
-    private static boolean sIsVisible = true;
-
-    private Pssst mPssst;
-
-    /**
-     * Sets the Pssst directory.
-     */
-    public void onCreate() {
-        super.onCreate();
-
-        // Only for debugging
-        if (Debug.isDebuggerConnected()) {
-            Pssst.setServer("http://dev.pssst.name");
-        }
-
-        Pssst.setDirectory(getFilesDir().getAbsolutePath());
-    }
+    private ArrayList<Message> mPssstMessages = new ArrayList<>();
+    private Pssst mPssstInstance = null;
+    private boolean mIsVisible = true;
 
     /**
-     * Sets the App visibility.
-     * @param isVisible App is visible
+     * Clears all Pssst specific data.
      */
-    public static void setIsVisible(boolean isVisible) {
-        sIsVisible = isVisible;
-    }
-
-    /**
-     * Returns the App visibility.
-     * @return App is visible
-     */
-    public static boolean getIsVisible() {
-        return sIsVisible;
+    public void clearPssstData() {
+        mPssstInstance = null;
+        mPssstMessages = new ArrayList<>();
     }
 
     /**
@@ -64,7 +43,7 @@ public class App extends android.app.Application {
      * @param pssst Pssst instance
      */
     public void setPssstInstance(Pssst pssst) {
-        mPssst = pssst;
+        mPssstInstance = pssst;
     }
 
     /**
@@ -72,6 +51,30 @@ public class App extends android.app.Application {
      * @return Pssst instance
      */
     public Pssst getPssstInstance() {
-        return mPssst;
+        return mPssstInstance;
+    }
+
+    /**
+     * Returns the received Pssst messages.
+     * @return Pssst messages
+     */
+    public ArrayList<Message> getPssstMessages() {
+        return mPssstMessages;
+    }
+
+    /**
+     * Sets the App visibility.
+     * @param isVisible App is visible
+     */
+    public void setIsVisible(boolean isVisible) {
+        mIsVisible = isVisible;
+    }
+
+    /**
+     * Returns the App visibility.
+     * @return App is visible
+     */
+    public boolean getIsVisible() {
+        return mIsVisible;
     }
 }

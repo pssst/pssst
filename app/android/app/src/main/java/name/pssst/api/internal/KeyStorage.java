@@ -56,6 +56,12 @@ public final class KeyStorage {
      * @throws PssstException
      */
     public KeyStorage(String directory, String server, String username, String password) throws PssstException {
+        final File file = new File(directory);
+
+        if (!file.exists() && !file.mkdirs()) {
+            throw new PssstException("Could not create directory");
+        }
+
         mStorage = new File(String.format("%s/.%s", directory, new Name(username).toString()));
         mScheme = "%s";
 
