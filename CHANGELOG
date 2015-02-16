@@ -1,4 +1,6 @@
 0.2.38
+* Added scaling test script
+* Added reply function to GUI
 * Fixed bug in test.py script
 * Fixed optimize bug in makeexe script
 * Changed CLI unit test command line handling
@@ -8,6 +10,7 @@
 * Changed example scripts error handling
 * Updated Travis CI Python version
 * Updated README.md
+* Renamed test vectors script
 
 0.2.37
 * Refactored server
