@@ -200,7 +200,12 @@ define(['js/pssst.api.js'], function (api) {
               user: data[0],
               time: moment.unix(data[1]).format('YYYY-MM-DD HH:mm:ss')
             }));
-            $('#box-' + box + ' article:last-child').fadeIn(200);
+
+            $('#box-' + box + ' article:last-child').click(function() {
+              $('#receiver').val(data[0]);
+              $('#write').click();
+            }).fadeIn(200);
+
             $('html,body').animate({scrollTop: $(document).height()}, 'slow');
           }
         });

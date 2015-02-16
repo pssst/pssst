@@ -18,6 +18,7 @@ html, body {
 }
 
 .panel {
+  cursor: pointer;
   display: none;
   margin: 0 5px 5px 5px;
   text-align: justify;

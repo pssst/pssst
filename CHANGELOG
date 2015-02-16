@@ -1,5 +1,6 @@
 0.2.38
 * Added scaling test script
+* Added reply function to GUI
 * Fixed bug in test.py script
 * Fixed optimize bug in makeexe script
 * Changed CLI unit test command line handling
