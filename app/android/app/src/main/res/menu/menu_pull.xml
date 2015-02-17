@@ -10,7 +10,7 @@
           android:showAsAction="ifRoom"/>
 
     <item android:id="@+id/action_delete_user"
-          android:icon="@drawable/ic_action_user"
+          android:icon="@drawable/ic_action_trash"
           android:title="@string/action_delete_user"
           android:orderInCategory="100"
           android:showAsAction="never"/>

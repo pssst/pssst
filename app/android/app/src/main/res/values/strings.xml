@@ -16,8 +16,8 @@
     <string name="alert_logout">Do you want to logout?</string>
     <string name="pref_app_title">APP SETTINGS</string>
     <string name="pref_app_default_box">Default box</string>
-    <string name="pref_app_pull_interval_active">Active interval</string>
-    <string name="pref_app_pull_interval_paused">Inactive interval</string>
+    <string name="pref_app_pull_interval_active">Interval active</string>
+    <string name="pref_app_pull_interval_paused">Interval inactive</string>
     <string name="pref_api_title">API SETTINGS</string>
     <string name="pref_api_server_address">Pssst server</string>
     <string name="password_warning">Please remember your password, because we won\'t.</string>

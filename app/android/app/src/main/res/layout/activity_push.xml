@@ -23,7 +23,7 @@
         android:id="@+id/message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
+        android:inputType="textMultiLine|textAutoCorrect"
         android:ems="10"
         android:layout_gravity="center_horizontal"
         android:layout_weight="1"
@@ -38,6 +38,7 @@
         android:text="@string/button_send"
         android:layout_gravity="center_horizontal"
         android:layout_weight="0" style="?android:textAppearanceSmall"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:textStyle="bold"/>
 
 </LinearLayout>

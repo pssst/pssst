@@ -67,7 +67,7 @@ public class SettingsFragment extends PreferenceFragment {
         if (key.equals("APP_DEFAULT_BOX")) {
             preference.setSummary(String.format("Load %s on start up", summary));
         } else if (key.startsWith("APP_PULL_INTERVAL_")) {
-            preference.setSummary(String.format("Check for new messages every %s seconds", summary));
+            preference.setSummary(String.format("Check every %s seconds", summary));
         } else {
             preference.setSummary(summary);
         }
