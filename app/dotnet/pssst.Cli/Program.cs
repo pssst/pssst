@@ -1,20 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/**
+ * Pssst!
+ * Copyright (C) 2013  Christian & Christian  <pssst@pssst.name>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ **/
+
+using System;
+using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 using pssst.Api;
 using pssst.Api.Interface;
 
 namespace pssst.Cli
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             if (args.Length < 2)
+                return;
+
+            if (!Configure())
                 return;
 
             string command = args[0];
@@ -34,6 +52,38 @@ namespace pssst.Cli
                     PushMessage(username, args[2], args[3]);
                     break;
             }
+        }
+
+        private static Uri _server;
+
+        private static bool Configure()
+        {
+            string server;
+
+            try
+            {
+                server = ConfigurationManager.AppSettings["server"];
+            }
+            catch (ConfigurationErrorsException e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(server))
+                return false;
+
+            try
+            {
+                _server = new Uri(server);
+            }
+            catch (UriFormatException e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
+
+            return true;
         }
 
         private static void CreateUser(string username)
@@ -58,16 +108,16 @@ namespace pssst.Cli
             if (!message.HasValue)
                 return;
 
-            Console.WriteLine("From: '{0}' received at '{1}': '{2}'", 
-                message.Value.head.user, 
-                message.Value.head.time, 
+            Console.WriteLine("From: '{0}' received at '{1}': '{2}'",
+                message.Value.head.user,
+                message.Value.head.time,
                 message.Value.body);
         }
 
         private static void PushMessage(string username, string receivername, string message)
         {
             User user = LoadUser(username);
-            
+
             if (user == null)
                 return;
 
@@ -78,13 +128,13 @@ namespace pssst.Cli
             if (receiver == null)
                 return;
 
-            client.SendMessage(user, receiver, message);            
+            client.SendMessage(user, receiver, message);
         }
 
         private static IPssstClient CreateClient()
         {
             IPssstClient client = new PssstClient();
-            client.Configure("http://192.168.0.101", 62421);
+            client.Configure(_server);
 
             return client;
         }
@@ -92,13 +142,13 @@ namespace pssst.Cli
         private static User LoadUser(string username)
         {
             string filename = username + ".pssst";
-            
+
             User user = DeserializeData<User>(filename);
 
             return user;
         }
 
-        private static T DeserializeData<T>(string filename) where T: class
+        private static T DeserializeData<T>(string filename) where T : class
         {
             if (!File.Exists(filename))
                 return null;
