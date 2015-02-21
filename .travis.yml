@@ -9,4 +9,4 @@ install:
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release ./app/dotnet/pssst.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./app/dotnet/pssst.Api.Tests.Unit/bin/Release/pssst.Api.Tests.Unit.dll
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./app/dotnet/pssst.Api.Pcl.Tests.Unit/bin/Release/pssst.Api.Pcl.Tests.Unit.dll

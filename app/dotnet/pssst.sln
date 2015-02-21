@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pssst.Api.Pcl.Tests.Unit", "pssst.Api.Tests.Unit\pssst.Api.Pcl.Tests.Unit.csproj", "{0B3EB0AB-A3EC-45E1-96B2-3D6E6FE82F5C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pssst.Api.Pcl.Tests.Unit", "pssst.Api.Pcl.Tests.Unit\pssst.Api.Pcl.Tests.Unit.csproj", "{0B3EB0AB-A3EC-45E1-96B2-3D6E6FE82F5C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pssst.Cli", "pssst.Cli\pssst.Cli.csproj", "{41EEB45B-7955-4B09-878B-E4F8D6186DA4}"
 EndProject
