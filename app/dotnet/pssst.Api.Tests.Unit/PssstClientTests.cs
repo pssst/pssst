@@ -20,11 +20,11 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
-using pssst.Api.Interface;
+using pssst.Api.Pcl.Interface;
 using Rhino.Mocks;
 using NUnit.Framework;
 
-namespace pssst.Api.Tests.Unit
+namespace pssst.Api.Pcl.Tests.Unit
 {
     /// <summary>
     /// Summary description for PssstClientTests

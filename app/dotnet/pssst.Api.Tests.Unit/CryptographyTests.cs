@@ -19,7 +19,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using pssst.Api.Interface;
+using pssst.Api.Pcl.Interface;
 using Rhino.Mocks;
 using Org.BouncyCastle.Security;
 using System.IO;
@@ -27,7 +27,7 @@ using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Crypto;
 using NUnit.Framework;
 
-namespace pssst.Api.Tests.Unit
+namespace pssst.Api.Pcl.Tests.Unit
 {
     /// <summary>
     /// Summary description for CryptographyTests

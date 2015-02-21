@@ -51,9 +51,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\pssst.Api\pssst.Api.csproj">
-      <Project>{51c6945b-c58f-4ede-a8eb-59acfa581578}</Project>
-      <Name>pssst.Api</Name>
+    <ProjectReference Include="..\pssst.Api.Pcl\pssst.Api.Pcl.csproj">
+      <Project>{fa3d70fa-66be-4cfe-bced-79bce7bc39b5}</Project>
+      <Name>pssst.Api.Pcl</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

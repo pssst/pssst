@@ -20,8 +20,8 @@ using System;
 using System.Configuration;
 using System.IO;
 using System.Xml.Serialization;
-using pssst.Api;
-using pssst.Api.Interface;
+using pssst.Api.Pcl;
+using pssst.Api.Pcl.Interface;
 
 namespace pssst.Cli
 {

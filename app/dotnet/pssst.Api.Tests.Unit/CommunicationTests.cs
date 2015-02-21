@@ -24,13 +24,13 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Net;
 using System.Threading;
-using pssst.Api.Interface;
+using pssst.Api.Pcl.Interface;
 using System.Linq;
 using Rhino.Mocks;
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-namespace pssst.Api.Tests.Unit
+namespace pssst.Api.Pcl.Tests.Unit
 {
     /// <summary>
     /// Summary description for CommunicationTests
