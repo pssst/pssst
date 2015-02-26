@@ -18,10 +18,8 @@
 package name.pssst.app.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
@@ -33,13 +31,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.Arrays;
-
 import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
-import name.pssst.api.entity.Name;
 import name.pssst.app.App;
 import name.pssst.app.R;
+import name.pssst.app.TaskCallback;
 
 import static android.R.layout.simple_list_item_1;
 import static name.pssst.app.R.layout.activity_login;
@@ -47,13 +43,8 @@ import static name.pssst.app.R.layout.activity_login;
 /**
  * Start activity.
  */
-public class LoginActivity extends Activity {
+public class Login extends Activity {
     private static final int SETTINGS = 1;
-    private static enum Mode {
-        CREATE, LOGIN
-    }
-
-    private App mApp;
 
     /**
      * Initializes the activity and fast forward if user is already logged in.
@@ -66,13 +57,11 @@ public class LoginActivity extends Activity {
 
         //noinspection ConstantConditions
         getActionBar().setTitle(getResources().getString(R.string.app_name));
-        getActionBar().setDisplayShowHomeEnabled(true);
-        getActionBar().setIcon(R.mipmap.ic_launcher);
 
-        mApp = (App) getApplication();
+        final App app = (App) getApplication();
 
-        if (mApp.getPssstInstance() != null) {
-            final Intent intent = new Intent(this, PullActivity.class);
+        if (app.getPssstInstance() != null) {
+            final Intent intent = new Intent(this, Pull.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
             finish();
@@ -87,11 +76,20 @@ public class LoginActivity extends Activity {
             Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
+        final TaskCallback callback = new TaskCallback() {
+            @Override
+            public void execute(Object param) {
+                app.setPssstInstance((Pssst) param);
+                startActivity(new Intent(Login.this, Pull.class));
+                finish();
+            }
+        };
+
         final Button create = (Button) findViewById(R.id.create);
         create.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (isInputValid()) {
-                    new LoginTask(Mode.CREATE).execute();
+                    new name.pssst.app.task.Login(Login.this, callback, name.pssst.app.task.Login.Mode.CREATE).execute();
                 }
             }
         });
@@ -100,7 +98,7 @@ public class LoginActivity extends Activity {
         login.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (isInputValid()) {
-                    new LoginTask(Mode.LOGIN).execute();
+                    new name.pssst.app.task.Login(Login.this, callback, name.pssst.app.task.Login.Mode.LOGIN).execute();
                 }
             }
         });
@@ -130,7 +128,7 @@ public class LoginActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                startActivityForResult(new Intent(this, SettingsActivity.class), SETTINGS);
+                startActivityForResult(new Intent(this, Settings.class), SETTINGS);
                 return true;
         }
 
@@ -178,90 +176,5 @@ public class LoginActivity extends Activity {
         }
 
         return true;
-    }
-
-    /**
-     * Login task.
-     */
-    private class LoginTask extends AsyncTask<Void, Void, Pssst> {
-        private final String mUsername;
-        private final String mPassword;
-
-        private ProgressDialog mProgress;
-        private String mResult = null;
-        private Mode mMode;
-
-        public LoginTask(Mode mode) {
-            mMode = mode;
-            mUsername = ((EditText) findViewById(R.id.username)).getText().toString();
-            mPassword = ((EditText) findViewById(R.id.password)).getText().toString();
-        }
-
-        @Override
-        protected void onPreExecute() {
-            String title;
-            String user;
-
-            try {
-                user = new Name(mUsername).toString();
-            } catch (PssstException e) {
-                user = e.getMessage();
-            }
-
-            switch (mMode) {
-                case CREATE:
-                    title = String.format("Creating %s", user);
-                    break;
-
-                case LOGIN:
-                    title = String.format("Logging in %s", user);
-                    break;
-
-                default:
-                    title = "Mode unknown";
-                    break;
-            }
-
-            mProgress = ProgressDialog.show(LoginActivity.this, null, title, true);
-        }
-
-        @Override
-        protected Pssst doInBackground(Void... unused) {
-            try {
-                // Check user exists
-                if (mMode == Mode.LOGIN) {
-                    if (!Arrays.asList(Pssst.getUsernames()).contains(new Name(mUsername).toString())) {
-                        throw new PssstException("User not found");
-                    }
-                }
-
-                final Pssst pssst = new Pssst(mUsername, mPassword);
-
-                // Create new user
-                if (mMode == Mode.CREATE) {
-                    pssst.create();
-                }
-
-                return pssst;
-            } catch (PssstException e) {
-                mResult = e.getMessage();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Pssst pssst) {
-            mProgress.cancel();
-
-            if (mResult != null) {
-                Toast.makeText(getApplicationContext(), mResult, Toast.LENGTH_LONG).show();
-            }
-
-            if (pssst != null) {
-                mApp.setPssstInstance(pssst);
-                startActivity(new Intent(LoginActivity.this, PullActivity.class));
-                finish();
-            }
-        }
     }
 }

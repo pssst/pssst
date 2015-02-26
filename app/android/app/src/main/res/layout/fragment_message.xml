@@ -17,7 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:textColorLink="@color/actionbar_back"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -31,7 +32,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_gravity="center_horizontal"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            />
 
         <TextView
             android:id="@+id/time"

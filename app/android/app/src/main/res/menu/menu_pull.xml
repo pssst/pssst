@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="name.pssst.app.activity.PullActivity">
+      tools:context="name.pssst.app.activity.Pull">
 
     <item android:id="@+id/action_write"
           android:icon="@drawable/ic_action_write"

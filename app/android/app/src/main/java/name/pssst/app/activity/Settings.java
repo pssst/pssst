@@ -22,12 +22,11 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import name.pssst.app.R;
-import name.pssst.app.fragment.SettingsFragment;
 
 /**
  * Settings activity.
  */
-public class SettingsActivity extends Activity {
+public class Settings extends Activity {
 
     /**
      * Initializes the activity and load settings fragment.
@@ -39,10 +38,8 @@ public class SettingsActivity extends Activity {
 
         //noinspection ConstantConditions
         getActionBar().setTitle(getResources().getString(R.string.app_name));
-        getActionBar().setDisplayShowHomeEnabled(true);
-        getActionBar().setIcon(R.mipmap.ic_launcher);
 
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+        getFragmentManager().beginTransaction().replace(android.R.id.content, new name.pssst.app.fragment.Settings()).commit();
     }
 
     /**

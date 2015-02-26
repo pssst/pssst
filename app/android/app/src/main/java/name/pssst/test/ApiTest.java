@@ -28,6 +28,7 @@ import java.util.Random;
 
 import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
+import name.pssst.api.entity.Name;
 
 /**
  * API unit tests
@@ -38,6 +39,30 @@ public final class ApiTest extends AndroidTestCase {
     private final static String SERVER_ADDRESS = "https://dev.pssst.name";
 
     private final List<String> usernames = new ArrayList<>();
+
+    /**
+     * Generic test for minimum name notation.
+     * @throws PssstException
+     */
+    public void test_api_name_maximum() throws PssstException {
+        final Name name = new Name(" pssst.USERNAME.Box ");
+
+        assertEquals(name.toString(), "pssst.username.box");
+        assertEquals(name.getUser(), "username");
+        assertEquals(name.getBox(), "box");
+    }
+
+    /**
+     * Generic test for minimum name notation.
+     * @throws PssstException
+     */
+    public void test_api_name_minimum() throws PssstException {
+        final Name name = new Name("xy");
+
+        assertEquals(name.toString(), "pssst.xy");
+        assertEquals(name.getUser(), "xy");
+        assertTrue(name.getBox().isEmpty());
+    }
 
     /**
      * Generic test for the API create command.

@@ -22,14 +22,13 @@ import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DataSetObserver;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -54,6 +53,8 @@ import name.pssst.api.entity.Message;
 import name.pssst.api.entity.Name;
 import name.pssst.app.App;
 import name.pssst.app.R;
+import name.pssst.app.TaskCallback;
+import name.pssst.app.task.DeleteUser;
 
 import static name.pssst.app.R.layout.activity_pull;
 import static name.pssst.app.R.layout.fragment_message;
@@ -61,7 +62,7 @@ import static name.pssst.app.R.layout.fragment_message;
 /**
  * List messages activity.
  */
-public class PullActivity extends Activity {
+public class Pull extends Activity {
     private String mBox;
 
     private App mApp;
@@ -88,11 +89,12 @@ public class PullActivity extends Activity {
         mApp = (App) getApplication();
         mPssst = mApp.getPssstInstance();
         mAdapter = new MessageAdapter(this, mApp.getPssstMessages());
+        mAdapter.registerDataSetObserver(new MessageObserver());
+
+        final String username = mPssst.getUsername();
 
         //noinspection ConstantConditions
-        getActionBar().setTitle(mPssst.getUsername());
-        getActionBar().setDisplayShowHomeEnabled(true);
-        getActionBar().setIcon(R.mipmap.ic_launcher);
+        getActionBar().setTitle(username.substring(0, 1).toUpperCase() + username.substring(1));
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mConnectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
@@ -103,7 +105,7 @@ public class PullActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
                 final Message message = (Message) messages.getItemAtPosition(position);
-                final Intent intent = new Intent(PullActivity.this, PushActivity.class);
+                final Intent intent = new Intent(Pull.this, Push.class);
 
                 try {
                     intent.putExtra("receiver", message.getUsername());
@@ -135,8 +137,8 @@ public class PullActivity extends Activity {
             @Override
             public void run() {
                 if (mPssst != null) {
+                    pullMessages();
                     mHandler.postDelayed(this, delay);
-                    pullMessage();
                 }
             }
         }, delay);
@@ -199,7 +201,7 @@ public class PullActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_write:
-                startActivity(new Intent(this, PushActivity.class));
+                startActivity(new Intent(this, Push.class));
                 return true;
 
             case R.id.action_delete_user:
@@ -215,42 +217,20 @@ public class PullActivity extends Activity {
     }
 
     /**
-     * Adds a new message to the list and notifies the system.
-     * @param message Message
+     * Pulls new messages if a network is connected.
      */
-    private void addMessage(Message message) {
-        mAdapter.addMessage(message);
-
-        if (!mApp.getIsVisible()) {
-            try {
-                final Intent intent = new Intent(this, LoginActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-                final Notification newMessage = new Notification.Builder(this)
-                        .setContentIntent(PendingIntent.getActivity(this, 0, intent, 0))
-                        .setContentTitle(getResources().getString(R.string.app_name))
-                        .setContentText(String.format("New message from %s", message.getUsername()))
-                        .setSmallIcon(R.drawable.ic_stat_app)
-                        .setDefaults(Notification.DEFAULT_ALL)
-                        .setPriority(Notification.PRIORITY_HIGH)
-                        .setAutoCancel(true)
-                        .build();
-
-                mNotificationManager.notify(0, newMessage);
-            } catch (PssstException e) {
-                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    /**
-     * Pulls a new message if a network is connected.
-     */
-    private void pullMessage() {
+    private void pullMessages() {
         NetworkInfo network = mConnectivityManager.getActiveNetworkInfo();
 
         if (network != null && network.isConnectedOrConnecting()) {
-            new PullTask().execute(mPssst);
+            new name.pssst.app.task.Pull(Pull.this, new TaskCallback() {
+                @Override
+                public void execute(Object param) {
+                    for (Message message: ((ArrayList<Message>) param)) {
+                        mAdapter.add(message);
+                    }
+                }
+            }, mBox).execute(mPssst);
         }
     }
 
@@ -265,7 +245,12 @@ public class PullActivity extends Activity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new DeleteUserTask().execute(mPssst);
+                        new DeleteUser(Pull.this, new TaskCallback() {
+                            @Override
+                            public void execute(Object param) {
+                                logout();
+                            }
+                        }, mPssst.getUsername()).execute(mPssst);
                     }
                 })
                 .show();
@@ -306,26 +291,52 @@ public class PullActivity extends Activity {
         private final Context mContext;
         private final ArrayList<Message> mMessages;
 
+        /**
+         * Initializes the adapter.
+         * @param context Context
+         * @param messages Messages
+         */
         public MessageAdapter(Context context, ArrayList<Message> messages) {
             mContext = context;
             mMessages = messages;
         }
 
+        /**
+         * Returns the message count.
+         * @return Count
+         */
         @Override
         public int getCount() {
             return mMessages.size();
         }
 
+        /**
+         * Returns the message.
+         * @param position Position
+         * @return Message
+         */
         @Override
         public Object getItem(int position) {
             return mMessages.get(position);
         }
 
+        /**
+         * Returns the message id.
+         * @param position Position
+         * @return Id
+         */
         @Override
         public long getItemId(int position) {
             return position;
         }
 
+        /**
+         * Returns the message view.
+         * @param position Position
+         * @param convertView View
+         * @param parent Parent
+         * @return View
+         */
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             final Message message = mMessages.get(position);
@@ -339,7 +350,7 @@ public class PullActivity extends Activity {
             final TextView user = (TextView) convertView.findViewById(R.id.user);
             final TextView time = (TextView) convertView.findViewById(R.id.time);
 
-            final SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+            final SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.yy HH:mm");
             format.setTimeZone(Calendar.getInstance().getTimeZone());
 
             try {
@@ -353,76 +364,68 @@ public class PullActivity extends Activity {
             return convertView;
         }
 
-        public void addMessage(Message message) {
+        /**
+         * Adds a new message.
+         * @param message Message
+         */
+        public void add(Message message) {
             mMessages.add(message);
             notifyDataSetChanged();
         }
-    }
 
-    /**
-     * Delete user task.
-     */
-    private class DeleteUserTask extends AsyncTask<Pssst, Void, Boolean> {
-        private final String mUser = mPssst.getUsername();
-
-        private ProgressDialog mProgress;
-        private String mResult = null;
-
-        @Override
-        protected void onPreExecute() {
-            mProgress = ProgressDialog.show(PullActivity.this, null, String.format("Deleting %s", mUser), true);
-        }
-
-        @Override
-        protected Boolean doInBackground(Pssst... pssst) {
-            try {
-                pssst[0].delete();
-                return true;
-            } catch (PssstException e) {
-                mResult = e.getMessage();
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            mProgress.cancel();
-
-            if (mResult != null) {
-                Toast.makeText(getApplicationContext(), mResult, Toast.LENGTH_LONG).show();
-            }
-
-            if (success) {
-                logout();
-            }
-        }
-    }
-
-    /**
-     * Pull task.
-     */
-    private class PullTask extends AsyncTask<Pssst, Void, Message> {
-        private String mResult = null;
-
-        @Override
-        protected Message doInBackground(Pssst... pssst) {
-            try {
-                return pssst[0].pull(mBox);
-            } catch (PssstException e) {
-                mResult = e.getMessage();
+        /**
+         * Returns the last message or null.
+         * @return Message
+         */
+        public Message getLast() {
+            if (!mMessages.isEmpty()) {
+                return mMessages.get(mMessages.size() - 1);
+            } else {
                 return null;
             }
         }
+    }
 
+    /**
+     * Message observer.
+     */
+    private class MessageObserver extends DataSetObserver {
+
+        /**
+         * Sends a notification if activity is not visible.
+         */
         @Override
-        protected void onPostExecute(Message message) {
-            if (mResult != null) {
-                Toast.makeText(getApplicationContext(), mResult, Toast.LENGTH_LONG).show();
-            }
+        public void onChanged() {
+            final Message message = mAdapter.getLast();
 
-            if (message != null) {
-                addMessage(message);
+            if (!mApp.getIsVisible()) {
+                try {
+                    final Intent intent = new Intent(Pull.this, Login.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                    final Notification newMessage = new Notification.Builder(Pull.this)
+                            .setContentIntent(PendingIntent.getActivity(Pull.this, 0, intent, 0))
+                            .setContentTitle(getResources().getString(R.string.app_name))
+                            .setContentText(String.format("New message from %s", message.getUsername()))
+                            .setSmallIcon(R.drawable.ic_stat_app)
+                            .setDefaults(Notification.DEFAULT_ALL)
+                            .setPriority(Notification.PRIORITY_HIGH)
+                            .setAutoCancel(true)
+                            .build();
+
+                    mNotificationManager.notify(0, newMessage);
+                } catch (PssstException e) {
+                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
+        }
+
+        /**
+         * Clears all notifications.
+         */
+        @Override
+        public void onInvalidated() {
+            mNotificationManager.cancelAll();
         }
     }
 }

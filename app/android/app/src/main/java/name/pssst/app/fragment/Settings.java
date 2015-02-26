@@ -29,7 +29,7 @@ import name.pssst.app.R;
 /**
  * Settings fragment.
  */
-public class SettingsFragment extends PreferenceFragment {
+public class Settings extends PreferenceFragment {
     private OnSharedPreferenceChangeListener mListener;
 
     /**

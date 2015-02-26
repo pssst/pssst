@@ -18,8 +18,6 @@
 package name.pssst.app.activity;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -32,6 +30,7 @@ import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
 import name.pssst.app.App;
 import name.pssst.app.R;
+import name.pssst.app.TaskCallback;
 
 import static android.R.layout.simple_list_item_1;
 import static name.pssst.app.R.layout.activity_push;
@@ -39,7 +38,7 @@ import static name.pssst.app.R.layout.activity_push;
 /**
  * Send message activity.
  */
-public class PushActivity extends Activity {
+public class Push extends Activity {
 
     /**
      * Initializes the activity.
@@ -52,11 +51,10 @@ public class PushActivity extends Activity {
 
         final Pssst pssst = ((App) getApplication()).getPssstInstance();
         final Bundle extras = getIntent().getExtras();
+        final String username = pssst.getUsername();
 
         //noinspection ConstantConditions
-        getActionBar().setTitle(pssst.getUsername());
-        getActionBar().setDisplayShowHomeEnabled(true);
-        getActionBar().setIcon(R.mipmap.ic_launcher);
+        getActionBar().setTitle(username.substring(0, 1).toUpperCase() + username.substring(1));
 
         try {
             final AutoCompleteTextView receiver = (AutoCompleteTextView) findViewById(R.id.receiver);
@@ -75,7 +73,12 @@ public class PushActivity extends Activity {
         send.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (isInputValid()) {
-                    new PushTask().execute(pssst);
+                    new name.pssst.app.task.Push(Push.this, new TaskCallback() {
+                        @Override
+                        public void execute(Object param) {
+                            finish();
+                        }
+                    }).execute(pssst);
                 }
             }
         });
@@ -97,45 +100,5 @@ public class PushActivity extends Activity {
         }
 
         return true;
-    }
-
-    /**
-     * Push task.
-     */
-    private class PushTask extends AsyncTask<Pssst, Void, Boolean> {
-        private ProgressDialog mProgress;
-        private String mResult = null;
-
-        @Override
-        protected void onPreExecute() {
-            mProgress = ProgressDialog.show(PushActivity.this, null, "Sending message", true);
-        }
-
-        @Override
-        protected Boolean doInBackground(Pssst... pssst) {
-            final String receiver = ((EditText) findViewById(R.id.receiver)).getText().toString();
-            final String message = ((EditText) findViewById(R.id.message)).getText().toString();
-
-            try {
-                pssst[0].push(receiver, message);
-                return true;
-            } catch (PssstException e) {
-                mResult = e.getMessage();
-                return false;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            mProgress.cancel();
-
-            if (mResult != null) {
-                Toast.makeText(getApplicationContext(), mResult, Toast.LENGTH_LONG).show();
-            }
-
-            if (success) {
-                finish();
-            }
-        }
     }
 }

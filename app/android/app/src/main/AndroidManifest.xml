@@ -10,7 +10,7 @@
         android:launchMode="singleTask"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".activity.LoginActivity"
+            android:name=".activity.Login"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateVisible" >
             <intent-filter>
@@ -19,17 +19,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.PullActivity"
+            android:name=".activity.Pull"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
-            android:name=".activity.PushActivity"
+            android:name=".activity.Push"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
         <activity
-            android:name=".activity.SettingsActivity"
+            android:name=".activity.Settings"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateVisible" >
         </activity>
