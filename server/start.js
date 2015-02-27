@@ -85,7 +85,7 @@ try {
       }
     });
   } else {
-    switch (process.argv[2]) {
+    switch (process.argv[2].toLowerCase()) {
 
       // Print license
       case '-l':
