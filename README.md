@@ -12,6 +12,15 @@ Created by Christian & Christian just for the joy of it.
 
 Install
 -------
+### APP
+
+Required for the Android application:
+
+* At least Android 4.2 (API version 17)
+
+> To be sure no harmful modifications to the code were made, please compile
+> the application by yourself and do not download the APK file anywhere else.
+
 ### CLI
 
 Required for the command line interface (CLI):
