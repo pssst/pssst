@@ -2,6 +2,7 @@
 * Added scaling test script
 * Added reply function to GUI
 * Fixed bug in test.py script
+* Fixed server command line parsing
 * Fixed optimize bug in makeexe script
 * Changed CLI unit test command line handling
 * Changed CLI/GUI usage text
