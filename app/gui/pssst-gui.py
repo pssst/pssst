@@ -176,7 +176,7 @@ class CLI:
 
     def pull(self, box=None):
         """
-        Pulls a message from a box (override).
+        Pulls messages from a box (override).
 
         Parameters
         ----------
@@ -185,15 +185,24 @@ class CLI:
 
         Returns
         -------
-        tuple or None
-            The user name, time and message, None if empty.
+        list of tuples
+            List of messages.
 
         """
-        data = self.pssst.pull(box)
+        messages = []
 
-        if data:
+        while True:
+            data = self.pssst.pull(box)
+
+            if not data:
+                break
+
             user, time, message = data
-            return (repr(Pssst.Name(user)), time, message.decode("utf-8"))
+            user = repr(Pssst.Name(user))
+
+            messages.append((user, time, message.decode("utf-8")))
+
+        return messages
 
     def push(self, receivers, message):
         """
