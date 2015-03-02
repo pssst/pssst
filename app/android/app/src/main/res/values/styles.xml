@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="AppTheme" parent="android:Theme.DeviceDefault">
-        <!-- <item name="android:actionBarStyle">@style/AppActionBar</item> -->
+        <item name="android:actionBarStyle">@style/AppActionBar</item>
     </style>
     <style name="AppActionBar" parent="android:Widget.DeviceDefault.ActionBar">
         <item name="android:displayOptions">showTitle</item>
-        <item name="android:background">@color/actionbar_back</item>
-        <item name="android:titleTextStyle">@style/AppActionBarTitle</item>
-    </style>
-    <style name="AppActionBarTitle" parent="android:TextAppearance.DeviceDefault.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/actionbar_text</item>
     </style>
 </resources>
