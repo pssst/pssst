@@ -179,11 +179,11 @@ define(['js/pssst.api.js'], function (api) {
       },
 
       /**
-       * Pulls a message from a box.
+       * Pulls messages from a box.
        */
       pull: function pull() {
-        app.call('pull', [box], function call(data) {
-          if (data) {
+        app.call('pull', [box], function call(messages) {
+          messages.forEach(function(data) {
             $('#box-' + box).append(Mustache.render(
               '<article class="panel panel-default">'
             + '  <div class="panel-body">'
@@ -207,7 +207,7 @@ define(['js/pssst.api.js'], function (api) {
             }).fadeIn(200);
 
             $('html,body').animate({scrollTop: $(document).height()}, 'slow');
-          }
+          });
         });
       },
 
