@@ -25,19 +25,15 @@ import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import name.pssst.api.Pssst;
-import name.pssst.api.PssstException;
 import name.pssst.app.App;
 import name.pssst.app.R;
-import name.pssst.app.TaskCallback;
+import name.pssst.app.task.Callback;
+import name.pssst.app.task.CreateUser;
 
-import static android.R.layout.simple_list_item_1;
 import static name.pssst.app.R.layout.activity_login;
 
 /**
@@ -60,6 +56,7 @@ public class Login extends Activity {
 
         final App app = (App) getApplication();
 
+        // Forward to next activity
         if (app.getPssstInstance() != null) {
             final Intent intent = new Intent(this, Pull.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -69,14 +66,7 @@ public class Login extends Activity {
 
         PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
-        try {
-            final AutoCompleteTextView username = (AutoCompleteTextView) findViewById(R.id.username);
-            username.setAdapter(new ArrayAdapter<>(this, simple_list_item_1, Pssst.getUsernames()));
-        } catch (PssstException e) {
-            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-        }
-
-        final TaskCallback callback = new TaskCallback() {
+        final Callback callback = new Callback() {
             @Override
             public void execute(Object param) {
                 app.setPssstInstance((Pssst) param);
@@ -89,7 +79,7 @@ public class Login extends Activity {
         create.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (isInputValid()) {
-                    new name.pssst.app.task.Login(Login.this, callback, name.pssst.app.task.Login.Mode.CREATE).execute();
+                    new CreateUser(Login.this, callback, CreateUser.Mode.CREATE).execute();
                 }
             }
         });
@@ -98,7 +88,7 @@ public class Login extends Activity {
         login.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (isInputValid()) {
-                    new name.pssst.app.task.Login(Login.this, callback, name.pssst.app.task.Login.Mode.LOGIN).execute();
+                    new CreateUser(Login.this, callback, CreateUser.Mode.LOGIN).execute();
                 }
             }
         });

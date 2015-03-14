@@ -21,8 +21,6 @@ import org.spongycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.File;
 import java.security.Security;
-import java.util.ArrayList;
-import java.util.Collections;
 
 import name.pssst.api.entity.Message;
 import name.pssst.api.entity.Name;
@@ -94,6 +92,16 @@ public final class Pssst {
     }
 
     /**
+     * Returns if the user file exists.
+     * @param username User name
+     * @return Existence
+     * @throws PssstException
+     */
+    public static boolean exists(String username) throws PssstException {
+        return KeyStorage.exists(sDirectory, username);
+    }
+
+    /**
      * Returns the Pssst server.
      * @return Pssst server
      */
@@ -150,48 +158,11 @@ public final class Pssst {
     }
 
     /**
-     * Returns all stored user names in alphabetical order.
-     * @return User names
-     * @throws PssstException
-     */
-    public static String[] getUsernames() throws PssstException {
-        final ArrayList<String> names = new ArrayList<>();
-
-        for (String storage: KeyStorage.listKeyStorages(sDirectory)) {
-            names.add(new Name(storage).toString());
-        }
-
-        Collections.sort(names);
-
-        return names.toArray(new String[names.size()]);
-    }
-
-    /**
      * Returns the user name.
      * @return User name
      */
     public final String getUsername() {
         return mUser.toString();
-    }
-
-    /**
-     * Returns all cached receiver names in alphabetical order.
-     * @return Receiver names
-     * @throws PssstException
-     */
-    public final String[] getCachedReceivers() throws PssstException {
-        final ArrayList<String> names = new ArrayList<>();
-
-        // Get only user name keys
-        for (String key: mKeyStorage.listKeys()) {
-            if (key.matches("^[A-Za-z0-9]+$")) {
-                names.add(new Name(key).toString());
-            }
-        }
-
-        Collections.sort(names);
-
-        return names.toArray(new String[names.size()]);
     }
 
     /**

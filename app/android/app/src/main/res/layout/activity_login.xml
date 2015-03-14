@@ -12,7 +12,7 @@
               tools:context="name.pssst.app.activity.Login"
               android:weightSum="1">
 
-    <AutoCompleteTextView
+    <EditText
         android:id="@+id/username"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -45,8 +45,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
             style="?android:textAppearanceSmall"
-            android:textStyle="bold"
-            />
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/login"
@@ -67,7 +66,6 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/password_warning"
         android:layout_weight="1"
-        android:gravity="bottom"
-        />
+        android:gravity="bottom"/>
 
 </LinearLayout>

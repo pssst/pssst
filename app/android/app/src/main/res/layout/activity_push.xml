@@ -12,7 +12,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="name.pssst.app.activity.Push">
 
-    <AutoCompleteTextView
+    <EditText
         android:id="@+id/receiver"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

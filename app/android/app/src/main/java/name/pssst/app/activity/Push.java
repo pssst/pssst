@@ -20,19 +20,14 @@ package name.pssst.app.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import name.pssst.api.Pssst;
-import name.pssst.api.PssstException;
 import name.pssst.app.App;
 import name.pssst.app.R;
-import name.pssst.app.TaskCallback;
+import name.pssst.app.task.Callback;
 
-import static android.R.layout.simple_list_item_1;
 import static name.pssst.app.R.layout.activity_push;
 
 /**
@@ -56,24 +51,18 @@ public class Push extends Activity {
         //noinspection ConstantConditions
         getActionBar().setTitle(username.substring(0, 1).toUpperCase() + username.substring(1));
 
-        try {
-            final AutoCompleteTextView receiver = (AutoCompleteTextView) findViewById(R.id.receiver);
-            receiver.setAdapter(new ArrayAdapter<>(this, simple_list_item_1, pssst.getCachedReceivers()));
-
-            // Preselect receiver
-            if (extras != null) {
-                receiver.setText(extras.getString("receiver"));
-                findViewById(R.id.message).requestFocus();
-            }
-        } catch (PssstException e) {
-            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+        // Preselect receiver
+        if (extras != null) {
+            final EditText receiver = (EditText) findViewById(R.id.receiver);
+            receiver.setText(extras.getString("receiver"));
+            findViewById(R.id.message).requestFocus();
         }
 
         final Button send = (Button) findViewById(R.id.send);
         send.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (isInputValid()) {
-                    new name.pssst.app.task.Push(Push.this, new TaskCallback() {
+                    new name.pssst.app.task.Push(Push.this, new Callback() {
                         @Override
                         public void execute(Object param) {
                             finish();

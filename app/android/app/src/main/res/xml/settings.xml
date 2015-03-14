@@ -22,7 +22,7 @@
             android:title="@string/pref_app_pull_interval_paused"
             android:summary=""
             android:numeric="integer"
-            android:defaultValue="5" />
+            android:defaultValue="30" />
     </PreferenceCategory>
     <PreferenceCategory
         android:title="@string/pref_api_title"

@@ -27,14 +27,13 @@ import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
 import name.pssst.api.entity.Message;
 import name.pssst.app.App;
-import name.pssst.app.TaskCallback;
 
 /**
  * Pull task.
  */
 public class Pull extends AsyncTask<Pssst, Void, ArrayList<Message>> {
     private final Activity mActivity;
-    private final TaskCallback mCallback;
+    private final Callback mCallback;
     private final String mBox;
 
     private String mResult = null;
@@ -45,7 +44,7 @@ public class Pull extends AsyncTask<Pssst, Void, ArrayList<Message>> {
      * @param callback Callback
      * @param box Box
      */
-    public Pull(Activity activity, TaskCallback callback, String box) {
+    public Pull(Activity activity, Callback callback, String box) {
         mActivity = activity;
         mCallback = callback;
         mBox = box;

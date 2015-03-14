@@ -24,7 +24,6 @@ import org.zeroturnaround.zip.commons.IOUtils;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -77,26 +76,14 @@ public final class KeyStorage {
     }
 
     /**
-     * Returns a list of all key storages.
-     * @param directory KeyStorage directory
-     * @return Storages
+     * Returns if the key storage exists.
+     * @param directory Pssst directory
+     * @param username User name
+     * @return Existence
+     * @throws PssstException
      */
-    public static List<String> listKeyStorages(String directory) {
-        final File[] files = new File(directory).listFiles(new FilenameFilter() {
-
-            @Override
-            public boolean accept(File dir, String filename) {
-                return filename.startsWith(String.format(".%s.", Name.getService()));
-            }
-        });
-
-        final ArrayList<String> storages = new ArrayList<>();
-
-        for (File file: files) {
-            storages.add(file.getName().substring(1));
-        }
-
-        return storages;
+    public static boolean exists(String directory, String username) throws PssstException {
+        return new File(String.format("%s/.%s", directory, new Name(username).toString())).exists();
     }
 
     /**

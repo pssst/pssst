@@ -53,7 +53,7 @@ import name.pssst.api.entity.Message;
 import name.pssst.api.entity.Name;
 import name.pssst.app.App;
 import name.pssst.app.R;
-import name.pssst.app.TaskCallback;
+import name.pssst.app.task.Callback;
 import name.pssst.app.task.DeleteUser;
 
 import static name.pssst.app.R.layout.activity_pull;
@@ -70,9 +70,8 @@ public class Pull extends Activity {
     private Handler mHandler;
     private MessageAdapter mAdapter;
 
-    private int pull_interval_active;
-    private int pull_interval_paused;
-    private int delay;
+    private int intervalActive;
+    private int intervalPaused;
 
     private NotificationManager mNotificationManager;
     private ConnectivityManager mConnectivityManager;
@@ -87,8 +86,10 @@ public class Pull extends Activity {
         setContentView(activity_pull);
 
         mApp = (App) getApplication();
+        mBox = mApp.getPssstBox();
         mPssst = mApp.getPssstInstance();
-        mAdapter = new MessageAdapter(this, mApp.getPssstMessages());
+        mHandler = new Handler();
+        mAdapter = new MessageAdapter(this, mApp.getPssstMessages(mBox));
         mAdapter.registerDataSetObserver(new MessageObserver());
 
         final String username = mPssst.getUsername();
@@ -118,8 +119,8 @@ public class Pull extends Activity {
         });
 
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        pull_interval_active = Integer.parseInt(preferences.getString("APP_PULL_INTERVAL_ACTIVE", "")) * 1000;
-        pull_interval_paused = Integer.parseInt(preferences.getString("APP_PULL_INTERVAL_PAUSED", "")) * 1000;
+        intervalActive = Integer.parseInt(preferences.getString("APP_PULL_INTERVAL_ACTIVE", "2"));
+        intervalPaused = Integer.parseInt(preferences.getString("APP_PULL_INTERVAL_PAUSED", "30"));
         mBox = preferences.getString("APP_DEFAULT_BOX", Pssst.getDefaultBox());
 
         if (!mBox.equals(Pssst.getDefaultBox())) {
@@ -130,18 +131,7 @@ public class Pull extends Activity {
             }
         }
 
-        delay = pull_interval_active;
-
-        mHandler = new Handler();
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mPssst != null) {
-                    pullMessages();
-                    mHandler.postDelayed(this, delay);
-                }
-            }
-        }, delay);
+        setPullHandler(intervalActive);
     }
 
     /**
@@ -171,7 +161,7 @@ public class Pull extends Activity {
     public void onPause() {
         super.onPause();
         mApp.setIsVisible(false);
-        delay = pull_interval_paused;
+        setPullHandler(intervalPaused);
     }
 
     /**
@@ -181,7 +171,7 @@ public class Pull extends Activity {
     public void onResume() {
         super.onResume();
         mApp.setIsVisible(true);
-        delay = pull_interval_active;
+        setPullHandler(intervalActive);
     }
 
     /**
@@ -217,13 +207,32 @@ public class Pull extends Activity {
     }
 
     /**
+     * Sets the pull handler.
+     * @param interval Interval
+     */
+    private void setPullHandler(long interval) {
+        final long delay = interval * 1000; // Milliseconds
+
+        mHandler.removeCallbacks(null);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mPssst != null) {
+                    pullMessages();
+                    mHandler.postDelayed(this, delay);
+                }
+            }
+        }, delay);
+    }
+
+    /**
      * Pulls new messages if a network is connected.
      */
     private void pullMessages() {
         NetworkInfo network = mConnectivityManager.getActiveNetworkInfo();
 
         if (network != null && network.isConnectedOrConnecting()) {
-            new name.pssst.app.task.Pull(Pull.this, new TaskCallback() {
+            new name.pssst.app.task.Pull(Pull.this, new Callback() {
                 @Override
                 public void execute(Object param) {
                     for (Message message: ((ArrayList<Message>) param)) {
@@ -245,7 +254,7 @@ public class Pull extends Activity {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new DeleteUser(Pull.this, new TaskCallback() {
+                        new DeleteUser(Pull.this, new Callback() {
                             @Override
                             public void execute(Object param) {
                                 logout();

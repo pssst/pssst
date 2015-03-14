@@ -24,14 +24,13 @@ import android.widget.Toast;
 
 import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
-import name.pssst.app.TaskCallback;
 
 /**
  * Delete user task.
  */
 public class DeleteUser extends AsyncTask<Pssst, Void, Boolean> {
     private final Activity mActivity;
-    private final TaskCallback mCallback;
+    private final Callback mCallback;
     private final String mUsername;
 
     private ProgressDialog mProgress;
@@ -43,7 +42,7 @@ public class DeleteUser extends AsyncTask<Pssst, Void, Boolean> {
      * @param callback Callback
      * @param username Username
      */
-    public DeleteUser(Activity activity, TaskCallback callback, String username) {
+    public DeleteUser(Activity activity, Callback callback, String username) {
         mActivity = activity;
         mCallback = callback;
         mUsername = username;

@@ -26,14 +26,13 @@ import android.widget.Toast;
 import name.pssst.api.Pssst;
 import name.pssst.api.PssstException;
 import name.pssst.app.R;
-import name.pssst.app.TaskCallback;
 
 /**
  * Push task.
  */
 public class Push extends AsyncTask<Pssst, Void, Boolean> {
     private final Activity mActivity;
-    private final TaskCallback mCallback;
+    private final Callback mCallback;
 
     private ProgressDialog mProgress;
     private String mResult = null;
@@ -43,7 +42,7 @@ public class Push extends AsyncTask<Pssst, Void, Boolean> {
      * @param activity Activity
      * @param callback Callback
      */
-    public Push(Activity activity, TaskCallback callback) {
+    public Push(Activity activity, Callback callback) {
         mActivity = activity;
         mCallback = callback;
     }
