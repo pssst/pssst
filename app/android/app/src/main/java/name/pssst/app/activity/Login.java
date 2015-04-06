@@ -17,6 +17,7 @@
 
 package name.pssst.app.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -51,8 +52,11 @@ public class Login extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(activity_login);
 
+        final ActionBar actionbar = getActionBar();
         //noinspection ConstantConditions
-        getActionBar().setTitle(getResources().getString(R.string.app_name));
+        actionbar.setTitle(getResources().getString(R.string.app_name));
+        actionbar.setDisplayShowHomeEnabled(true);
+        actionbar.setIcon(R.mipmap.ic_actionbar);
 
         final App app = (App) getApplication();
 

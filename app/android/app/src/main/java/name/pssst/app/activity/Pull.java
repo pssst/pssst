@@ -17,6 +17,7 @@
 
 package name.pssst.app.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -92,10 +93,11 @@ public class Pull extends Activity {
         mAdapter = new MessageAdapter(this, mApp.getPssstMessages(mBox));
         mAdapter.registerDataSetObserver(new MessageObserver());
 
-        final String username = mPssst.getUsername();
-
+        final ActionBar actionbar = getActionBar();
         //noinspection ConstantConditions
-        getActionBar().setTitle(username.substring(0, 1).toUpperCase() + username.substring(1));
+        actionbar.setTitle(mPssst.getUsername());
+        actionbar.setDisplayShowHomeEnabled(true);
+        actionbar.setIcon(R.mipmap.ic_actionbar);
 
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         mConnectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);

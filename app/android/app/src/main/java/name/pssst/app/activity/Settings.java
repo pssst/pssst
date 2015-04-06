@@ -17,6 +17,7 @@
 
 package name.pssst.app.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -36,8 +37,11 @@ public class Settings extends Activity {
     public final void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final ActionBar actionbar = getActionBar();
         //noinspection ConstantConditions
-        getActionBar().setTitle(getResources().getString(R.string.app_name));
+        actionbar.setTitle(getResources().getString(R.string.app_name));
+        actionbar.setDisplayShowHomeEnabled(true);
+        actionbar.setIcon(R.mipmap.ic_actionbar);
 
         getFragmentManager().beginTransaction().replace(android.R.id.content, new name.pssst.app.fragment.Settings()).commit();
     }

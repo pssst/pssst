@@ -17,6 +17,7 @@
 
 package name.pssst.app.activity;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -46,10 +47,11 @@ public class Push extends Activity {
 
         final Pssst pssst = ((App) getApplication()).getPssstInstance();
         final Bundle extras = getIntent().getExtras();
-        final String username = pssst.getUsername();
-
+        final ActionBar actionbar = getActionBar();
         //noinspection ConstantConditions
-        getActionBar().setTitle(username.substring(0, 1).toUpperCase() + username.substring(1));
+        actionbar.setTitle(pssst.getUsername());
+        actionbar.setDisplayShowHomeEnabled(true);
+        actionbar.setIcon(R.mipmap.ic_actionbar);
 
         // Preselect receiver
         if (extras != null) {
