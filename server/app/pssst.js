@@ -219,7 +219,7 @@ module.exports = function Pssst(app, db, config) {
 
       // Assert user is within limit
       if (User.isLimited(user, config.limit)) {
-        return res.sign(413, 'User limit reached');
+        return res.sign(413, 'User reached limit');
       }
 
       // Add request timestamp to message
