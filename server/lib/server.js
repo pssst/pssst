@@ -191,7 +191,7 @@ module.exports = function Server(app, config, callback) {
         auth(db, req, res, next);
       });
 
-      pssst(app, db, config.deny);
+      pssst(app, db, config.app);
 
       // Returns current time
       app.get('/time', function time(req, res) {

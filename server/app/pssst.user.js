@@ -15,6 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 var DENY = '!?(^name$)';
+var LIMIT = 536870912; // 512 MB
 
 /**
  * Returns a new user.
@@ -60,4 +61,15 @@ exports.isDeleted = function isDeleted(user) {
  */
 exports.isDenied = function isDenied(name, deny) {
   return new RegExp(deny || DENY).test(name);
+};
+
+/**
+ * Returns if the user has reached his limit.
+ *
+ * @param {Object} the user
+ * @param {Integer} the maximum bytes
+ * @return {Boolean} true if limited
+ */
+exports.isLimited = function isLimited(user, limit) {
+  return (JSON.stringify(user).length >= (limit || LIMIT));
 };

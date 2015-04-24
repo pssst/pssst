@@ -120,6 +120,9 @@ separately. This is limit is hard coded by the Redis database and may change
 in future releases. Only messages not yet pulled by the user will count to
 this limit.
 
+> If you want to lower the users limit, please set the `limit` configuration
+> setting in your `server/config.json` file.
+
 API
 ===
 Our REST API is based on HTTP and designed to be lean and mean. All messages

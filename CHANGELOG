@@ -1,3 +1,9 @@
+0.2.39
+* Added user limit to server
+* Changed server config.json layout
+* Changed server config.json.sample
+* Refactored server config handling
+
 0.2.38
 * Added scaling test script
 * Added reply function to GUI

@@ -19,9 +19,9 @@
  *
  * @param {Object} express app
  * @param {Object} database wrapper
- * @param {String} denied names regex
+ * @param {Object} app config
  */
-module.exports = function Pssst(app, db, deny) {
+module.exports = function Pssst(app, db, config) {
 
   // Required static classes
   var User = require('./pssst.user.js');
@@ -123,7 +123,7 @@ module.exports = function Pssst(app, db, deny) {
     api.request(req, res, function request(user, box) {
 
       // Assert user name is allowed
-      if (User.isDenied(req.params.user, deny)) {
+      if (User.isDenied(req.params.user, config.deny)) {
         return res.sign(403, 'User name restricted');
       }
 
@@ -216,6 +216,11 @@ module.exports = function Pssst(app, db, deny) {
    */
   app.put('/1/:user/:box?', function push(req, res) {
     api.request(req, res, function request(user, box) {
+
+      // Assert user is within limit
+      if (User.isLimited(user, config.limit)) {
+        return res.sign(413, 'User limit reached');
+      }
 
       // Add request timestamp to message
       req.body.head.time = req.timestamp;

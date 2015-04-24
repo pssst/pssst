@@ -22,11 +22,14 @@ try {
   var info = require('./package.json');
   var config = JSON.stringify({
     "debug": 0,
-    "deny": null,
     "port": 62421,
     "db": {
       "source": 6379,
       "number": 0
+    },
+    "app": {
+      "limit": null,
+      "deny": null
     }
   }, null, 2);
 
