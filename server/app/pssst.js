@@ -123,7 +123,7 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert user name is allowed
-      if (User.isDenied(req.params.user, config.allow)) {
+      if (!User.isAllowed(req.params.user, config.allow)) {
         return res.sign(403, 'User name restricted');
       }
 
@@ -184,7 +184,7 @@ module.exports = function Pssst(app, db, config) {
       }
 
       // Assert box name is allowed
-      if (Box.isDenied(req.params.box)) {
+      if (!Box.isAllowed(req.params.box)) {
         return res.sign(403, 'Box name restricted');
       }
 
@@ -206,7 +206,7 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert box name is allowed
-      if (Box.isDenied(req.params.box)) {
+      if (!Box.isAllowed(req.params.box)) {
         return res.sign(403, 'Box name restricted');
       }
 

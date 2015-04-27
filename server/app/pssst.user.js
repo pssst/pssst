@@ -60,10 +60,10 @@ exports.isDeleted = function isDeleted(user) {
  *
  * @param {String} the user name
  * @param {String} the regular expression
- * @return {Boolean} true if denied
+ * @return {Boolean} true if allowed
  */
-exports.isDenied = function isDenied(name, allow) {
-  return !(new RegExp(allow || ALLOW).test(name));
+exports.isAllowed = function isAllowed(name, allow) {
+  return new RegExp(allow || ALLOW).test(name);
 };
 
 /**

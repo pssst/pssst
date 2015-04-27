@@ -338,8 +338,8 @@ HTTP headers are listed.
 
 ### Create
 
-Creates a new empty box for the user. The box names `box`, `key` and `list`
-are restricted because of protocol usage.
+Creates a new empty box for the user. The box name `box`, `key` and `list`
+are restricted because of their protocol usage.
 
 #### Request
 

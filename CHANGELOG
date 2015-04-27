@@ -2,6 +2,7 @@
 * Added the default user database limit
 * Added a per user database entry limit
 * Changed server user name testing logic
+* Changed server box name testing logic
 * Changed server config.json layout
 * Changed server config.json.sample
 * Removed name restriction from server

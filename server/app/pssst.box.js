@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-var ALLOW = '!?^((box)|(key)|(max))$';
+ var RESERVED = ['box', 'key', 'list'];
 
 /**
  * Creates a new box.
@@ -90,8 +90,8 @@ exports.find = function find(user, box) {
  * Returns if the box name is allowed.
  *
  * @param {String} the box name
- * @return {Boolean} true if denied
+ * @return {Boolean} true if allowed
  */
-exports.isDenied = function isDenied(box) {
-  return !(new RegExp(ALLOW).test(box));
+exports.isAllowed = function isAllowed(box) {
+  return (RESERVED.indexOf(box) < 0);
 };
