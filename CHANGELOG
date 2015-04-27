@@ -1,7 +1,11 @@
 0.2.39
-* Added user limit to server
+* Added the default user database limit
+* Added a per user database entry limit
+* Changed server user name testing logic
 * Changed server config.json layout
 * Changed server config.json.sample
+* Removed name restriction from server
+* Removed name restriction unit test
 * Refactored server config handling
 
 0.2.38

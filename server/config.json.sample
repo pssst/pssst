@@ -6,7 +6,7 @@
     "number": 0     // Redis database number (default: 0)
   },
   "app": {
-    "limit": null,  // Maximum bytes of stored user data
-    "deny": null    // Regular expression of denied user names
+    "allow": null,  // Regular expression of allowed user names (default: all)
+    "limit": null   // Default limit of user data in bytes (default: 512 mb)
   }
 }

@@ -28,8 +28,8 @@ try {
       "number": 0
     },
     "app": {
-      "limit": null,
-      "deny": null
+      "allow": null,
+      "limit": null
     }
   }, null, 2);
 

@@ -14,18 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-var DENY = '!?(^name$)';
+var ALLOW = '.*';
 var LIMIT = 536870912; // 512 MB
 
 /**
  * Returns a new user.
  *
  * @param {String} the key (PEM format)
+ * @param {Integer} the maximum bytes
  * @return {Object} the new user
  */
-exports.create = function create(key) {
+exports.create = function create(key, max) {
   return {
     key: key,
+    max: max || LIMIT,
     box: {
       box: [] // Default box
     }
@@ -39,6 +41,7 @@ exports.create = function create(key) {
  */
 exports.erase = function erase(user) {
   user.key = null;
+  user.max = null;
   user.box = null;
 };
 
@@ -53,23 +56,22 @@ exports.isDeleted = function isDeleted(user) {
 };
 
 /**
- * Returns if the user name is denied.
+ * Returns if the user name is allowed.
  *
  * @param {String} the user name
  * @param {String} the regular expression
  * @return {Boolean} true if denied
  */
-exports.isDenied = function isDenied(name, deny) {
-  return new RegExp(deny || DENY).test(name);
+exports.isDenied = function isDenied(name, allow) {
+  return !(new RegExp(allow || ALLOW).test(name));
 };
 
 /**
  * Returns if the user has reached his limit.
  *
  * @param {Object} the user
- * @param {Integer} the maximum bytes
  * @return {Boolean} true if limited
  */
-exports.isLimited = function isLimited(user, limit) {
-  return (JSON.stringify(user).length >= (limit || LIMIT));
+exports.isMaximum = function isMaximum(user) {
+  return (JSON.stringify(user).length >= user.max);
 };

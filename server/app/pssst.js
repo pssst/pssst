@@ -123,7 +123,7 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert user name is allowed
-      if (User.isDenied(req.params.user, config.deny)) {
+      if (User.isDenied(req.params.user, config.allow)) {
         return res.sign(403, 'User name restricted');
       }
 
@@ -137,7 +137,7 @@ module.exports = function Pssst(app, db, config) {
         return res.sign(400, 'Public key invalid');
       }
 
-      user = User.create(req.body.key);
+      user = User.create(req.body.key, config.limit);
 
       api.respond(req, res, user, 'User created');
     }, req.body.key);
@@ -177,6 +177,11 @@ module.exports = function Pssst(app, db, config) {
    */
   app.post('/1/:user/:box?', function create(req, res) {
     api.request(req, res, function request(user, box) {
+
+      // Assert user is within limit
+      if (User.isMaximum(user)) {
+        return res.sign(413, 'User reached limit');
+      }
 
       // Assert box name is allowed
       if (Box.isDenied(req.params.box)) {
@@ -218,7 +223,7 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert user is within limit
-      if (User.isLimited(user, config.limit)) {
+      if (User.isMaximum(user)) {
         return res.sign(413, 'User reached limit');
       }
 
