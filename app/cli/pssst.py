@@ -43,14 +43,14 @@ except ImportError:
 try:
     from Crypto import Random
     from Crypto.Cipher import AES, PKCS1_OAEP
-    from Crypto.Hash import HMAC, SHA, SHA512
+    from Crypto.Hash import HMAC, SHA, SHA256
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
 except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.39"
+__all__, __version__ = ["Pssst"], "0.2.40"
 
 
 def _encode64(data): # Utility shortcut
@@ -224,7 +224,7 @@ class Pssst:
         This class is not meant to be called externally.
 
         """
-        RSA_SIZE, NONCE_SIZE = 4096, 32 + AES.block_size
+        RSA_SIZE, NONCE_SIZE = 2048, 32 + AES.block_size
 
         def __init__(self, key=None, password=None):
             try:
@@ -259,8 +259,8 @@ class Pssst:
         def verify(self, data, timestamp, signature):
             current, data = int(round(time.time())), data.encode("utf-8")
 
-            hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA512)
-            hmac = SHA512.new(hmac.digest())
+            hmac = HMAC.new(str(timestamp).encode("ascii"), data, SHA256)
+            hmac = SHA256.new(hmac.digest())
 
             if abs(timestamp - current) <= 30:
                 return PKCS1_v1_5.new(self.key).verify(hmac, signature)
@@ -270,8 +270,8 @@ class Pssst:
         def sign(self, data):
             current, data = int(round(time.time())), data.encode("utf-8")
 
-            hmac = HMAC.new(str(current).encode("ascii"), data, SHA512)
-            hmac = SHA512.new(hmac.digest())
+            hmac = HMAC.new(str(current).encode("ascii"), data, SHA256)
+            hmac = SHA256.new(hmac.digest())
 
             signature = PKCS1_v1_5.new(self.key).sign(hmac)
 
@@ -312,7 +312,7 @@ class Pssst:
         in fingerprint.
 
         """
-        FINGERPRINT, GRACE = "5a749f99dbc2a03b0cde327bafcf9bd7dc616830", 30
+        FINGERPRINT, GRACE = "cdd39bed344c7a812ded0655047778e367de15db", 30
 
         config = os.path.join(os.path.expanduser("~"), ".pssst")
 

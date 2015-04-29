@@ -40,17 +40,10 @@ def setup_module(module):
     param module : string
         The module name.
 
-    Notes
-    -----
-    Smaller keys are only used for tests. DO NOT DO THIS IN PRODUCTION CODE!
-
     """
     global files
 
     files = []
-
-    # Only for testing
-    Pssst._Key.RSA_SIZE = 1024
 
 
 def teardown_module(module):

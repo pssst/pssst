@@ -30,8 +30,8 @@ module.exports = function Crypto() {
   var BINARY = 'base64';
   var ENCODING = 'utf8';
 
-  var RSA_SIZE = 4096;
-  var RSA_HASH = 'sha512';
+  var RSA_SIZE = 2048;
+  var RSA_HASH = 'sha256';
 
   var ID_RSA = __dirname + '/../id_rsa';
   var ID_PUB = __dirname + '/../www/key';

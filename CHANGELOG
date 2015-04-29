@@ -1,3 +1,11 @@
+0.2.40
+* Changed RSA hash algorithm to SHA256
+* Changed RSA key size to 2048 bit
+* Changed public key fingerprint
+* Changed test vectors script
+* Changed README.md
+* Removed reduced key size for unit testing
+
 0.2.39
 * Added the default user database limit
 * Added a per user database entry limit
