@@ -34,8 +34,8 @@ try {
   }, null, 2);
 
   // Required constants
-  var CONFIG = __dirname + '/config.json'
-  var PUBLIC = __dirname + '/www'
+  var CONFIG = __dirname + '/config.json';
+  var PUBLIC = __dirname + '/www';
 
   // Check given options
   if (process.argv.length <= 2) {

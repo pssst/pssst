@@ -1,3 +1,7 @@
+0.2.41
+* Added server maintenance shell
+* Fixed some server code typos
+
 0.2.40
 * Changed RSA hash algorithm to SHA256
 * Changed RSA key size to 2048 bit
