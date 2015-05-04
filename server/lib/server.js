@@ -185,13 +185,13 @@ module.exports = function Server(app, config, callback) {
     });
   }
 
-  redis(config.db, function (err, db) {
+  redis(config.db, function redis(err, db) {
     if (!err) {
       app.use(function (req, res, next) {
         auth(db, req, res, next);
       });
 
-      pssst(app, db, config.deny);
+      pssst(app, db, config.app);
 
       // Returns current time
       app.get('/time', function time(req, res) {

@@ -1,3 +1,26 @@
+0.2.41
+* Added server maintenance shell
+* Fixed some server code typos
+
+0.2.40
+* Changed RSA hash algorithm to SHA256
+* Changed RSA key size to 2048 bit
+* Changed public key fingerprint
+* Changed test vectors script
+* Changed README.md
+* Removed reduced key size for unit testing
+
+0.2.39
+* Added the default user database limit
+* Added a per user database entry limit
+* Changed server user name testing logic
+* Changed server box name testing logic
+* Changed server config.json layout
+* Changed server config.json.sample
+* Removed name restriction from server
+* Removed name restriction unit test
+* Refactored server config handling
+
 0.2.38
 * Added scaling test script
 * Added reply function to GUI

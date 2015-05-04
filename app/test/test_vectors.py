@@ -9,7 +9,7 @@ import textwrap
 
 try:
     from Crypto.Cipher import AES, PKCS1_OAEP
-    from Crypto.Hash import HMAC, SHA512
+    from Crypto.Hash import HMAC, SHA256
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
 except ImportError:
@@ -94,11 +94,11 @@ def test_nonce(nonce=NONCE):
 
 def test_hmac(time=TIME, data=DATA):
     """
-    HMAC (SHA 512 Bit)
+    HMAC (SHA 256 Bit)
     """
     time = test_time(time)
-    mac = HMAC.new(time, data, SHA512)
-    mac = SHA512.new(mac.digest())
+    mac = HMAC.new(time, data, SHA256)
+    mac = SHA256.new(mac.digest())
     return base64.b64encode(mac.digest()), len(mac.digest())
 
 
@@ -159,8 +159,8 @@ def test_rsa_sign(key=KEY, time=TIME, data=DATA):
     RSA Sign (PKCS #1 v1.5)
     """
     time = test_time(time)
-    mac = HMAC.new(time, data, SHA512)
-    mac = SHA512.new(mac.digest())
+    mac = HMAC.new(time, data, SHA256)
+    mac = SHA256.new(mac.digest())
     key = RSA.importKey(key)
     sig = PKCS1_v1_5.new(key).sign(mac)
     return base64.b64encode(sig), len(sig)
@@ -171,8 +171,8 @@ def test_rsa_verify(key=KEY, time=TIME, data=DATA):
     RSA Verify (PKCS #1 v1.5)
     """
     time = test_time(time)
-    mac = HMAC.new(time, data, SHA512)
-    mac = SHA512.new(mac.digest())
+    mac = HMAC.new(time, data, SHA256)
+    mac = SHA256.new(mac.digest())
     key = RSA.importKey(key)
     sig = PKCS1_v1_5.new(key).sign(mac)
     return "Yes" if PKCS1_v1_5.new(key).verify(mac, sig) else "No"

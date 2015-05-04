@@ -120,6 +120,9 @@ separately. This is limit is hard coded by the Redis database and may change
 in future releases. Only messages not yet pulled by the user will count to
 this limit.
 
+> If you want to lower the users limit, please set the `limit` configuration
+> setting in your `server/config.json` file.
+
 API
 ===
 Our REST API is based on HTTP and designed to be lean and mean. All messages
@@ -175,7 +178,7 @@ Please be aware:
 
 > The message code is called _nonce_ for a reason. Never use it twice.
 
-RSA keys are requiered to be 4096 bit strong and encoded in PEM / PKCS#8.
+RSA keys are requiered to be 2048 bit strong and encoded in PEM / PKCS#8.
 
 ### Decryption
 
@@ -202,8 +205,8 @@ and `signature` the calculated and signed hash of the HTTP body encoded in
 standard Base64 with padding. Calculation of the hash is done in the following
 steps:
 
-1. Create a SHA-512 HMAC of the HTTP body with the timestamp string as key.
-2. Create a SHA-512 hash of the resulting HMAC one more time.
+1. Create a SHA-256 HMAC of the HTTP body with the timestamp string as key.
+2. Create a SHA-256 hash of the resulting HMAC one more time.
 3. Sign the resulting hash with the senders private key using PKCS#1 v1.5.
 
 To verify a request / response, calculate its hash as described above in the
@@ -217,7 +220,7 @@ processing.
 
 The public key of our official API has the following SHA-1 fingerprint:
 
-`5a:74:9f:99:db:c2:a0:3b:0c:de:32:7b:af:cf:9b:d7:dc:61:68:30`
+`cd:d3:9b:ed:34:4c:7a:81:2d:ed:06:55:04:77:78:e3:67:de:15:db`
 
 If a client connects to the official APIs `master` Branch, it is required to
 match the APIs delivered public key in PEM format against this fingerprint
@@ -335,8 +338,8 @@ HTTP headers are listed.
 
 ### Create
 
-Creates a new empty box for the user. The box names `box`, `key` and `list`
-are restricted because of protocol usage.
+Creates a new empty box for the user. The box name `box`, `key` and `list`
+are restricted because of their protocol usage.
 
 #### Request
 

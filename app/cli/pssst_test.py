@@ -40,18 +40,10 @@ def setup_module(module):
     param module : string
         The module name.
 
-    Notes
-    -----
-    Smaller keys are only used for tests. DO NOT DO THIS IN PRODUCTION CODE!
-
     """
     global files
 
-    # Clean up invalid name test
-    files = [os.path.join(os.path.expanduser("~"), ".pssst.name")]
-
-    # Only for testing
-    Pssst._Key.RSA_SIZE = 1024
+    files = []
 
 
 def teardown_module(module):
@@ -256,7 +248,6 @@ class TestUser:
     Tests user commands with this test cases:
 
     * User create
-    * User create failed, name restricted
     * User create failed, already exists
     * User delete
     * User delete, user was deleted
@@ -270,8 +261,6 @@ class TestUser:
     -------
     test_create_user()
         Tests if an user can be created.
-    test_create_user_name_restricted()
-        Tests if an user name is restricted.
     test_create_user_already_exists()
         Tests if an user already exists.
     test_delete_user()
@@ -297,17 +286,6 @@ class TestUser:
         """
         pssst = Pssst(createUserName())
         pssst.create()
-
-    def test_create_user_name_restricted(self):
-        """
-        Tests if an user name is restricted.
-
-        """
-        with pytest.raises(Exception) as ex:
-            pssst = Pssst("name")
-            pssst.create()
-
-        assert str(ex.value) == "User name restricted"
 
     def test_create_user_already_exists(self):
         """

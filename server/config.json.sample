@@ -1,9 +1,12 @@
 {
-  "debug": <Level 0 (none) to 3 (full)>,
-  "deny":  <Regex of denied user names>,
-  "port":  <Pssst server port>,
+  "debug": 0,       // Pssst debug level 0 (none) to 3 (full)
+  "port": 62421,    // Pssst server port (default: 62421)
   "db": {
-    "source": <Redis port or socket path>,
-    "number": <Redis database number>
+    "source": 6379, // Redis port or socket path (default: 6379)
+    "number": 0     // Redis database number (default: 0)
+  },
+  "app": {
+    "allow": null,  // Regular expression of allowed user names (default: all)
+    "limit": null   // Default limit of user data in bytes (default: 512 mb)
   }
 }

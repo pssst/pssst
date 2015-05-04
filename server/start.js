@@ -22,17 +22,20 @@ try {
   var info = require('./package.json');
   var config = JSON.stringify({
     "debug": 0,
-    "deny": null,
     "port": 62421,
     "db": {
       "source": 6379,
       "number": 0
+    },
+    "app": {
+      "allow": null,
+      "limit": null
     }
   }, null, 2);
 
   // Required constants
-  var CONFIG = __dirname + '/config.json'
-  var PUBLIC = __dirname + '/www'
+  var CONFIG = __dirname + '/config.json';
+  var PUBLIC = __dirname + '/www';
 
   // Check given options
   if (process.argv.length <= 2) {

@@ -19,9 +19,9 @@
  *
  * @param {Object} express app
  * @param {Object} database wrapper
- * @param {String} denied names regex
+ * @param {Object} app config
  */
-module.exports = function Pssst(app, db, deny) {
+module.exports = function Pssst(app, db, config) {
 
   // Required static classes
   var User = require('./pssst.user.js');
@@ -123,7 +123,7 @@ module.exports = function Pssst(app, db, deny) {
     api.request(req, res, function request(user, box) {
 
       // Assert user name is allowed
-      if (User.isDenied(req.params.user, deny)) {
+      if (!User.isAllowed(req.params.user, config.allow)) {
         return res.sign(403, 'User name restricted');
       }
 
@@ -137,7 +137,7 @@ module.exports = function Pssst(app, db, deny) {
         return res.sign(400, 'Public key invalid');
       }
 
-      user = User.create(req.body.key);
+      user = User.create(req.body.key, config.limit);
 
       api.respond(req, res, user, 'User created');
     }, req.body.key);
@@ -178,8 +178,13 @@ module.exports = function Pssst(app, db, deny) {
   app.post('/1/:user/:box?', function create(req, res) {
     api.request(req, res, function request(user, box) {
 
+      // Assert user is within limit
+      if (User.isMaximum(user)) {
+        return res.sign(413, 'User reached limit');
+      }
+
       // Assert box name is allowed
-      if (Box.isDenied(req.params.box)) {
+      if (!Box.isAllowed(req.params.box)) {
         return res.sign(403, 'Box name restricted');
       }
 
@@ -201,7 +206,7 @@ module.exports = function Pssst(app, db, deny) {
     api.request(req, res, function request(user, box) {
 
       // Assert box name is allowed
-      if (Box.isDenied(req.params.box)) {
+      if (!Box.isAllowed(req.params.box)) {
         return res.sign(403, 'Box name restricted');
       }
 
@@ -216,6 +221,11 @@ module.exports = function Pssst(app, db, deny) {
    */
   app.put('/1/:user/:box?', function push(req, res) {
     api.request(req, res, function request(user, box) {
+
+      // Assert user is within limit
+      if (User.isMaximum(user)) {
+        return res.sign(413, 'User reached limit');
+      }
 
       // Add request timestamp to message
       req.body.head.time = req.timestamp;
