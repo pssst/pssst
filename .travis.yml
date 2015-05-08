@@ -7,9 +7,9 @@ python:
   - "2.7"
   - "3.4"
 node_js:
-  - '0.10'
-  - '0.12'
-  - 'iojs'
+  - "0.10"
+  - "0.12"
+  - "iojs"
 services:
   - redis-server
 install:
