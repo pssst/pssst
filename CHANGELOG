@@ -1,3 +1,8 @@
+0.2.42
+* Changed AES cipher to use CBC mode with PCKS#5 padding
+* Changed test vectors script
+* Changed README.md
+
 0.2.41
 * Added server maintenance shell
 * Fixed some server code typos

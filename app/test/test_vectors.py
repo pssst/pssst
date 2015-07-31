@@ -104,18 +104,21 @@ def test_hmac(time=TIME, data=DATA):
 
 def test_aes_encrypt(data=DATA, nonce=NONCE):
     """
-    AES Encrypt (256 Bit, CFB8 Mode, No Padding)
+    AES Encrypt (256 Bit, CBC Mode, PKCS #5 Padding)
     """
-    data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).encrypt(data)
+    byte = AES.block_size - len(data) % AES.block_size
+    data = data + (byte * chr(byte))
+    data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).encrypt(data)
     return base64.b64encode(data), len(data)
 
 
 def test_aes_decrypt(data=DATA, nonce=NONCE):
     """
-    AES Decrypt (256 Bit, CFB8 Mode, No Padding)
+    AES Decrypt (256 Bit, CBC Mode, PKCS #5 Padding)
     """
     data = base64.b64decode(test_aes_encrypt(data, nonce)[0])
-    return AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).decrypt(data)
+    data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).decrypt(data)
+    return data[:-ord(data[len(data) - 1:])]
 
 
 def test_rsa_private(key=KEY, password=NONCE):

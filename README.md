@@ -170,7 +170,7 @@ will always be returned in plain text. Line endings must only consists of a
 Encryption of the message `nonce` and `body` is done in the following steps:
 
 1. Generate cyptographically secure 48 random bytes as message code.
-2. Encrypt the data with AES-256 (CFB8, no padding) using the first 32
+2. Encrypt the data with AES-256 (CBC mode, PKCS#5 padding) using the first 32
    bytes from the message code as key and the last 16 bytes as IV.
 3. Encrypt the message code with PKCS#1 OAEP and the receivers public key.
 
@@ -185,7 +185,7 @@ RSA keys are requiered to be 2048 bit strong and encoded in PEM / PKCS#8.
 Decryption of the received `nonce` and `body` is done in the following steps:
 
 1. Decrypt the nonce with PKCS#1 OAEP and the receivers private key.
-2. Decrypt the data with AES-256 (CFB8, no padding) using the first 32
+2. Decrypt the data with AES-256 (CBC mode, PKCS#5 padding) using the first 32
    bytes from the decrypted message code as key and the last 16 bytes as IV.
 
 All encrypted data is exchanged as JSON object in the request / response body
