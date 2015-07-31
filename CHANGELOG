@@ -1,5 +1,6 @@
 0.2.42
-* Changed AES cipher to use CBC mode with PCKS#5 padding
+* Fixed padding specification to PKCS#7
+* Changed AES cipher to use CBC mode with PKCS#5 padding
 * Changed test vectors script
 * Changed README.md
 

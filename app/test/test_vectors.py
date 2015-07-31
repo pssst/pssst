@@ -104,7 +104,7 @@ def test_hmac(time=TIME, data=DATA):
 
 def test_aes_encrypt(data=DATA, nonce=NONCE):
     """
-    AES Encrypt (256 Bit, CBC Mode, PKCS #5 Padding)
+    AES Encrypt (256 Bit, CBC Mode, PKCS #7 Padding)
     """
     byte = AES.block_size - len(data) % AES.block_size
     data = data + (byte * chr(byte))
@@ -114,7 +114,7 @@ def test_aes_encrypt(data=DATA, nonce=NONCE):
 
 def test_aes_decrypt(data=DATA, nonce=NONCE):
     """
-    AES Decrypt (256 Bit, CBC Mode, PKCS #5 Padding)
+    AES Decrypt (256 Bit, CBC Mode, PKCS #7 Padding)
     """
     data = base64.b64decode(test_aes_encrypt(data, nonce)[0])
     data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).decrypt(data)
