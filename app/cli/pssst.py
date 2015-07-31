@@ -245,7 +245,7 @@ class Pssst:
         def encrypt(self, data):
             nonce = Random.get_random_bytes(Pssst._Key.NONCE_SIZE)
             size = AES.block_size - len(data) % AES.block_size
-            data = data.ljust(size, chr(size))
+            data = data.ljust(AES.block_size, size)
 
             data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).encrypt(data)
             nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
