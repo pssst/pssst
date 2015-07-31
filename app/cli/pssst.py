@@ -246,8 +246,9 @@ class Pssst:
             nonce = Random.get_random_bytes(Pssst._Key.NONCE_SIZE)
             size = AES.block_size - len(data) % AES.block_size
             print(type(data))
-            print(type(chr(size)*size))
-            data = data + (chr(size) * size)
+            print(type(bytearray([size] * size)))
+            data = (data + bytearray([size] * size)).decode("ascii")
+            print(type(data))
 
             data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).encrypt(data)
             nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
