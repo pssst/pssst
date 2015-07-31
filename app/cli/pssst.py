@@ -247,7 +247,7 @@ class Pssst:
             size = AES.block_size - len(data) % AES.block_size
             print(type(data))
             print(type(chr(size)*size))
-            data = data + "".join([chr(size)] * size)
+            data = data + (chr(size) * size)
 
             data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).encrypt(data)
             nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
