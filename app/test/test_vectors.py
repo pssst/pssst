@@ -12,6 +12,7 @@ try:
     from Crypto.Hash import HMAC, SHA256
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
+    from Crypto.Util.py3compat import bchr, bord, tobytes
 except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
@@ -97,7 +98,7 @@ def test_hmac(time=TIME, data=DATA):
     HMAC (SHA 256 Bit)
     """
     time = test_time(time)
-    mac = HMAC.new(time, data, SHA256)
+    mac = HMAC.new(time, data.encode("ascii"), SHA256)
     mac = SHA256.new(mac.digest())
     return base64.b64encode(mac.digest()), len(mac.digest())
 
@@ -106,8 +107,8 @@ def test_aes_encrypt(data=DATA, nonce=NONCE):
     """
     AES Encrypt (256 Bit, CBC Mode, PKCS #7 Padding)
     """
-    byte = AES.block_size - len(data) % AES.block_size
-    data = data + (byte * chr(byte))
+    size = AES.block_size - (len(data) % AES.block_size)
+    data = tobytes(data) + (bchr(size) * size)
     data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).encrypt(data)
     return base64.b64encode(data), len(data)
 
@@ -118,7 +119,7 @@ def test_aes_decrypt(data=DATA, nonce=NONCE):
     """
     data = base64.b64decode(test_aes_encrypt(data, nonce)[0])
     data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).decrypt(data)
-    return data[:-ord(data[len(data) - 1:])]
+    return data[:-bord(data[-1])]
 
 
 def test_rsa_private(key=KEY, password=NONCE):
@@ -162,7 +163,7 @@ def test_rsa_sign(key=KEY, time=TIME, data=DATA):
     RSA Sign (PKCS #1 v1.5)
     """
     time = test_time(time)
-    mac = HMAC.new(time, data, SHA256)
+    mac = HMAC.new(time, data.encode("ascii"), SHA256)
     mac = SHA256.new(mac.digest())
     key = RSA.importKey(key)
     sig = PKCS1_v1_5.new(key).sign(mac)
@@ -174,11 +175,11 @@ def test_rsa_verify(key=KEY, time=TIME, data=DATA):
     RSA Verify (PKCS #1 v1.5)
     """
     time = test_time(time)
-    mac = HMAC.new(time, data, SHA256)
+    mac = HMAC.new(time, data.encode("ascii"), SHA256)
     mac = SHA256.new(mac.digest())
     key = RSA.importKey(key)
     sig = PKCS1_v1_5.new(key).sign(mac)
-    return "Yes" if PKCS1_v1_5.new(key).verify(mac, sig) else "No"
+    return b"Yes" if PKCS1_v1_5.new(key).verify(mac, sig) else b"No"
 
 
 def pretty(test, *args):

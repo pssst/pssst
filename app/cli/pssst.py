@@ -46,6 +46,7 @@ try:
     from Crypto.Hash import HMAC, SHA, SHA256
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
+    from Crypto.Util.py3compat import bchr, bord, tobytes
 except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
@@ -244,11 +245,8 @@ class Pssst:
 
         def encrypt(self, data):
             nonce = Random.get_random_bytes(Pssst._Key.NONCE_SIZE)
-            size = AES.block_size - len(data) % AES.block_size
-            print(type(data))
-            print(type(bytearray([size] * size)))
-            data = (data + bytearray([size] * size)).decode("ascii")
-            print(type(data))
+            size = AES.block_size - (len(data) % AES.block_size)
+            data = tobytes(data) + (bchr(size) * size)
 
             data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).encrypt(data)
             nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
@@ -259,7 +257,7 @@ class Pssst:
             nonce = PKCS1_OAEP.new(self.key).decrypt(nonce)
             data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).decrypt(data)
 
-            return data[:-ord(data[len(data) - 1:])]
+            return data[:-bord(data[-1])]
 
         def verify(self, data, timestamp, signature):
             current, data = int(round(time.time())), data.encode("utf-8")
