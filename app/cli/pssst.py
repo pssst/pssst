@@ -46,11 +46,12 @@ try:
     from Crypto.Hash import HMAC, SHA, SHA256
     from Crypto.PublicKey import RSA
     from Crypto.Signature import PKCS1_v1_5
+    from Crypto.Util.py3compat import bchr, bord, tobytes
 except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "0.2.41"
+__all__, __version__ = ["Pssst"], "0.2.42"
 
 
 def _encode64(data): # Utility shortcut
@@ -244,17 +245,19 @@ class Pssst:
 
         def encrypt(self, data):
             nonce = Random.get_random_bytes(Pssst._Key.NONCE_SIZE)
+            size = AES.block_size - (len(data) % AES.block_size)
+            data = tobytes(data) + (bchr(size) * size)
 
-            data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).encrypt(data)
+            data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).encrypt(data)
             nonce = PKCS1_OAEP.new(self.key).encrypt(nonce)
 
             return (data, nonce)
 
         def decrypt(self, data, nonce):
             nonce = PKCS1_OAEP.new(self.key).decrypt(nonce)
-            data = AES.new(nonce[:32], AES.MODE_CFB, nonce[32:]).decrypt(data)
+            data = AES.new(nonce[:32], AES.MODE_CBC, nonce[32:]).decrypt(data)
 
-            return data
+            return data[:-bord(data[-1])]
 
         def verify(self, data, timestamp, signature):
             current, data = int(round(time.time())), data.encode("utf-8")

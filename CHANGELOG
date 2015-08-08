@@ -1,3 +1,11 @@
+0.2.42
+* Added more Python versions to Travis CI
+* Fixed padding specification to PKCS#7
+* Fixed padding encoding bug
+* Changed AES cipher to use CBC mode with PKCS#5 padding
+* Changed test vectors script
+* Changed README.md
+
 0.2.41
 * Added server maintenance shell
 * Fixed some server code typos
