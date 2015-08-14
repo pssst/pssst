@@ -130,8 +130,10 @@ will be stored protocol agnostic. You can also add more fields to the HTTP
 body. The only field required by the server is `head.user`. All clients are
 requested to send an unique `user-agent` header per implementation.
 
-URL
----
+> An API specification (RAML) is available under `api.raml`.
+
+Address
+-------
 The official address of our (test) API is:
 
 `https://api.pssst.name`
