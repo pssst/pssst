@@ -130,7 +130,7 @@ will be stored protocol agnostic. You can also add more fields to the HTTP
 body. The only field required by the server is `head.user`. All clients are
 requested to send an unique `user-agent` header per implementation.
 
-> An API specification (RAML) is available under `api.raml`.
+> A RAML specification of the API is available under `server/api.raml`.
 
 Address
 -------
