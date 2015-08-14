@@ -1,7 +1,9 @@
 0.2.42
+* Added API RAML specification 
 * Added more Python versions to Travis CI
 * Fixed padding specification to PKCS#7
 * Fixed padding encoding bug
+* Moved API specification to server folder
 * Changed AES cipher to use CBC mode with PKCS#5 padding
 * Changed test vectors script
 * Changed README.md
