@@ -22,8 +22,8 @@ We advise you to please setup your own local test server and database
 
 Please be warned:
 
-> Do not rely on these endpoints. As they will not be backuped nor will they
-> be available all the time. These are meant only for API testing purposes.
+> Do not rely on these endpoints. As we do not backup these nor will they
+> be available all the time. These are meant only for testing purposes.
 
 Cryptography
 ------------
