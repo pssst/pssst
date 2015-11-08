@@ -7,9 +7,6 @@ services by our self, but we provide you with the tools to start your own
 service. These tools build upon open-source software and use strong end-to-end
 encryption.
 
-As this project is under continuous development, we advise you to not rely on
-our test server and run your own. We may change things, we may break things.
-
 Install
 -------
 ### CLI
@@ -60,6 +57,18 @@ Required if you want to run your own server:
 Please refer to the file `server/package.json` for further details on the
 required Node.js modules and their according versions.
 
+> We also have built-in support for Heroku and all its Redis database add-ons.
+
+As this project is under continuous development, we advise you to not rely on
+our test server and run your own. We may change things, we may break things.
+To start your own server, just execute the following command inside the
+`server` directory using the default Redis configuration:
+
+`$ npm start`
+
+The server will now start and create a default configuration file. A commented
+sample configuration file can be found under `server/config.json.sample`.
+
 > The default server port is `62421`.
 
 Commands
@@ -99,18 +108,6 @@ $ pssst pull bar.spam
 $ pssst delete bar.spam
 ```
 
-How To Set Up Your Own Server
------------------------------
-To setup your own server, just execute the following command inside the
-`server` directory using a default Redis configuration:
-
-`$ npm install && node start`
-
-The server will now start and create a default configuration file. A commented
-sample configuration can be found under `server/config.json.sample`.
-
-> We also have built-in support for Heroku and all its Redis database add-ons.
-
 ### Limits
 
 Every user has a fix limit of `512 MB` overall buffered data. This includes
@@ -122,26 +119,6 @@ this limit.
 
 > If you want to lower the users limit, please set the `quota` configuration
 > setting in your `server/config.json` file.
-
-Resources
----------
-Additional resouces can be found here:
-
-### Config
-
-Some useful configs can be found in this repository:
-
-[pssst/pssst-config](https://github.com/pssst/pssst-config)
-
-### Script
-
-Some useful scripts can be found in this repository:
-
-[pssst/pssst-script](https://github.com/pssst/pssst-script)
-
-Security Advisories
--------------------
-None known as of today.
 
 Contact
 -------
@@ -162,6 +139,18 @@ Please see the files `AUTHORS` and `THANKS` for further information.
 * If you have a concrete bug report for Pssst please go to the
   Pssst issue tracker on GitHub and submit your report:
   https://github.com/pssst/pssst/issues
+
+### Repositories
+
+* This repository contains our configurations for various services:
+  https://github.com/pssst/pssst-config/
+
+* This repository contains our maintenance and utility scripts:
+  https://github.com/pssst/pssst-script/
+
+Security Advisories
+-------------------
+None known as of today.
 
 License
 -------
