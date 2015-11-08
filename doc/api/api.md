@@ -402,6 +402,6 @@ Message pushed
 
 Appendix
 --------
-[RFC 2313 (PKCS#1)](https://tools.ietf.org/html/rfc2313)
-[RFC 2315 (PKCS#7)](https://tools.ietf.org/html/rfc2315)
-[RFC 5208 (PKCS#8)](https://tools.ietf.org/html/rfc5208)
+* [RFC 2313 (PKCS#1)](https://tools.ietf.org/html/rfc2313)
+* [RFC 2315 (PKCS#7)](https://tools.ietf.org/html/rfc2315)
+* [RFC 5208 (PKCS#8)](https://tools.ietf.org/html/rfc5208)
