@@ -21,15 +21,15 @@ try {
   var fs = require('fs');
   var info = require('./package.json');
   var config = JSON.stringify({
-    "debug": 0,
     "port": 62421,
+    "debug": 0,
     "db": {
       "source": 6379,
       "number": 0
     },
     "app": {
       "allow": null,
-      "limit": null
+      "quota": null
     }
   }, null, 2);
 

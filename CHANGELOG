@@ -1,5 +1,12 @@
+0.2.43
+* Added all relevant RFC documents
+* Moved documentation to doc folder
+* Changed server sample config
+* Changed limit to quota
+* Changed README.md
+
 0.2.42
-* Added API RAML specification 
+* Added API RAML specification
 * Added more Python versions to Travis CI
 * Fixed padding specification to PKCS#7
 * Fixed padding encoding bug

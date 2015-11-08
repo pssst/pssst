@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 var ALLOW = '.*';
-var LIMIT = 536870912; // 512 MB
+var LIMIT = 536870912; // 512 MB (From Redis DB)
 
 /**
  * Returns a new user.
@@ -67,11 +67,11 @@ exports.isAllowed = function isAllowed(name, allow) {
 };
 
 /**
- * Returns if the user has reached his limit.
+ * Returns if the user has reached his quota.
  *
  * @param {Object} the user
  * @return {Boolean} true if limited
  */
-exports.isMaximum = function isMaximum(user) {
+exports.isLimited = function isLimited(user) {
   return (JSON.stringify(user).length >= user.max);
 };

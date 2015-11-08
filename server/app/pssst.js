@@ -137,7 +137,7 @@ module.exports = function Pssst(app, db, config) {
         return res.sign(400, 'Public key invalid');
       }
 
-      user = User.create(req.body.key, config.limit);
+      user = User.create(req.body.key, config.quota);
 
       api.respond(req, res, user, 'User created');
     }, req.body.key);
@@ -178,9 +178,9 @@ module.exports = function Pssst(app, db, config) {
   app.post('/1/:user/:box?', function create(req, res) {
     api.request(req, res, function request(user, box) {
 
-      // Assert user is within limit
-      if (User.isMaximum(user)) {
-        return res.sign(413, 'User reached limit');
+      // Assert user is within quota
+      if (User.isLimited(user)) {
+        return res.sign(413, 'User reached quota');
       }
 
       // Assert box name is allowed
@@ -222,9 +222,9 @@ module.exports = function Pssst(app, db, config) {
   app.put('/1/:user/:box?', function push(req, res) {
     api.request(req, res, function request(user, box) {
 
-      // Assert user is within limit
-      if (User.isMaximum(user)) {
-        return res.sign(413, 'User reached limit');
+      // Assert user is within quota
+      if (User.isLimited(user)) {
+        return res.sign(413, 'User reached quota');
       }
 
       // Add request timestamp to message
