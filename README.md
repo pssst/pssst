@@ -8,21 +8,34 @@ service. These tools build upon open-source software and use strong end-to-end
 encryption.
 
 ```
-$ pssst me you "Hello World"
+$ pssst me you "Hello"
 ```
 
-Example
--------
-In this example we create the users `me` & `you` and the box `you.spam`. Then
-we push a message from `me` to `you.spam` and we pull it by `you`. And finally
-deleting the box `you.spam` _because nobody likes spam_.
-
+Usage
+-----
+Create the users `me` and `you`:
 ```
 $ pssst create me
 $ pssst create you
+```
+
+Create the box `you.spam`:
+```
 $ pssst create you.spam
-$ pssst push me you.spam "Hello World"
+```
+
+Push a message from `me` to `you.spam`:
+```
+$ pssst push me you.spam "Hello"
+```
+
+Pull new messages from `you.spam`:
+```
 $ pssst pull you.spam
+```
+
+Delete the box `you.spam` (_because nobody likes spam_):
+```
 $ pssst delete you.spam
 ```
 
@@ -139,7 +152,7 @@ required to make verified HTTPS connections.
 
 Please take a look at our [documentation](/doc/) which can be under `doc`.
 
-We alse have additional repositories:
+We also have additional repositories:
 * [Pssst Configs](https://github.com/pssst/pssst-config/)
 * [Pssst Scripts](https://github.com/pssst/pssst-script/)
 
