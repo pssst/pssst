@@ -5,7 +5,7 @@ will be stored protocol agnostic. You can also add more fields to the HTTP
 body. The only field required by the server is `head.user`. All clients are
 requested to send an unique `user-agent` header per implementation.
 
-> A RAML specification of the API is available under `doc/api/api.raml`.
+> A RAML specification of the API is available under `docs/api/api.raml`.
 
 Reference Implementation
 ------------------------
@@ -98,7 +98,7 @@ using the SHA-1 hash. If they do not match, the client must terminate
 immediately.
 
 For further information about the used cryptographical methods, please consult
-the RFCs listed in the appendix which can be found in `doc/rfc` directory.
+the RFCs listed in the appendix which can be found in `docs/rfc` directory.
 
 Server Actions
 --------------

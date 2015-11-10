@@ -85,7 +85,7 @@ sample configuration file can be found under `server/config.json.sample`.
 
 API
 ---
-Our full [API](/doc/api/api.md) documentation can be found under `doc/api`.
+Our full [API](/docs/api/api.md) documentation can be found under `docs/api`.
 
 ### Commands
 
@@ -150,7 +150,7 @@ required to make verified HTTPS connections.
 
 **Where can I find additional resources?**
 
-Please take a look at our [documentation](/doc/) which can be under `doc`.
+Please take a look at our [documentation](/docs/) which can be under `docs`.
 
 We also have additional repositories:
 * [Pssst Configs](https://github.com/pssst/pssst-config/)
