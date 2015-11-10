@@ -19,12 +19,12 @@ securitySchemes:
             maxLength: 696
             example: |
               1234567890; ABCDEFGHIJKLMNOPQRSTUVWXYZ...
-/{userName}:
+/{user}:
   displayName: User
   description: A specific user
   uriParameters:
-    userName:
-      displayName: User name
+    user:
+      displayName: User
       type: string
   post:
     description: This method will create this user
@@ -78,12 +78,12 @@ securitySchemes:
                   "required": true,
                   "type": "array"
                 ]
-  /{boxName}:
+  /{box}:
     displayName: Box
     description: A specific box
     uriParameters:
-      boxName:
-        displayName: Box name
+      box:
+        displayName: Box
         type: string
     get:
       description: This method will pull a message

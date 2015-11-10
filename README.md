@@ -7,72 +7,75 @@ services by our self, but we provide you with the tools to start your own
 service. These tools build upon open-source software and use strong end-to-end
 encryption.
 
+```
+$ pssst me you "Hello World"
+```
+
+Example
+-------
+In this example we create the users `me` & `you` and the box `you.spam`. Then
+we push a message from `me` to `you.spam` and we pull it by `you`. And finally
+deleting the box `you.spam` _because nobody likes spam_.
+
+```
+$ pssst create me
+$ pssst create you
+$ pssst create you.spam
+$ pssst push me you.spam "Hello World"
+$ pssst pull you.spam
+$ pssst delete you.spam
+```
+
 Install
 -------
 ### CLI
 
-Required for the command line interface (CLI):
+Required at least for the CLI (command line interface):
 
-* At least Python 2.7.3
-* At least Requests 2.0.1
-* At least PyCrypto 2.6.1
+* Python 2.7
+* Requests 2.0
+* PyCrypto 2.6
 
-There is no need to install anything, just run the `app/cli/pssst.py` script:
+There is no need to install anything, just run the script `app/cli/pssst.py`:
 
-`$ pssst.py [option|command]`
+`$ pssst.py`
 
 If you wish to install the CLI on a POSIX compatible system, just execute:
 
 `$ curl -s https://get.pssst.name | bash`
 
-If you want to use any other server besides our test API, simply create a file
-named `.pssst` in your home directory with the desired server address:
-
-`$ echo http://localhost:62421 > ~/.pssst`
-
-Please use the `--help` option to show further help on the CLI. All user
-specific data will be stored as zip files named `.pssst.<username>` in
-the users home directory.
-
-> If you use Python 2.7 than pyASN1, pyOpenSSL and ndg-httpsclient
-> are also required to make verified HTTPS connections.
-
 ### GUI
 
-Required for the HTML interface (GUI):
+Required at least for the GUI (HTML interface):
 
-* At least CherryPy 3.2.2
-* At least Bower 1.3.12
+* CherryPy 3.2
+* Bower 1.3
 
-Please start the GUI with the `app/gui/start` script. This
-will download and install all necessary packages.
+Please start the GUI per `app/gui/start` script, this will download and
+install all necessary Bower packages. The GUI uses the CLI as a local
+proxy, so those requirements apply here also.
 
 ### Server
 
-Required if you want to run your own server:
+Required at least if you want to run your own server:
 
-* At least Node.js 0.10
-* A Redis database server
+* Node.js 0.10
+* A Redis database instance
 
-Please refer to the file `server/package.json` for further details on the
-required Node.js modules and their according versions.
-
-> We also have built-in support for Heroku and all its Redis database add-ons.
-
-As this project is under continuous development, we advise you to not rely on
-our test server and run your own. We may change things, we may break things.
 To start your own server, just execute the following command inside the
-`server` directory using the default Redis configuration:
+`server` directory using a default Redis Database configuration:
 
 `$ npm start`
 
 The server will now start and create a default configuration file. A commented
 sample configuration file can be found under `server/config.json.sample`.
 
-> The default server port is `62421`.
+API
+---
+Our full [API](/doc/api/api.md) documentation can be found under `doc/api`.
 
-Commands
---------
+### Commands
+
 These commands are currently supported by the API:
 
 * `create` an user or a box.
@@ -84,29 +87,14 @@ These commands are currently supported by the API:
 
 ### Names
 
-All user names are specified by this format:
+All user/box names are specified by this format:
 
-`pssst.<username>.<boxname>`
+`pssst.<user>.<box>`
 
 All user and box names must be between 2 and 63 characters long and must only
 contain of the lowercase letters a-z and numbers. The service prefix `pssst.`
 can be omitted, but should be specified for clarity reasons. If no box name
-is given, the users default box named `box` is used.
-
-Examples
---------
-In this example we create the users `foo`, `bar` and the box `bar.spam`. Then
-pushing a message from `foo` to this box and pulling it by `bar`. And finally
-deleting the box _because nobody likes spam_.
-
-```
-$ pssst create foo
-$ pssst create bar
-$ pssst create bar.spam
-$ pssst push foo bar.spam "Hello World"
-$ pssst pull bar.spam
-$ pssst delete bar.spam
-```
+is given, the users default box (named `box`) is used.
 
 ### Limits
 
@@ -117,17 +105,50 @@ separately. This is limit is hard coded by the Redis database and may change
 in future releases. Only messages not yet pulled by the user will count to
 this limit.
 
-> If you want to lower the users limit, please set the `quota` configuration
+> If you want to lower the limit per user, please set the `quota` config
 > setting in your `server/config.json` file.
+
+FAQ
+---
+**How can I use my own server?**
+
+If you want to use any other server besides our test API, simply create a file
+named `.pssst` in your home directory with the desired server address:
+
+`$ echo http://localhost:62421 > ~/.pssst`
+
+**What is the default server port?**
+
+The default server port is `62421`.
+
+**What services do you support?**
+
+We have built-in support for Heroku and all its Redis database add-ons.
+
+**Where are my user settings stored?**
+
+All user specific data is stored as zip files named `.pssst.<user>` in the
+users home directory.
+
+**How can I use verified HTTPS connections with Python 2.x?**
+
+If you use Python 2.7 than pyASN1, pyOpenSSL and ndg-httpsclient are also
+required to make verified HTTPS connections.
+
+**Where can I find additional resources?**
+
+Please take a look at our [documentation](/doc/) which can be under `doc`.
+
+We alse have additional repositories:
+* [Pssst Configs](https://github.com/pssst/pssst-config/)
+* [Pssst Scripts](https://github.com/pssst/pssst-script/)
+
+Warnings
+--------
+No Security Advisories are known as of today.
 
 Contact
 -------
-### Authors
-
-Please see the files `AUTHORS` and `THANKS` for further information.
-
-### Resources
-
 * If you want to be informed about new releases, general news
   and information about Pssst, please visit our website under:
   https://pssst.name
@@ -140,17 +161,9 @@ Please see the files `AUTHORS` and `THANKS` for further information.
   Pssst issue tracker on GitHub and submit your report:
   https://github.com/pssst/pssst/issues
 
-### Repositories
-
-* This repository contains our configurations for various services:
-  https://github.com/pssst/pssst-config/
-
-* This repository contains our maintenance and utility scripts:
-  https://github.com/pssst/pssst-script/
-
-Security Advisories
--------------------
-None known as of today.
+Authors
+-------
+Please see the files `AUTHORS` and `THANKS` for further information.
 
 License
 -------

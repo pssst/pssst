@@ -196,7 +196,7 @@ default box `box`. The given key must be in PEM format.
 #### Request
 
 ```
-POST /1/<username> HTTP/1.1
+POST /1/<user> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-type: application/json
@@ -225,7 +225,7 @@ users.
 #### Request
 
 ```
-DELETE /1/<username> HTTP/1.1
+DELETE /1/<user> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -248,7 +248,7 @@ Returns the users public key in PEM format.
 #### Request
 
 ```
-GET /1/<username>/key HTTP/1.1
+GET /1/<user>/key HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 ```
@@ -271,7 +271,7 @@ users.
 #### Request
 
 ```
-GET /1/<username>/list HTTP/1.1
+GET /1/<user>/list HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -307,7 +307,7 @@ are restricted because of their protocol usage.
 #### Request
 
 ```
-POST /1/<username>/<boxname> HTTP/1.1
+POST /1/<user>/<box> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -331,7 +331,7 @@ box `box` can not be deleted.
 #### Request
 
 ```
-DELETE /1/<username>/<boxname> HTTP/1.1
+DELETE /1/<user>/<box> HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -357,7 +357,7 @@ the servers current EPOCH timestamp while processing the pushed message.
 #### Request
 
 ```
-GET /1/<username>/<boxname>/ HTTP/1.1
+GET /1/<user>/<box>/ HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-hash: <timestamp>; <signature>
@@ -381,7 +381,7 @@ Pushes a message into an users box. If no box is specified, the default box
 #### Request
 
 ```
-PUT /1/<username>/<boxname>/ HTTP/1.1
+PUT /1/<user>/<box>/ HTTP/1.1
 host: api.pssst.name
 user-agent: <app>
 content-type: application/json
