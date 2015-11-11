@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Test Vectors
+Pssst Test Vectors
 """
 import base64
 import sys
@@ -199,7 +199,7 @@ def main(script):
     """
     Prints the test vectors
     """
-    print(__doc__.lstrip())
+    print(__doc__.upper().lstrip())
     pretty(test_data)
     pretty(test_time)
     pretty(test_nonce)

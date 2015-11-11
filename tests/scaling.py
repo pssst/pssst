@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Test Scaling
+Pssst Server Scaling Test
 """
 import os
 import random

@@ -49,7 +49,7 @@ Required at least for the CLI (command line interface):
 * Requests 2.0
 * PyCrypto 2.6
 
-There is no need to install anything, just run the script `app/cli/pssst.py`:
+There is no need to install anything, just run the script `src/cli/pssst.py`:
 
 `$ pssst.py`
 
@@ -64,7 +64,7 @@ Required at least for the GUI (HTML interface):
 * CherryPy 3.2
 * Bower 1.3
 
-Please start the GUI per `app/gui/start` script, this will download and
+Please start the GUI per `src/gui/start` script, this will download and
 install all necessary Bower packages. The GUI uses the CLI as a local
 proxy, so those requirements apply here also.
 
@@ -81,7 +81,7 @@ To start your own server, just execute the following command inside the
 `$ npm start`
 
 The server will now start and create a default configuration file. A commented
-sample configuration file can be found under `server/config.json.sample`.
+sample configuration file can be found under `src/server/config.json.sample`.
 
 API
 ---
@@ -119,7 +119,7 @@ in future releases. Only messages not yet pulled by the user will count to
 this limit.
 
 > If you want to lower the limit per user, please set the `quota` config
-> setting in your `server/config.json` file.
+> setting in your `src/server/config.json` file.
 
 FAQ
 ---
