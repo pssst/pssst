@@ -21,7 +21,7 @@ before_script:
   - cd src/server
   - npm install
   - node start &
-  - cd ..
+  - cd ../..
   - sleep 10
 script:
   - python src/cli/pssst_test.py
