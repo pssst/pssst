@@ -18,10 +18,10 @@ install:
 before_script:
   - echo 'http://localhost:62421' > ~/.pssst
   - export PYTHON=`which python2`
-  - cd server
+  - cd src/server
   - npm install
   - node start &
   - cd ..
   - sleep 10
 script:
-  - python app/cli/pssst_test.py
+  - python src/cli/pssst_test.py
