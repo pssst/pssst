@@ -7,34 +7,40 @@ services by our self, but we provide you with the tools to start your own
 service. These tools build upon open-source software and use strong end-to-end
 encryption.
 
+**How to get**
+```
+$ curl -s https://get.pssst.name | bash
+```
+
+**How to use**
 ```
 $ pssst me you "Hello"
 ```
 
 Usage
 -----
-Create the users `me` and `you`:
+**Create the users `me` and `you`**
 ```
 $ pssst create me
 $ pssst create you
 ```
 
-Create the box `you.spam`:
+**Create the box `you.spam`**
 ```
 $ pssst create you.spam
 ```
 
-Push a message from `me` to `you.spam`:
+**Push a message from `me` to `you.spam`**
 ```
 $ pssst push me you.spam "Hello"
 ```
 
-Pull new messages from `you.spam`:
+**Pull new messages from `you.spam`**
 ```
 $ pssst pull you.spam
 ```
 
-Delete the box `you.spam` (_because nobody likes spam_):
+**Delete the box `you.spam`** (_because nobody likes spam_)
 ```
 $ pssst delete you.spam
 ```
@@ -43,7 +49,7 @@ Install
 -------
 ### CLI
 
-Required at least for the CLI (command line interface):
+Required (at least) for the CLI (command line interface):
 
 * Python 2.7
 * Requests 2.0
@@ -53,13 +59,13 @@ There is no need to install anything, just run the script `src/cli/pssst.py`:
 
 `$ pssst.py`
 
-If you wish to install the CLI on a POSIX compatible system, just execute:
+If you wish to install the CLI on a POSIX compatible system just execute:
 
 `$ curl -s https://get.pssst.name | bash`
 
 ### GUI
 
-Required at least for the GUI (HTML interface):
+Required (at least) for the GUI (HTML interface):
 
 * CherryPy 3.2
 * Bower 1.3
@@ -70,7 +76,7 @@ proxy, so those requirements apply here also.
 
 ### Server
 
-Required at least if you want to run your own server:
+Required (at least) if you want to run your own server:
 
 * Node.js 0.10
 * A Redis database instance
@@ -85,7 +91,7 @@ sample configuration file can be found under `src/server/config.json.sample`.
 
 API
 ---
-Our full [API](/docs/api/api.md) documentation can be found under `docs/api`.
+Our full [API](/docs/api/api.md) documentation can be found under `docs/api/`.
 
 ### Commands
 
@@ -150,7 +156,7 @@ required to make verified HTTPS connections.
 
 **Where can I find additional resources?**
 
-Please take a look at our [documentation](/docs/) which can be under `docs`.
+Please take a look at our [documentation](/docs/) which can be under `docs/`.
 
 We also have additional repositories:
 * [Pssst Configs](https://github.com/pssst/pssst-config/)
@@ -158,7 +164,7 @@ We also have additional repositories:
 
 Warnings
 --------
-No Security Advisories are known as of today.
+No security advisories are known as of today.
 
 Contact
 -------
