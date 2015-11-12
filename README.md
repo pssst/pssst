@@ -19,28 +19,28 @@ $ pssst me you "Hello"
 
 Usage
 -----
-**Create the users `me` and `you`**
+Create the users `me` and `you`
 ```
 $ pssst create me
 $ pssst create you
 ```
 
-**Create the box `you.spam`**
+Create the box `you.spam`
 ```
 $ pssst create you.spam
 ```
 
-**Push a message from `me` to `you.spam`**
+Push a message from `me` to `you.spam`
 ```
 $ pssst push me you.spam "Hello"
 ```
 
-**Pull new messages from `you.spam`**
+Pull new messages from `you.spam`
 ```
 $ pssst pull you.spam
 ```
 
-**Delete the box `you.spam`** (_because nobody likes spam_)
+Delete the box `you.spam` (_because nobody likes spam_)
 ```
 $ pssst delete you.spam
 ```
