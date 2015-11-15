@@ -15,7 +15,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * Pssst rounting and handling.
+ * Pssst routing and handling.
  *
  * @param {Object} express app
  * @param {Object} database wrapper
@@ -23,12 +23,11 @@
  */
 module.exports = function Pssst(app, db, config) {
 
-  // Required static classes
-  var User = require('./pssst.user.js');
-  var Box = require('./pssst.box.js');
-
   // Required constants
   var BOX = 'box';
+  var ALLOW = '.*';
+  var LIMIT = 536870912; // 512 MB (From Redis DB)
+  var RESERVED = ['box', 'key', 'list'];
 
   // Pssst API version 1
   var api = {
@@ -113,6 +112,151 @@ module.exports = function Pssst(app, db, config) {
           res.sign(204);
         }
       })
+    }
+  };
+
+  // Pssst user methods
+  var User = {
+    /**
+     * Returns a new user.
+     *
+     * @param {String} the key (PEM format)
+     * @param {Integer} the maximum bytes
+     * @return {Object} the new user
+     */
+    create: function create(key, max) {
+      return {
+        key: key,
+        max: max || LIMIT,
+        box: {
+          box: [] // Default box
+        }
+      };
+    },
+
+    /**
+     * Deletes an user.
+     *
+     * @param {Object} the user
+     */
+    erase: function erase(user) {
+      user.key = null;
+      user.max = null;
+      user.box = null;
+    },
+
+    /**
+     * Returns if the user is deleted.
+     *
+     * @param {Object} the user
+     * @return {Boolean} true if deleted
+     */
+    isDeleted: function isDeleted(user) {
+      return (user.key === null);
+    },
+
+    /**
+     * Returns if the user name is allowed.
+     *
+     * @param {String} the user name
+     * @param {String} the regular expression
+     * @return {Boolean} true if allowed
+     */
+    isAllowed: function isAllowed(name, allow) {
+      return new RegExp(allow || ALLOW).test(name);
+    },
+
+    /**
+     * Returns if the user has reached his quota.
+     *
+     * @param {Object} the user
+     * @return {Boolean} true if limited
+     */
+    isLimited: function isLimited(user) {
+      return (JSON.stringify(user).length >= user.max);
+    }
+  };
+
+  // Pssst box methods
+  var Box = {
+    /**
+     * Creates a new box.
+     *
+     * @param {Object} the user
+     * @param {String} the box name
+     */
+    create: function create(user, box) {
+      user.box[box] = [];
+    },
+
+    /**
+     * Deletes a box.
+     *
+     * @param {Object} the user
+     * @param {String} the box name
+     */
+    erase: function erase(user, box) {
+      delete user.box[box];
+    },
+
+    /**
+     * Returns a list of all user boxes.
+     *
+     * @param {Object} the user
+     * @return {Object} list of box names
+     */
+    list: function list(user) {
+      return Object.keys(user.box).sort();
+    },
+
+    /**
+     * Returns the box object.
+     *
+     * @param {Object} the user
+     * @param {String} the box name
+     * @return {Object} the box or null
+     */
+    find: function find(user, box) {
+      if (box in user.box) {
+        return {
+          /**
+           * The associated user.
+           *
+           * @type {Object} the user
+           */
+          user: user,
+
+          /**
+           * Pulls the first message from the box.
+           *
+           * @return {Object} the message
+           */
+          pull: function pull() {
+            return user.box[box].shift();
+          },
+
+          /**
+           * Pushes a message into the box.
+           *
+           * @param {Object} the message
+           */
+          push: function push(message) {
+            user.box[box].push(message);
+          }
+        };
+      } else {
+        return null; // Box not found
+      }
+    },
+
+    /**
+     * Returns if the box name is allowed.
+     *
+     * @param {String} the box name
+     * @return {Boolean} true if allowed
+     */
+    isAllowed: function isAllowed(box) {
+      return (RESERVED.indexOf(box) < 0);
     }
   };
 

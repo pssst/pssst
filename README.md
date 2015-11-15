@@ -73,7 +73,7 @@ Needed if you want to run your own server:
 
 Just execute this command in your `src/server` directory to start the server:
 
-`$ npm start`
+`$ npm install && npm start`
 
 API
 ---

@@ -1,7 +1,8 @@
 0.2.44
-* Added Python requirements files
+* Added Python requirement files
 * Refactored project structure
 * Refactored documentation
+* Refactored server app
 
 0.2.43
 * Added all relevant RFC documents
