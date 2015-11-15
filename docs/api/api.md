@@ -25,6 +25,30 @@ Please be warned:
 > Do not rely on these endpoints. As we do not backup these nor will they
 > be available all the time. These are meant only for testing purposes.
 
+### User Names
+
+All user/box names are specified by this format:
+
+`pssst.<user>.<box>`
+
+All user and box names must be between 2 and 63 characters long and must only
+contain of the lowercase letters a-z and numbers. The service prefix `pssst.`
+can be omitted, but should be specified for clarity reasons. If no box name
+is given, the users default box (named `box`) is used.
+
+### User Quota
+
+Every user has a fix limit of `512 MB` overall buffered data. This includes
+all user specific data, such as the public key, boxes and messages. Neither
+the number of the users boxes, nor the size of a message are limited
+separately. This is limit is hard coded by the Redis database and may change
+in future releases. Only messages not yet pulled by the user will count to
+this limit.
+
+> To lower the used default quota at the time of the user creation, the 
+> `quota` config setting in the `src/server/config.json` file can be used. A
+> commented sample config can be found under `src/server/config.json.sample`.
+
 Cryptography
 ------------
 ### Encoding
@@ -98,7 +122,8 @@ using the SHA-1 hash. If they do not match, the client must terminate
 immediately.
 
 For further information about the used cryptographical methods, please consult
-the RFCs listed in the appendix which can be found in `docs/rfc` directory.
+the [RFCs](/docs/rfc) listed in the appendix, which can be found in `docs/rfc`
+directory.
 
 Server Actions
 --------------
