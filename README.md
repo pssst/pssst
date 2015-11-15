@@ -19,23 +19,23 @@ $ pssst me you "Hello"
 
 Commands
 --------
-**`pssst create`**
+`pssst create`
 
 Creates an user or a box.
 
-**`pssst delete`**
+`pssst delete`
 
 Deletes an user or a box.
 
-**`pssst list`**
+`pssst list`
 
 Lists all boxes.
 
-**`pssst push`**
+`pssst push`
 
 Pushes a messages into a box.
 
-**`pssst pull`**
+`pssst pull`
 
 Pulls a message from a box.
 
@@ -79,6 +79,10 @@ API
 ---
 Our full [API](/docs/api/api.md) documentation can be found under `docs/api/`.
 
+CVE
+---
+No security advisories are known as of today.
+
 FAQ
 ---
 **How can I use my own server?**
@@ -105,10 +109,6 @@ users home directory.
 
 If you use Python 2.7 than pyASN1, pyOpenSSL and ndg-httpsclient are also
 required to make verified HTTPS connections.
-
-CVE
----
-No security advisories are known as of today.
 
 Contact
 -------
