@@ -1,5 +1,4 @@
 @echo off
-
 IF EXIST pssst.py GOTO START
 
 bower install

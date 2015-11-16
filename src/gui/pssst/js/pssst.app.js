@@ -142,7 +142,7 @@ define(['js/pssst.api.js'], function (api) {
         all.removeClass('fa-folder-open').addClass('fa-folder');
         box.removeClass('fa-folder').addClass('fa-folder-open');
 
-        document.title = 'Pssst - ' + user + '.' + boxname;
+        document.title = 'Pssst | ' + user + '.' + boxname;
       },
 
       /**

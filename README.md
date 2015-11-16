@@ -60,9 +60,9 @@ Needed for the GUI (HTML interface) also:
 * CherryPy 3.2
 * Bower 1.3
 
-Just run the `src/gui/pssst.sh` script to start the GUI:
+Just run the `src/gui/start.sh` script to start the GUI:
 
-`$ pssst.sh`
+`$ start.sh`
 
 ### Server
 

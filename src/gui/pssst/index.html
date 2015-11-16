@@ -1,161 +1,169 @@
 <!DOCTYPE html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="language" content="english" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/bower/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/bower/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/bower/animate.css/animate.min.css">
-    <link rel="stylesheet" href="/pssst/css/style.css">
-    <link rel="shortcut icon" href="/pssst/favicon.ico" />
-    <title>Pssst</title>
-  </head>
-  <body>
-    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-      <ul class="nav navbar-nav navbar-left">
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" title="Actions" href="">
-            <span class="fa fa-lg fa-ellipsis-v"></span>
-          </a>
-          <ul class="dropdown-menu">
-            <li>
-              <a href="#create-dialog" data-toggle="modal">
-                <span class="fa fa-folder"></span>&nbsp;&nbsp;Create Box
-              </a>
-            </li>
-            <li>
-              <a href="#delete-dialog" data-toggle="modal">
-                <span class="fa fa-folder"></span>&nbsp;&nbsp;Delete Box
-              </a>
-            </li>
-            <li class="divider"></li>
-            <li>
-              <a href="#disable-dialog" data-toggle="modal">
-                <span class="fa fa-user"></span>&nbsp;&nbsp;Delete User
-              </a>
-            </li>
-            <li class="divider"></li>
-            <li>
-              <a id="logout" href="">
-                <span class="fa fa-sign-out"></span>&nbsp;&nbsp;Logout
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a id="user" class="dropdown-toggle" data-toggle="dropdown" title="Boxes" href=""></a>
-          <ul id="boxes" class="dropdown-menu"></ul>
-        </li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-        <form class="navbar-form navbar-left" role="search">
-          <button id="write" class="btn btn-default navbar-button" type="button" data-toggle="modal" data-target="#write-dialog">
-            <span class="fa fa-pencil"></span>
+<html lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta charset="utf-8">
+  <title>Pssst | Simple. Secure.</title>
+  <meta name="language" content="english">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Christian & Christian">
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" type="text/css" href="/bower/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/bower/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/bower/animate.css/animate.min.css">
+  <link rel="stylesheet" type="text/css" href="/pssst/css/style.css">
+  <!--[if lt IE 9]>
+    <script src="/bower/html5shiv/dist/html5shiv.js"></script>
+    <script src="/bower/respond/dest/respond.min.js"></script>
+  <![endif]-->
+  <link rel="shortcut icon" type="image/x-icon" href="/pssst/favicon.ico">
+</head>
+<body>
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <ul class="nav navbar-nav navbar-left">
+      <li class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" title="Actions" href="">
+          <span class="fa fa-lg fa-ellipsis-v"></span>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="#create-dialog" data-toggle="modal">
+              <span class="fa fa-folder"></span>&nbsp;&nbsp;Create Box
+            </a>
+          </li>
+          <li>
+            <a href="#delete-dialog" data-toggle="modal">
+              <span class="fa fa-folder"></span>&nbsp;&nbsp;Delete Box
+            </a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a href="#disable-dialog" data-toggle="modal">
+              <span class="fa fa-user"></span>&nbsp;&nbsp;Delete User
+            </a>
+          </li>
+          <li class="divider"></li>
+          <li>
+            <a id="logout" href="">
+              <span class="fa fa-sign-out"></span>&nbsp;&nbsp;Logout
+            </a>
+          </li>
+        </ul>
+      </li>
+      <li class="dropdown">
+        <a id="user" class="dropdown-toggle" data-toggle="dropdown" title="Boxes" href=""></a>
+        <ul id="boxes" class="dropdown-menu"></ul>
+      </li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <form class="navbar-form navbar-left" role="search">
+        <button id="write" class="btn btn-default navbar-button" type="button" data-toggle="modal" data-target="#write-dialog">
+          <span class="fa fa-pencil"></span>
+        </button>
+      </form>
+      <li>&nbsp;&nbsp;</li>
+    </ul>
+  </nav>
+  <div id="error" class="alert alert-danger" role="alert"></div>
+  <div id="login-dialog" class="modal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">
+            <a href="https://pssst.name" target="_blank">Pssst</a>&nbsp;&nbsp;<small><span class="version"></span></small>
+          </h4>
+        </div>
+        <div class="modal-body">
+          <input id="username" type="text" class="form-control" placeholder="Username" required autofocus/>
+          <input id="password" type="password" class="form-control" placeholder="Password" required/>
+        </div>
+        <div class="modal-footer">
+          <button id="login-create" type="button" class="btn btn-default">
+            <span class="fa fa-user"></span> Create
           </button>
-        </form>
-        <li>&nbsp;&nbsp;</li>
-      </ul>
-    </nav>
-    <div id="error" class="alert alert-danger" role="alert"></div>
-    <div id="login-dialog" class="modal">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">
-              <a href="https://pssst.name" target="_blank">Pssst</a>&nbsp;&nbsp;<small><span class="version"></span></small>
-            </h4>
-          </div>
-          <div class="modal-body">
-            <input id="username" type="text" class="form-control" placeholder="Username" required autofocus/>
-            <input id="password" type="password" class="form-control" placeholder="Password" required/>
-          </div>
-          <div class="modal-footer">
-            <button id="login-create" type="button" class="btn btn-default">
-              <span class="fa fa-user"></span> Create
-            </button>
-            <button id="login-exists" type="button" class="btn btn-primary">
-              <span class="fa fa-sign-in"></span> Login
-            </button>
-          </div>
+          <button id="login-exists" type="button" class="btn btn-primary">
+            <span class="fa fa-sign-in"></span> Login
+          </button>
         </div>
       </div>
     </div>
-    <div id="create-dialog" class="modal" role="dialog">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-body">
-            <input id="boxname" type="text" class="form-control" placeholder="Box" required autofocus/>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">
-              Cancel
-            </button>
-            <button id="create" type="button" class="btn btn-primary" data-dismiss="modal">
-              <span class="fa fa-check"></span> Create
-            </button>
-          </div>
+  </div>
+  <div id="create-dialog" class="modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-body">
+          <input id="boxname" type="text" class="form-control" placeholder="Box" required autofocus/>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Cancel
+          </button>
+          <button id="create" type="button" class="btn btn-primary" data-dismiss="modal">
+            <span class="fa fa-check"></span> Create
+          </button>
         </div>
       </div>
     </div>
-    <div id="delete-dialog" class="modal" role="dialog">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-body">
-            Delete this box?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">
-              Cancel
-            </button>
-            <button id="delete" type="button" class="btn btn-danger" data-dismiss="modal">
-              <span class="fa fa-times"></span> Delete
-            </button>
-          </div>
+  </div>
+  <div id="delete-dialog" class="modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-body">
+          Delete this box?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Cancel
+          </button>
+          <button id="delete" type="button" class="btn btn-danger" data-dismiss="modal">
+            <span class="fa fa-times"></span> Delete
+          </button>
         </div>
       </div>
     </div>
-    <div id="disable-dialog" class="modal" role="dialog">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-body">
-            Delete this user?
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">
-              Cancel
-            </button>
-            <button id="disable" type="button" class="btn btn-danger" data-dismiss="modal">
-              <span class="fa fa-times"></span> Delete
-            </button>
-          </div>
+  </div>
+  <div id="disable-dialog" class="modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-body">
+          Delete this user?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Cancel
+          </button>
+          <button id="disable" type="button" class="btn btn-danger" data-dismiss="modal">
+            <span class="fa fa-times"></span> Delete
+          </button>
         </div>
       </div>
     </div>
-    <div id="write-dialog" class="modal" role="dialog">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-body">
-            <input id="receiver" type="text" class="form-control" placeholder="Username" required autofocus/>
-            <textarea id="message" class="form-control" rows="6" placeholder="..." required></textarea>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">
-              Cancel
-            </button>
-            <button id="send" type="button" class="btn btn-primary" data-dismiss="modal">
-              <span class="fa fa-check"></span> Send
-            </button>
-          </div>
+  </div>
+  <div id="write-dialog" class="modal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body">
+          <input id="receiver" type="text" class="form-control" placeholder="Username" required autofocus/>
+          <textarea id="message" class="form-control" rows="6" placeholder="..." required></textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            Cancel
+          </button>
+          <button id="send" type="button" class="btn btn-primary" data-dismiss="modal">
+            <span class="fa fa-check"></span> Send
+          </button>
         </div>
       </div>
     </div>
-    <div id="content"></div>
-    <script src="/bower/jquery/dist/jquery.min.js"></script>
-    <script src="/bower/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="/bower/cryptojslib/rollups/aes.js"></script>
-    <script src="/bower/momentjs/moment.js"></script>
-    <script src="/bower/mustache/mustache.js"></script>
-    <script src="/bower/requirejs/require.js"></script>
-    <script src="/pssst/js/pssst.js"></script>
-  </body>
+  </div>
+  <div id="content"></div>
+</body>
+<script type="text/javascript" src="/bower/jquery/dist/jquery.min.js"/>
+<script type="text/javascript" src="/bower/bootstrap/dist/js/bootstrap.min.js"/>
+<script type="text/javascript" src="/bower/cryptojslib/rollups/aes.js"/>
+<script type="text/javascript" src="/bower/momentjs/moment.js"/>
+<script type="text/javascript" src="/bower/mustache/mustache.js"/>
+<script type="text/javascript" src="/bower/requirejs/require.js"/>
+<script type="text/javascript" src="/pssst/js/pssst.js"/>
 </html>
