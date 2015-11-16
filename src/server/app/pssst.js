@@ -26,8 +26,8 @@ module.exports = function Pssst(app, db, config) {
   // Required constants
   var BOX = 'box';
   var ALLOW = '.*';
-  var LIMIT = 536870912; // 512 MB (From Redis DB)
-  var RESERVED = ['box', 'key', 'list'];
+  var QUOTA = 536870912; // 512 MB (From Redis DB)
+  var BOXES = ['box', 'key', 'max', 'list'];
 
   // Pssst API version 1
   var api = {
@@ -66,7 +66,7 @@ module.exports = function Pssst(app, db, config) {
           }
 
           // Assert user is not deleted
-          if (user !== null && User.isDeleted(user)) {
+          if (user !== null && user.key === null) {
             return res.sign(410, 'User was deleted');
           }
 
@@ -76,7 +76,37 @@ module.exports = function Pssst(app, db, config) {
           }
 
           if (user && req.params.box) {
-            var box = Box.find(user, req.params.box);
+            var box = null;
+
+            // Box found
+            if (req.params.box in user.box) {
+              box = {
+                /**
+                 * The associated user.
+                 *
+                 * @type {Object} the user
+                 */
+                user: user,
+
+                /**
+                 * Pulls the first message from the box.
+                 *
+                 * @return {Object} the message
+                 */
+                pull: function pull() {
+                  return user.box[req.params.box].shift();
+                },
+
+                /**
+                 * Pushes a message into the box.
+                 *
+                 * @param {Object} the message
+                 */
+                push: function push(message) {
+                  user.box[req.params.box].push(message);
+                }
+              };
+            }
 
             // Assert box exists
             if (box === null && req.method !== 'POST') {
@@ -115,151 +145,6 @@ module.exports = function Pssst(app, db, config) {
     }
   };
 
-  // Pssst user methods
-  var User = {
-    /**
-     * Returns a new user.
-     *
-     * @param {String} the key (PEM format)
-     * @param {Integer} the maximum bytes
-     * @return {Object} the new user
-     */
-    create: function create(key, max) {
-      return {
-        key: key,
-        max: max || LIMIT,
-        box: {
-          box: [] // Default box
-        }
-      };
-    },
-
-    /**
-     * Deletes an user.
-     *
-     * @param {Object} the user
-     */
-    erase: function erase(user) {
-      user.key = null;
-      user.max = null;
-      user.box = null;
-    },
-
-    /**
-     * Returns if the user is deleted.
-     *
-     * @param {Object} the user
-     * @return {Boolean} true if deleted
-     */
-    isDeleted: function isDeleted(user) {
-      return (user.key === null);
-    },
-
-    /**
-     * Returns if the user name is allowed.
-     *
-     * @param {String} the user name
-     * @param {String} the regular expression
-     * @return {Boolean} true if allowed
-     */
-    isAllowed: function isAllowed(name, allow) {
-      return new RegExp(allow || ALLOW).test(name);
-    },
-
-    /**
-     * Returns if the user has reached his quota.
-     *
-     * @param {Object} the user
-     * @return {Boolean} true if limited
-     */
-    isLimited: function isLimited(user) {
-      return (JSON.stringify(user).length >= user.max);
-    }
-  };
-
-  // Pssst box methods
-  var Box = {
-    /**
-     * Creates a new box.
-     *
-     * @param {Object} the user
-     * @param {String} the box name
-     */
-    create: function create(user, box) {
-      user.box[box] = [];
-    },
-
-    /**
-     * Deletes a box.
-     *
-     * @param {Object} the user
-     * @param {String} the box name
-     */
-    erase: function erase(user, box) {
-      delete user.box[box];
-    },
-
-    /**
-     * Returns a list of all user boxes.
-     *
-     * @param {Object} the user
-     * @return {Object} list of box names
-     */
-    list: function list(user) {
-      return Object.keys(user.box).sort();
-    },
-
-    /**
-     * Returns the box object.
-     *
-     * @param {Object} the user
-     * @param {String} the box name
-     * @return {Object} the box or null
-     */
-    find: function find(user, box) {
-      if (box in user.box) {
-        return {
-          /**
-           * The associated user.
-           *
-           * @type {Object} the user
-           */
-          user: user,
-
-          /**
-           * Pulls the first message from the box.
-           *
-           * @return {Object} the message
-           */
-          pull: function pull() {
-            return user.box[box].shift();
-          },
-
-          /**
-           * Pushes a message into the box.
-           *
-           * @param {Object} the message
-           */
-          push: function push(message) {
-            user.box[box].push(message);
-          }
-        };
-      } else {
-        return null; // Box not found
-      }
-    },
-
-    /**
-     * Returns if the box name is allowed.
-     *
-     * @param {String} the box name
-     * @return {Boolean} true if allowed
-     */
-    isAllowed: function isAllowed(box) {
-      return (RESERVED.indexOf(box) < 0);
-    }
-  };
-
   /**
    * Creates an user.
    */
@@ -267,7 +152,7 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert user name is allowed
-      if (!User.isAllowed(req.params.user, config.allow)) {
+      if (!new RegExp(config.allow || ALLOW).test(req.params.user)) {
         return res.sign(403, 'User name restricted');
       }
 
@@ -281,7 +166,14 @@ module.exports = function Pssst(app, db, config) {
         return res.sign(400, 'Public key invalid');
       }
 
-      user = User.create(req.body.key, config.quota);
+      // The new user object
+      user = {
+        key: req.body.key,
+        max: config.quota || QUOTA,
+        box: {
+          box: []
+        }
+      };
 
       api.respond(req, res, user, 'User created');
     }, req.body.key);
@@ -292,7 +184,7 @@ module.exports = function Pssst(app, db, config) {
    */
   app.delete('/1/:user', function erase(req, res) {
     api.request(req, res, function request(user, box) {
-      User.erase(user);
+      user.key = user.max = user.box = null;
 
       return 'User deleted';
     });
@@ -312,7 +204,7 @@ module.exports = function Pssst(app, db, config) {
    */
   app.get('/1/:user/list', function list(req, res) {
     api.request(req, res, function request(user, box) {
-      res.sign(200, Box.list(user));
+      res.sign(200, Object.keys(user.box).sort());
     });
   });
 
@@ -323,12 +215,12 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert user is within quota
-      if (User.isLimited(user)) {
+      if (JSON.stringify(user).length >= user.max) {
         return res.sign(413, 'User reached quota');
       }
 
       // Assert box name is allowed
-      if (!Box.isAllowed(req.params.box)) {
+      if (BOXES.indexOf(req.params.box) >= 0) {
         return res.sign(403, 'Box name restricted');
       }
 
@@ -337,7 +229,7 @@ module.exports = function Pssst(app, db, config) {
         return res.sign(409, 'Box already exists');
       }
 
-      Box.create(user, req.params.box);
+      user.box[req.params.box] = [];
 
       return 'Box created';
     });
@@ -350,11 +242,11 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert box name is allowed
-      if (!Box.isAllowed(req.params.box)) {
+      if (BOXES.indexOf(req.params.box) >= 0) {
         return res.sign(403, 'Box name restricted');
       }
 
-      Box.erase(user, req.params.box);
+      delete user.box[req.params.box];
 
       return 'Box deleted';
     });
@@ -367,7 +259,7 @@ module.exports = function Pssst(app, db, config) {
     api.request(req, res, function request(user, box) {
 
       // Assert user is within quota
-      if (User.isLimited(user)) {
+      if (JSON.stringify(user).length >= user.max) {
         return res.sign(413, 'User reached quota');
       }
 
