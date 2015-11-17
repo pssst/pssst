@@ -12,7 +12,9 @@ Just execute this command to start the server using the default Redis port:
 
 `$ npm install && node start`
 
-A commented sample configuration can be found under `config.json.sample`.
+The default server port is `62421` and can be changed in the automatically 
+created `config.json` file. A commented sample configuration can be found 
+under `config.json.sample`.
 
 Install
 -------
