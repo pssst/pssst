@@ -29,10 +29,6 @@ CVE
 ---
 No security advisories are known as of today.
 
-Authors
--------
-Please see [AUTHORS](AUTHORS) and [THANKS](THANKS) for further information.
-
 License
 -------
 Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
