@@ -1,7 +1,10 @@
 0.2.44
 * Added Python requirement files
 * Added support for IE 8 to GUI
+* Added READMEs to sources
 * Fixed GUI HTML validation
+* Fixes server usage text
+* Changed README.md
 * Updated Bower versions
 * Refactored project structure
 * Refactored documentation

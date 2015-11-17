@@ -24,10 +24,12 @@
 module.exports = function Pssst(app, db, config) {
 
   // Required constants
-  var BOX = 'box';
-  var ALLOW = '.*';
-  var QUOTA = 536870912; // 512 MB (From Redis DB)
+  var INBOX = 'box';
   var BOXES = ['box', 'key', 'max', 'list'];
+
+  // Set config default values
+  config.allow = config.allow || '.*';
+  config.quota = config.quota || 536870912; // 512 MB
 
   // Pssst API version 1
   var api = {
@@ -40,7 +42,7 @@ module.exports = function Pssst(app, db, config) {
      * @param {Mixed} verify sender
      */
     request: function request(req, res, callback, auth) {
-      req.params.box = req.params.box || BOX; // Default
+      req.params.box = req.params.box || INBOX; // Default
 
       // Assert valid user name
       if (!new RegExp('^[a-z0-9]{2,63}$').test(req.params.user)) {
@@ -75,46 +77,14 @@ module.exports = function Pssst(app, db, config) {
             return res.sign(404, 'User not found');
           }
 
+          // Assert box exists
           if (user && req.params.box) {
-            var box = null;
-
-            // Box found
-            if (req.params.box in user.box) {
-              box = {
-                /**
-                 * The associated user.
-                 *
-                 * @type {Object} the user
-                 */
-                user: user,
-
-                /**
-                 * Pulls the first message from the box.
-                 *
-                 * @return {Object} the message
-                 */
-                pull: function pull() {
-                  return user.box[req.params.box].shift();
-                },
-
-                /**
-                 * Pushes a message into the box.
-                 *
-                 * @param {Object} the message
-                 */
-                push: function push(message) {
-                  user.box[req.params.box].push(message);
-                }
-              };
-            }
-
-            // Assert box exists
-            if (box === null && req.method !== 'POST') {
+            if (!req.params.box in user.box && req.method !== 'POST') {
               return res.sign(404, 'Box not found');
             }
           }
 
-          var body = callback(user, box || null);
+          var body = callback(user);
 
           // Send response
           if (typeof body === 'string') {
@@ -149,10 +119,10 @@ module.exports = function Pssst(app, db, config) {
    * Creates an user.
    */
   app.post('/1/:user', function create(req, res) {
-    api.request(req, res, function request(user, box) {
+    api.request(req, res, function request(user) {
 
       // Assert user name is allowed
-      if (!new RegExp(config.allow || ALLOW).test(req.params.user)) {
+      if (!new RegExp(config.allow).test(req.params.user)) {
         return res.sign(403, 'User name restricted');
       }
 
@@ -166,10 +136,10 @@ module.exports = function Pssst(app, db, config) {
         return res.sign(400, 'Public key invalid');
       }
 
-      // The new user object
+      // Create the new user object
       user = {
         key: req.body.key,
-        max: config.quota || QUOTA,
+        max: config.quota,
         box: {
           box: []
         }
@@ -183,7 +153,7 @@ module.exports = function Pssst(app, db, config) {
    * Deletes an user.
    */
   app.delete('/1/:user', function erase(req, res) {
-    api.request(req, res, function request(user, box) {
+    api.request(req, res, function request(user) {
       user.key = user.max = user.box = null;
 
       return 'User deleted';
@@ -194,7 +164,7 @@ module.exports = function Pssst(app, db, config) {
    * Gets the public key of an user.
    */
   app.get('/1/:user/key', function key(req, res) {
-    api.request(req, res, function request(user, box) {
+    api.request(req, res, function request(user) {
       res.sign(200, user.key);
     }, false);
   });
@@ -203,7 +173,7 @@ module.exports = function Pssst(app, db, config) {
    * Lists all box names.
    */
   app.get('/1/:user/list', function list(req, res) {
-    api.request(req, res, function request(user, box) {
+    api.request(req, res, function request(user) {
       res.sign(200, Object.keys(user.box).sort());
     });
   });
@@ -212,7 +182,7 @@ module.exports = function Pssst(app, db, config) {
    * Creates a new box.
    */
   app.post('/1/:user/:box?', function create(req, res) {
-    api.request(req, res, function request(user, box) {
+    api.request(req, res, function request(user) {
 
       // Assert user is within quota
       if (JSON.stringify(user).length >= user.max) {
@@ -229,6 +199,7 @@ module.exports = function Pssst(app, db, config) {
         return res.sign(409, 'Box already exists');
       }
 
+      // Create user box
       user.box[req.params.box] = [];
 
       return 'Box created';
@@ -239,13 +210,14 @@ module.exports = function Pssst(app, db, config) {
    * Deletes a box.
    */
   app.delete('/1/:user/:box?', function erase(req, res) {
-    api.request(req, res, function request(user, box) {
+    api.request(req, res, function request(user) {
 
       // Assert box name is allowed
       if (BOXES.indexOf(req.params.box) >= 0) {
         return res.sign(403, 'Box name restricted');
       }
 
+      // Delete user box
       delete user.box[req.params.box];
 
       return 'Box deleted';
@@ -256,7 +228,7 @@ module.exports = function Pssst(app, db, config) {
    * Pushes a message into a box.
    */
   app.put('/1/:user/:box?', function push(req, res) {
-    api.request(req, res, function request(user, box) {
+    api.request(req, res, function request(user) {
 
       // Assert user is within quota
       if (JSON.stringify(user).length >= user.max) {
@@ -266,7 +238,8 @@ module.exports = function Pssst(app, db, config) {
       // Add request timestamp to message
       req.body.head.time = req.timestamp;
 
-      box.push(req.body);
+      // Push message onto the box
+      user.box[req.params.box].push(req.body);
 
       return 'Message sent';
     }, req.body.head.user);
@@ -276,8 +249,8 @@ module.exports = function Pssst(app, db, config) {
    * Pulls a message from a box.
    */
   app.get('/1/:user/:box?', function pull(req, res) {
-    api.request(req, res, function request(user, box) {
-      api.respond(req, res, user, box.pull());
+    api.request(req, res, function request(user) {
+      api.respond(req, res, user, user.box[req.params.box].shift());
     });
   });
 

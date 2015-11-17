@@ -1,5 +1,5 @@
 {
-  "directory": "bower",
+  "directory": "lib",
   "analytics": false,
   "strict-ssl": true
 }
