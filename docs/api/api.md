@@ -46,8 +46,7 @@ in future releases. Only messages not yet pulled by the user will count to
 this limit.
 
 > To lower the used default quota at the time of the user creation, the 
-> `quota` config setting in the `src/server/config.json` file can be used. A
-> commented sample config can be found under `src/server/config.json.sample`.
+> `quota` config setting in the `src/server/config.json` file can be used.
 
 Cryptography
 ------------
