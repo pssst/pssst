@@ -1,4 +1,4 @@
- ![Pssst](http://www.gravatar.org/avatar/2aae9030772d5b59240388522f91468f?s=96)
+![Pssst](http://www.gravatar.org/avatar/2aae9030772d5b59240388522f91468f?s=96)
 
 Pssst [![](https://travis-ci.org/pssst/pssst.svg)](https://travis-ci.org/pssst/pssst)
 =====
@@ -28,24 +28,6 @@ Our full [API](/docs/api/api.md) documentation can be found under `docs/api/`.
 CVE
 ---
 No security advisories are known as of today.
-
-Contact
--------
-* If you want to be informed about new releases, general news
-  and information about Pssst, please visit our website under:
-  https://pssst.name
-
-* If you want to be informed about code updates, bug fixes and
-  security fixes of Pssst, please visit our project on GitHub:
-  https://github.com/pssst/pssst/
-
-* If you need additional Pssst configurations or utility scripts,
-  please visit our other repositories on GitHub:
-  https://github.com/pssst/
-
-* If you have a concrete bug report for Pssst please go to the
-  Pssst issue tracker on GitHub and submit your report:
-  https://github.com/pssst/pssst/issues
 
 Authors
 -------
