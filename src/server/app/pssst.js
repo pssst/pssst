@@ -78,8 +78,8 @@ module.exports = function Pssst(app, db, config) {
           }
 
           // Assert box exists
-          if (user && req.params.box) {
-            if (!req.params.box in user.box && req.method !== 'POST') {
+          if (user !== null && req.params.box) {
+            if (!user.box[req.params.box] && req.method !== 'POST') {
               return res.sign(404, 'Box not found');
             }
           }
@@ -195,7 +195,7 @@ module.exports = function Pssst(app, db, config) {
       }
 
       // Assert box does not exist
-      if (box !== null) {
+      if (req.params.box in user.box) {
         return res.sign(409, 'Box already exists');
       }
 
