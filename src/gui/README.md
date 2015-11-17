@@ -16,7 +16,7 @@ This will also download and install all necessary packages at the first start.
 
 Install
 -------
-At least [required](pip.txt):
+At least [required](pssst-gui.pip):
 
 * CherryPy 3.2.2
 * Bower 1.3.12

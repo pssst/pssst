@@ -20,7 +20,7 @@ create a file named `.pssst` in your home directory with the desired address:
 
 Install
 -------
-At least [required](pip.txt):
+At least [required](pssst.pip):
 
 * Python 2.7.3
 * Requests 2.0.1
