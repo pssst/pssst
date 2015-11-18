@@ -1,3 +1,3 @@
 Branch Closed
 -------------
-Please see [pssst/dotnet](https://github.com/pssst/dotnet)
+Please see [pssst/app-dotnet](https://github.com/pssst/app-dotnet)
