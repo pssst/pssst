@@ -13,7 +13,7 @@ Start
 Just execute this command to start the server using the default Redis port:
 
 ```
-$ npm install && node start
+$ npm install && npm start
 ```
 
 The default server port is `62421` and can be changed in the automatically 
@@ -24,7 +24,7 @@ Install
 -------
 At least [required](packages.json):
 
-* Node.js 0.10
+* Node.js 0.12
 * A Redis database instance
 
 > We also have built-in support for Heroku and all Redis database add-ons.
