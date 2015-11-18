@@ -5,6 +5,7 @@
 * Fixed GUI HTML validation
 * Fixes server usage text
 * Changed README.md
+* Changed Note.js version
 * Updated Bower versions
 * Refactored project structure
 * Refactored documentation
