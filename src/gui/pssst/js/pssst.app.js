@@ -32,12 +32,12 @@ define(['js/pssst.api.js'], function (api) {
           if (!err) {
             callback(val);
           } else {
-            $('#error').html(err).fadeIn(200).delay(3000).fadeOut(200);
+            alert(err);
 
             if (method === 'login') {
               $('#login-create span').removeClass('fa-spin fa-spinner');
               $('#login-create span').addClass('fa-user');
-              $('#login-create').prop('disabled', false);
+              $('#login-dialog button').prop('disabled', false);
             }
           }
         });
@@ -57,7 +57,7 @@ define(['js/pssst.api.js'], function (api) {
           $('#login-dialog').removeClass('animated shake');
 
           if (create === true) {
-            $('#login-create').prop('disabled', true);
+            $('#login-dialog button').prop('disabled', true);
             $('#login-create span').removeClass('fa-user');
             $('#login-create span').addClass('fa-spin fa-spinner');
           }
@@ -153,15 +153,28 @@ define(['js/pssst.api.js'], function (api) {
       list: function list(change) {
         app.call('list', null, function call(boxes) {
           $('#boxes').empty();
+          $('#boxes').append(
+            '<li>'
+          + '  <a id="boxname-box" class="box" href="">'
+          + '    <span class="fa fa-folder"></span>&nbsp;&nbsp;box'
+          + '  </a>'
+          + '</li>'
+          );
+
+          if (boxes.length > 1) {
+            $('#boxes').append('<li class="divider"></li>');
+          }
 
           boxes.forEach(function(box) {
-            $('#boxes').append(Mustache.render(
-              '<li>'
-            + '  <a id="boxname-{{box}}" class="box" href="">'
-            + '    <span class="fa fa-folder"></span>&nbsp;&nbsp;{{box}}'
-            + '  </a>'
-            + '</li>', {box: box}
-            ));
+            if (box !== 'box') {
+              $('#boxes').append(Mustache.render(
+                '<li>'
+              + '  <a id="boxname-{{box}}" class="box" href="">'
+              + '    <span class="fa fa-folder"></span>&nbsp;&nbsp;{{box}}'
+              + '  </a>'
+              + '</li>', {box: box}
+              ));
+            }
 
             if ($('#box-' + box).length === 0) {
               $('#content').append(Mustache.render(
@@ -198,13 +211,13 @@ define(['js/pssst.api.js'], function (api) {
             , {
               text: data[2].split('\n'),
               user: data[0],
-              time: moment.unix(data[1]).format('YYYY-MM-DD HH:mm:ss')
+              time: moment.unix(data[1]).format('L LTS')
             }));
 
             $('#box-' + box + ' article:last-child').click(function() {
               $('#receiver').val(data[0]);
-              $('#write').click();
-            }).fadeIn(200);
+              $('#write-dialog').modal('show');
+            });
 
             $('html,body').animate({scrollTop: $(document).height()}, 'slow');
           });
@@ -258,6 +271,9 @@ define(['js/pssst.api.js'], function (api) {
     }).on('shown.bs.modal', function() {
       $(this).find('[autofocus]:first').focus();
     });
+
+    // Set datetime locale
+    moment.locale(window.navigator.language);
 
     // Set message pulling
     setInterval(function task() {

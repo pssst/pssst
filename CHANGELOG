@@ -2,10 +2,13 @@
 * Added Python requirement files
 * Added support for IE 8 to GUI
 * Added READMEs to sources
+* Added GUI theme bootstrap-flat
+* Added GUI moment.js locale
 * Fixed GUI HTML validation
 * Fixes server usage text
+* Changed GUI layout
 * Changed README.md
-* Changed Note.js version
+* Changed Node.js version
 * Updated Bower versions
 * Refactored project structure
 * Refactored documentation
