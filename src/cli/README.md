@@ -13,7 +13,7 @@ Start
 Just run the `pssst.py` script to start the CLI:
 
 ```
-`$ pssst.py
+$ pssst.py
 ```
 
 All user specific data is stored as zip files named `.pssst.<user>` in the
