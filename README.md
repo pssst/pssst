@@ -1,3 +1,3 @@
 Branch Closed
 -------------
-Please see [pssst/app-java](https://github.com/pssst/app-java)
+Please see [pssst/pssst-java](https://github.com/pssst/pssst-java)
