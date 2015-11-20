@@ -157,8 +157,8 @@ try {
         case 'help':
           console.log([
             'Redis commands:',
-            '  edit OBJECT KEY VALUE',
-            '  view OBJECT',
+            '  edit <object> <key> <value>',
+            '  view <object>',
             'Shell commands:',
             '  exit',
             '  help',
@@ -204,7 +204,7 @@ try {
       // Print usage
       default:
         console.log([
-          'Usage: node shell [OPTION] [COMMAND]',
+          'Usage: node shell [option] [command]',
           '',
           '  -e --exec      Executes a command',
           '  -l --license   Shows license',

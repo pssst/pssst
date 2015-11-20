@@ -1,5 +1,7 @@
 @charset "utf-8";
 
+/* pssst styles */
+
 textarea {
   resize: none;
 }
@@ -15,6 +17,27 @@ article.panel {
 
 .modal {
   top: 30%;
+}
+
+#content {
+  padding-top: 52px;
+}
+
+/* bootstrap-flat overrides */
+
+.btn,
+.form-control {
+  outline: none !important;
+}
+
+.btn-primary {
+  background-color: #53a7ea;
+}
+
+.dropdown-menu > li > a:focus,
+.dropdown-menu > li > a:hover {
+  background-color: #53a7ea;
+  color: #ffffff;
 }
 
 .navbar-default {
@@ -33,14 +56,4 @@ article.panel {
 .navbar-default .navbar-nav > .open > a:hover {
   background-color: #ffffff;
   color: #333;
-}
-
-.dropdown-menu > li > a:focus,
-.dropdown-menu > li > a:hover {
-  background-color: #53a7ea;
-  color: #ffffff;
-}
-
-#content {
-  padding-top: 52px;
 }

@@ -14,6 +14,7 @@
 * Refactored documentation
 * Refactored server app
 * Refactored GUI layout
+* Refactored GUI logic
 
 0.2.43
 * Added all relevant RFC documents

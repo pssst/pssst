@@ -12,17 +12,30 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ *
+ * Pssst API.
+ *
+ * @param {String} security token
  */
 define(function (token) {
+  /**
+   * Pssst API class.
+   *
+   * @param {String} security token
+   */
   return function (token) {
+
+    // Extract key and iv from security token
     var key = CryptoJS.enc.Hex.parse(token.substring(0, 64));
     var iv = CryptoJS.enc.Hex.parse(token.substring(64));
 
     /**
-     * Returns the encrypted data (UTF-8 to Base64).
+     * Returns the encrypted data.
      *
-     * @param {String} decrypted data
-     * @return {String} encrypted data
+     * @param {String} decrypted data (UTF-8)
+     * @return {String} encrypted data (Base64)
      */
     function encrypt(data) {
       data = CryptoJS.AES.encrypt(data, key, {iv: iv});
@@ -32,10 +45,10 @@ define(function (token) {
     };
 
     /**
-     * Returns the decrypted data (Base64 to UTF-8).
+     * Returns the decrypted data.
      *
-     * @param {String} encrypted data
-     * @return {String} decrypted data
+     * @param {String} encrypted data (Base64)
+     * @return {String} decrypted data (UTF-8)
      */
     function decrypt(data) {
       data = CryptoJS.AES.decrypt(data, key, {iv: iv});
@@ -44,13 +57,16 @@ define(function (token) {
       return data;
     };
 
+    /**
+     * Pssst API instance.
+     */
     return {
       /**
-       * Calls the local server.
+       * Calls the local proxy server.
        *
-       * @param {String} the method
-       * @param {Object} the parameters
-       * @param {Function} callback
+       * @param {String} the request method
+       * @param {Object} the request parameters
+       * @param {Function} response callback
        */
       call: function call(method, params, callback) {
         var request = JSON.stringify({
@@ -58,6 +74,7 @@ define(function (token) {
           'params': params || []
         });
 
+        // Encrypted call (all data per JSON)
         $.post('/call', {'request': encrypt(request)}, function(val) {
           try {
             callback(null, JSON.parse(decrypt(val)));

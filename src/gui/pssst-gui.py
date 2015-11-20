@@ -218,14 +218,26 @@ class CLI:
         """
         self.pssst.push(receivers, message.encode("utf-8"))
 
-    def login(self, create, username, password):
+    def setup(self, username, password):
+        """
+        Sets up a new user.
+
+        Parameters
+        ----------
+        param username : string
+            User name.
+        param password : string
+            User private key password.
+
+        """
+        Pssst(username, password).create()
+        
+    def login(self, username, password):
         """
         Creates the Pssst instance.
 
         Parameters
         ----------
-        param create : boolean
-            Create user.
         param username : string
             User name.
         param password : string
@@ -240,15 +252,10 @@ class CLI:
         name = Pssst.Name(username)
         home = os.path.expanduser("~")
 
-        # New user
-        if create:
-            self.pssst = Pssst(username, password)
-            self.pssst.create()
-            return name.user
-
-        # Old user
+        # User exists
         if os.path.exists(os.path.join(home, ".pssst." + name.user)):
             self.pssst = Pssst(username, password)
+
             return name.user
 
     def logout(self):

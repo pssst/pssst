@@ -12,13 +12,34 @@
  * GNU General Public License for more details.
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ *
+ * Pssst app.
+ *
+ * @param {Object} pssst api
  */
 define(['js/pssst.api.js'], function (api) {
+  moment.locale(window.navigator.language);
+
+  /**
+   * Pssst app class.
+   *
+   * @param {String} security token
+   * @return {Object} app instance
+   */
   return function (token) {
+
+    // Current user and box
     var user = null;
     var box = 'box';
 
-    var cli = api(token);
+    // Uses the local proxy server
+    api = api(token);
+    
+    /**
+     * Pssst app instance.
+     */
     var app = {
       /**
        * Calls the API.
@@ -28,46 +49,48 @@ define(['js/pssst.api.js'], function (api) {
        * @param {Function} callback
        */
       call: function call(method, params, callback) {
-        cli.call(method, params, function call(err, val) {
+        api.call(method, params, function call(err, val) {
           if (!err) {
             callback(val);
           } else {
-            alert(err);
-
-            if (method === 'login') {
-              $('#login-create span').removeClass('fa-spin fa-spinner');
-              $('#login-create span').addClass('fa-user');
+            // Unlock login dialog
+            if (method === 'setup') {
+              $('#user-create span').removeClass('fa-spin fa-spinner');
+              $('#user-create span').addClass('fa-user');
               $('#login-dialog button').prop('disabled', false);
+              return;
             }
+
+            // Shake login dialog
+            if (method === 'login') {
+              callback(null);
+              return;
+            }
+
+            // General error handling
+            alert(err);
           }
         });
       },
 
       /**
        * Creates the Pssst instance.
-       *
-       * @param {Boolean} create user
        */
-      login: function login(create) {
+      login: function login() {
         var username = $.trim($('#username').val());
         var password = $.trim($('#password').val());
-        var args = [create === true, username, password];
 
+        // Check if credentials are present
         if (username && password) {
           $('#login-dialog').removeClass('animated shake');
 
-          if (create === true) {
-            $('#login-dialog button').prop('disabled', true);
-            $('#login-create span').removeClass('fa-user');
-            $('#login-create span').addClass('fa-spin fa-spinner');
-          }
-
-          app.call('login', args, function call(data) {
+          // Login user and loads its boxes list
+          app.call('login', [username, password], function call(data) {
             if (data) {
               user = data;
-              app.list();
-              $('#write').focus();
+              app.listBoxes();
               $('#login-dialog').modal('hide');
+              $('#login-dialog button').prop('disabled', false);
             } else {
               $('#login-dialog').addClass('animated shake');
             }
@@ -76,53 +99,51 @@ define(['js/pssst.api.js'], function (api) {
       },
 
       /**
-       * Clears the Pssst instance.
+       * Clears the Pssst instance and reloads (clears all user data).
        */
       logout: function logout() {
-        app.call('logout', null, function call() {
+        app.call('logout', null, function () {
+          clearInterval(id);
           location.reload();
         });
       },
 
       /**
-       * Shows the CLI version.
+       * Shows the proxy version.
        */
-      version: function version() {
+      showVersion: function showVersion() {
         app.call('version', null, function call(data) {
           $('.version').text(data);
         });
       },
 
       /**
-       * Deletes an user.
+       * Creates an new user and logs in.
        */
-      disable: function disable() {
-        app.call('delete', null, function call() {
-          app.logout();
-        });
-      },
+      createUser: function createUser() {
+        var username = $.trim($('#username').val());
+        var password = $.trim($('#password').val());
 
-      /**
-       * Creates a box.
-       */
-      create: function create() {
-        var boxname = $.trim($('#boxname').val());
+        // Check if credentials are present
+        if (username && password) {
 
-        if (boxname) {
-          app.call('create', [boxname], function call() {
-            app.list(box = boxname);
-            $('#boxname').val('');
+          // Lock login dialog while processing
+          $('#login-dialog button').prop('disabled', true);
+          $('#user-create span').removeClass('fa-user');
+          $('#user-create span').addClass('fa-spin fa-spinner');
+
+          app.call('setup', [username, password], function call() {
+            app.login();
           });
         }
       },
 
       /**
-       * Deletes a box.
+       * Deletes an user and logs out.
        */
-      erase: function erase() {
-        app.call('delete', [box], function call() {
-          $('#box-' + box).remove();
-          app.list(box = 'box');
+      deleteUser: function deleteUser() {
+        app.call('delete', null, function call() {
+          app.logout();
         });
       },
 
@@ -131,28 +152,60 @@ define(['js/pssst.api.js'], function (api) {
        *
        * @param {String} the box name
        */
-      change: function(boxname) {
-        $('#user').html(user + '.' + boxname + ' <b class="caret"></b>');
+      changeBox: function(box) {
+        document.title = 'Pssst | ' + user + '.' + box;
+
+        // Show active user and box
+        $('#user').html(user + '.' + box + ' <b class="caret"></b>');
+
+        // Toggle folder icons
+        $('.box span')
+          .removeClass('fa-folder-open')
+          .addClass('fa-folder');
+
+        $('#boxname-' + box + ' span')
+          .removeClass('fa-folder')
+          .addClass('fa-folder-open');
+
+        // Hide all boxes but one
         $('section').hide();
-        $('#box-' + boxname).show();
+        $('#box-' + box).show();
+      },
 
-        var all = $('.box span');
-        var box = $('#boxname-' + boxname + ' span');
+      /**
+       * Creates and selects a new box.
+       */
+      createBox: function createBox() {
+        var box = $.trim($('#boxname').val());
 
-        all.removeClass('fa-folder-open').addClass('fa-folder');
-        box.removeClass('fa-folder').addClass('fa-folder-open');
+        if (box) {
+          app.call('create', [box], function call() {
+            $('#boxname').val('');
+            app.listBoxes(box = box);
+          });
+        }
+      },
 
-        document.title = 'Pssst | ' + user + '.' + boxname;
+      /**
+       * Deletes the active box.
+       */
+      deleteBox: function deleteBox() {
+        app.call('delete', [box], function call() {
+          $('#box-' + box).remove();
+          app.listBoxes(box = 'box');
+        });
       },
 
       /**
        * Lists all boxes of an user.
        *
-       * @param {String} the box to change to
+       * @param {String} the selected box
        */
-      list: function list(change) {
+      listBoxes: function listBoxes(selected) {
         app.call('list', null, function call(boxes) {
           $('#boxes').empty();
+
+          // Always lists the default box first
           $('#boxes').append(
             '<li>'
           + '  <a id="boxname-box" class="box" href="">'
@@ -161,10 +214,12 @@ define(['js/pssst.api.js'], function (api) {
           + '</li>'
           );
 
+          // Show divider if there are other boxes
           if (boxes.length > 1) {
             $('#boxes').append('<li class="divider"></li>');
           }
 
+          // List remaining boxes alphabetically
           boxes.forEach(function(box) {
             if (box !== 'box') {
               $('#boxes').append(Mustache.render(
@@ -176,6 +231,7 @@ define(['js/pssst.api.js'], function (api) {
               ));
             }
 
+            // Add message section for all boxes
             if ($('#box-' + box).length === 0) {
               $('#content').append(Mustache.render(
                 '<section id="box-{{box}}"></section>', {box: box}
@@ -183,18 +239,20 @@ define(['js/pssst.api.js'], function (api) {
             }
           });
 
+          // Bind event to select box
           $('.box').click(function() {
-            app.change(box = $.trim($(this).text()));
+            app.changeBox(box = $.trim($(this).text()));
           });
 
-          app.change(change || box);
+          // Reload active box or default
+          app.changeBox(selected || box);
         });
       },
 
       /**
-       * Pulls messages from a box.
+       * Pulls all new messages from a box.
        */
-      pull: function pull() {
+      pullMessages: function pullMessages() {
         app.call('pull', [box], function call(messages) {
           messages.forEach(function(data) {
             $('#box-' + box).append(Mustache.render(
@@ -211,25 +269,27 @@ define(['js/pssst.api.js'], function (api) {
             , {
               text: data[2].split('\n'),
               user: data[0],
-              time: moment.unix(data[1]).format('L LTS')
+              time: moment.unix(data[1]).format('L LTS') // Use local time
             }));
 
+            // Bind event to reply message
             $('#box-' + box + ' article:last-child').click(function() {
               $('#receiver').val(data[0]);
               $('#write-dialog').modal('show');
             });
 
+            // Scroll to the last message
             $('html,body').animate({scrollTop: $(document).height()}, 'slow');
           });
         });
       },
 
       /**
-       * Pushes a message into a box.
+       * Pushes a new message into a box.
        */
-      push: function push() {
+      pushMessage: function pushMessage() {
         var receiver = $.trim($('#receiver').val());
-        var message  = $.trim($('#message').val());
+        var message = $.trim($('#message').val());
 
         if (receiver && message) {
           app.call('push', [[receiver], message], function call(data) {
@@ -240,48 +300,59 @@ define(['js/pssst.api.js'], function (api) {
       }
     };
 
-    app.version();
 
-    // Add token to all internal links
+    // Show the current version
+    app.showVersion();
+
+    // Set message pull interval
+    var id = setInterval(function task() {
+      if (user) app.pullMessages();
+    }, 2000);
+
+    // Add the security token to all anchor links
     $('body').on('click', 'a', function(event) {
       if ($(this).attr('href') === '') {
         $(this).attr('href', '#' + token);
       }
     });
 
-    // Set app bindings
-    $('#login-create').click(function() { app.login(true); });
-    $('#login-exists').click(app.login);
-    $('#logout').click(app.logout);
-    $('#disable').click(app.disable);
-    $('#create').click(app.create);
-    $('#delete').click(app.erase);
-    $('#send').click(app.push);
+    // Setup dialogs to be static
     $('.modal').modal({
       backdrop: 'static',
       keyboard: false,
       show: false
-    }).on('keypress', function(e) {
+    })
+
+    // Always focus first input field
+    $('.modal').on('shown.bs.modal', function() {
+      $(this).find('[autofocus]:first').focus();
+    })
+
+    // Always click the primary button if return is pressed
+    $('.modal').on('keypress', function(e) {
       if (e.which === 13) {
         var button = $(this).find('.btn-primary:first');
-        if (button.attr('id') !== 'send') {
+
+        // Ignore the return key for message text
+        if (button.attr('id') !== 'push-message') {
           button.click();
         }
       }
-    }).on('shown.bs.modal', function() {
-      $(this).find('[autofocus]:first').focus();
     });
 
-    // Set datetime locale
-    moment.locale(window.navigator.language);
+    // Bind events to all buttons
+    $('#user-login').click(app.login);
+    $('#user-logout').click(app.logout);
+    $('#user-create').click(app.createUser);
+    $('#user-delete').click(app.deleteUser);
+    $('#box-create').click(app.createBox);
+    $('#box-delete').click(app.deleteBox);
+    $('#push-message').click(app.pushMessage);
 
-    // Set message pulling
-    setInterval(function task() {
-      if (user) app.pull();
-    }, 2000);
-
+    // Show login dialog at first
     $('#login-dialog').modal('show');
 
+    // Return instance
     return this;
   };
 });

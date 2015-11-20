@@ -7,7 +7,7 @@
   <meta name="language" content="english">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="author" content="Christian & Christian">
-  <meta name="robots" content="noindex,nofollow">
+  <meta name="robots" content="noindex, nofollow">
   <link rel="stylesheet" type="text/css" href="/bower/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="/bower/bootstrap-flat/css/bootstrap-flat.min.css">
   <link rel="stylesheet" type="text/css" href="/bower/font-awesome/css/font-awesome.min.css">
@@ -45,12 +45,12 @@
           </li>
           <li>
             <a href="#disable-dialog" data-toggle="modal">
-              <span class="fa fa-times"></span>&nbsp;&nbsp;Delete User
+              <span class="fa fa-trash"></span>&nbsp;&nbsp;Delete User
             </a>
           </li>
           <li class="divider"></li>
           <li>
-            <a id="logout" href="">
+            <a id="user-logout" href="">
               <span class="fa fa-sign-out"></span>&nbsp;&nbsp;Logout
             </a>
           </li>
@@ -75,10 +75,10 @@
           <input id="password" type="password" class="form-control" placeholder="Password" required/>
         </div>
         <div class="modal-footer">
-          <button id="login-create" type="button" class="btn btn-default">
+          <button id="user-create" type="button" class="btn btn-default">
             <span class="fa fa-user"></span> Create
           </button>
-          <button id="login-exists" type="button" class="btn btn-primary">
+          <button id="user-login" type="button" class="btn btn-primary">
             <span class="fa fa-sign-in"></span> Login
           </button>
         </div>
@@ -95,7 +95,7 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">
             Cancel
           </button>
-          <button id="create" type="button" class="btn btn-primary" data-dismiss="modal">
+          <button id="box-create" type="button" class="btn btn-primary" data-dismiss="modal">
             <span class="fa fa-check"></span> Create
           </button>
         </div>
@@ -112,7 +112,7 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">
             Cancel
           </button>
-          <button id="delete" type="button" class="btn btn-danger" data-dismiss="modal">
+          <button id="box-delete" type="button" class="btn btn-danger" data-dismiss="modal">
             <span class="fa fa-times"></span> Delete
           </button>
         </div>
@@ -129,8 +129,8 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">
             Cancel
           </button>
-          <button id="disable" type="button" class="btn btn-danger" data-dismiss="modal">
-            <span class="fa fa-times"></span> Delete
+          <button id="user-delete" type="button" class="btn btn-danger" data-dismiss="modal">
+            <span class="fa fa-trash"></span> Delete
           </button>
         </div>
       </div>
@@ -149,7 +149,7 @@
           <button type="button" class="btn btn-default" data-dismiss="modal">
             Cancel
           </button>
-          <button id="send" type="button" class="btn btn-primary" data-dismiss="modal">
+          <button id="push-message" type="button" class="btn btn-primary" data-dismiss="modal">
             <span class="fa fa-check"></span> Send
           </button>
         </div>
