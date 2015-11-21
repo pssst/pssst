@@ -5,7 +5,7 @@ Pssst server.
 Usage
 -----
 ```
-$ node start [option]
+$ npm start [option]
 ```
 
 Start
