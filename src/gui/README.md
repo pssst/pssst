@@ -5,15 +5,15 @@ Pssst HTML user interface.
 Usage
 -----
 ```
-$ pssst [option|port]
+$ pssst-gui [option|port]
 ```
 
 Start
 -----
-Just run the `start.sh` script to start the GUI:
+Just run the `pssst-gui.sh` script to start the GUI:
 
 ```
-$ start.sh
+$ pssst-gui.sh
 ```
 
 This will also download and install all necessary packages at the first start.
