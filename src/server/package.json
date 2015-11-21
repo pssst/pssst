@@ -20,7 +20,7 @@
     "node": "0.12.*"
   },
   "scripts": {
-    "start": "node start.js"
+    "start": "node index.js"
   },
   "license": "GPL-3.0+",
   "private": true

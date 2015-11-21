@@ -33,7 +33,7 @@ module.exports = function Server(app, config, callback) {
 
   // Required libraries
   var info = require('../package.json');
-  var pssst = require('../app/pssst.js');
+  var pssst = require('../app/pssst_1.js');
   var redis = require('../lib/redis.js');
   var crypto = require('../lib/crypto.js');
 
@@ -84,7 +84,7 @@ module.exports = function Server(app, config, callback) {
       req.body = '';
     }
 
-    // Add current timestamp to the request
+    // Add current server timestamp to the request
     req.timestamp = crypto.now();
 
     /**
@@ -97,17 +97,17 @@ module.exports = function Server(app, config, callback) {
       function verify(key) {
         var header = req.headers[HEADER];
 
-        // Assert valid public key
+        // Assert the public key is given (error 404)
         if (!key) {
           return res.sign(404, 'Verification failed');
         }
 
-        // Assert valid signature format
+        // Assert the signature format is valid (error 400)
         if (!new RegExp('^[0-9]+; ?[A-Za-z0-9\+/]+=*$').test(header)) {
           return res.sign(400, 'Verification failed');
         }
 
-        // Assert valid signed body
+        // Assert the signed body is valid (error 401)
         if (!crypto.verify(req.body, parseHeader(header), key)) {
           return res.sign(401, 'Verification failed');
         }
@@ -115,7 +115,7 @@ module.exports = function Server(app, config, callback) {
         callback();
       }
 
-      // Get the public key from database if necessary
+      // Get the authentication public key from database if necessary
       if (user.indexOf('PUBLIC KEY') < 0) {
         db.get(user, function get(err, val) {
           if (!err) {
@@ -148,13 +148,13 @@ module.exports = function Server(app, config, callback) {
     /**
      * Sends a signed HTTP(S) error.
      *
-     * @param {Object} exception or error
+     * @param {Object} error or exception
      * @return {Boolean} always true
      */
     res.error = function error(err) {
       console.error(err.stack || err);
 
-      // Don't leak informations
+      // Don't leak information
       if (config.debug > 0) {
         return res.sign(500, String(err));
       } else {
@@ -166,7 +166,7 @@ module.exports = function Server(app, config, callback) {
   }
 
   /**
-   * Serves a static file.
+   * Serves a signed static file.
    *
    * @param {Object} request
    * @param {Object} response
@@ -186,15 +186,19 @@ module.exports = function Server(app, config, callback) {
     });
   }
 
+  // 
   redis(config.db, function redis(err, db) {
     if (!err) {
+
+      // Authentication hook
       app.use(function (req, res, next) {
         auth(db, req, res, next);
       });
 
+      // Load custom app
       pssst(app, db, config.app);
 
-      // Returns current time
+      // Returns the current time (status 200)
       app.get('/time', function time(req, res) {
         res.sign(200, req.timestamp);
       });
@@ -202,19 +206,19 @@ module.exports = function Server(app, config, callback) {
       // Returns a static file
       app.get('/:file', file);
 
-      // Returns supported protocols
+      // Returns the protocol version (status 200)
       app.get('/', function index(req, res) {
         res.sign(200, "Pssst " + info['version']);
       });
 
-      // Returns nothing
+      // For all other requests return nothing (error 404)
       app.get('*', function other(req, res) {
         res.sign(404, 'Not found');
       });
 
       var port = Number(process.env.PORT || config.port);
 
-      // Create HTTP(S) server
+      // Start HTTP(S) server
       if (!fs.existsSync(ID_CRT)) {
         http.createServer(app).listen(port, callback);
       } else {

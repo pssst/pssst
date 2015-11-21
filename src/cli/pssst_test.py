@@ -386,10 +386,10 @@ class TestBox:
     Tests box commands with this test cases:
 
     * Box create
-    * Box create failed, name restricted
+    * Box create failed, name reserved
     * Box create failed, already exists
     * Box delete
-    * Box delete failed, name restricted
+    * Box delete failed, name reserved
     * Box push
     * Box pull
     * Box was deleted
@@ -400,14 +400,14 @@ class TestBox:
     -------
     test_create_box()
         Tests if a box can be created.
-    test_create_box_name_restricted()
-        Tests if a box name is restricted.
+    test_create_box_name_reserved()
+        Tests if a box name is reserved.
     test_create_box_already_exists()
         Tests if a box already exists.
     test_delete_box()
         Tests if a box can be deleted.
-    test_delete_box_name_restricted()
-        Tests if a box name is restricted.
+    test_delete_box_name_reserved()
+        Tests if a box name is reserved.
     test_push_box()
         Tests if message could be pushed.
     test_pull_box()
@@ -429,9 +429,9 @@ class TestBox:
         pssst.create()
         pssst.create("test")
 
-    def test_create_box_name_restricted(self):
+    def test_create_box_name_reserved(self):
         """
-        Tests if a box name is restricted.
+        Tests if a box name is reserved.
 
         """
         with pytest.raises(Exception) as ex:
@@ -439,7 +439,7 @@ class TestBox:
             pssst.create()
             pssst.create("box")
 
-        assert str(ex.value) == "Box name restricted"
+        assert str(ex.value) == "Box name reserved"
 
     def test_create_box_already_exists(self):
         """
@@ -464,9 +464,9 @@ class TestBox:
         pssst.create("test")
         pssst.delete("test")
 
-    def test_delete_box_name_restricted(self):
+    def test_delete_box_name_reserved(self):
         """
-        Tests if a box name is restricted.
+        Tests if a box name is reserved.
 
         """
         with pytest.raises(Exception) as ex:
@@ -474,7 +474,7 @@ class TestBox:
             pssst.create()
             pssst.delete("box")
 
-        assert str(ex.value) == "Box name restricted"
+        assert str(ex.value) == "Box name reserved"
 
     def test_push_box(self):
         """

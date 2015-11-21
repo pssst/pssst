@@ -5,7 +5,8 @@ will be stored protocol agnostic. You can also add more fields to the HTTP
 body. The only field required by the server is `head.user`. All clients are
 requested to send an unique `user-agent` header per implementation.
 
-> A RAML specification of the API is available under `docs/api/api.raml`.
+> A [RAML](https://raml.org) specification of the [API](api.raml) is available
+> under `docs/api/api.raml`.
 
 Reference Implementation
 ------------------------

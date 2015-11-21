@@ -6,10 +6,13 @@
 * Added GUI moment.js locale
 * Fixed GUI HTML validation
 * Fixes server usage text
+* Moved server shell to scripts
+* Changed CLI unit tests
 * Changed GUI layout
 * Changed README.md
 * Changed Node.js version
 * Updated Bower versions
+* Renamed server some files
 * Refactored project structure
 * Refactored documentation
 * Refactored server app

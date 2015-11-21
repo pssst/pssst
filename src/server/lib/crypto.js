@@ -45,7 +45,7 @@ module.exports = function Crypto() {
     fs.writeFileSync(ID_PUB, key.toPublicPem(ENCODING));
   }
 
-  // Key bundle
+  // Server key bundle
   var key = {
     private: ursa.createPrivateKey(
       fs.readFileSync(ID_RSA, {encoding: ENCODING}), undefined, ENCODING
@@ -56,17 +56,17 @@ module.exports = function Crypto() {
     )
   };
 
-  // Assert valid private key
+  // Assert the private key is valid
   if (!ursa.isPrivateKey(key.private)){
     throw new Error('Private key invalid');
   }
 
-  // Assert valid public key
+  // Assert the public key is valid
   if (!ursa.isPublicKey(key.public)) {
     throw new Error('Public key invalid');
   }
 
-  // Assert matching key bundle
+  // Assert the key bundle matches
   if (!ursa.matchingPublicKeys(key.private, key.public)) {
     throw new Error('Key bundle invalid');
   }
@@ -81,6 +81,7 @@ module.exports = function Crypto() {
   function createHMAC(data, timestamp) {
     var hmac, timestamp = timestamp || now();
 
+    // Calculate hash with final round
     hmac = crypto.createHmac(RSA_HASH, timestamp.toString());
     hmac.update(data.toString());
 
@@ -111,11 +112,11 @@ module.exports = function Crypto() {
     }
 
     var hmac = createHMAC(data);
-    var prv = key.private;
+    var priv = key.private;
 
     return {
       timestamp: hmac.timestamp,
-      signature: prv.hashAndSign(RSA_HASH, hmac.signature, BINARY, BINARY)
+      signature: priv.hashAndSign(RSA_HASH, hmac.signature, BINARY, BINARY)
     };
   };
 
@@ -135,6 +136,7 @@ module.exports = function Crypto() {
     var time = parseInt(hmac.timestamp, 10);
     var sig = hmac.signature;
 
+    // Assert the timestamp is within grace time
     if (Math.abs(time - now()) <= GRACE) {
       var hmac = createHMAC(data, time);
       var pub = ursa.createPublicKey(pem, ENCODING);
@@ -142,7 +144,7 @@ module.exports = function Crypto() {
       try {
         return pub.hashAndVerify(RSA_HASH, hmac.signature, sig, BINARY);
       } catch (err) {
-        return false; // OpenSSL error
+        return false; // Possiblly an OpenSSL error
       }
     }
 

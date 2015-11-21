@@ -16,7 +16,7 @@
  *
  *
  *
- * Pssst routing and handling.
+ * Pssst app.
  *
  * @param {Object} express app
  * @param {Object} database wrapper
@@ -24,214 +24,254 @@
  */
 module.exports = function Pssst(app, db, config) {
 
-  // Required constants
-  var INBOX = 'box';
-  var BOXES = ['box', 'key', 'max', 'list'];
+  // Default box name
+  var BOX = 'box';
 
-  // Set config default values
-  config.allow = config.allow || '.*';
-  config.quota = config.quota || 536870912; // 512 MB
+  // Reserved box names (including commands)
+  var BOXES = [BOX, 'key', 'max', 'list'];
 
-  // Pssst API version 1
+  // Use config default values if not found
+  var allow = config.allow || '.*';
+  var quota = config.quota || 536870912; // 512 MB
+
+  /**
+   * Pssst API (version 1).
+   */
   var api = {
     /**
-     * Handles and verifies a request.
+     * Handles a request and returns a response.
      *
      * @param {Object} request
      * @param {Object} response
      * @param {Function} callback
-     * @param {Mixed} verify sender
+     * @param {Mixed} authentication
      */
     request: function request(req, res, callback, auth) {
-      req.params.box = req.params.box || INBOX; // Default
+      req.params.box = req.params.box || BOX; // Default box
 
-      // Assert valid user name
+      // Assert the user name is valid (error 400)
       if (!new RegExp('^[a-z0-9]{2,63}$').test(req.params.user)) {
         return res.sign(400, 'User name invalid');
       }
 
-      // Assert valid box name
+      // Assert the box name is valid (error 400)
       if (!new RegExp('^[a-z0-9]{2,63}$').test(req.params.box)) {
         return res.sign(400, 'Box name invalid');
       }
 
-      // Pass verification
+      // Bypass sender verification (for key requests only)
       if (auth === false) {
         req.verify = function pass(unused, callback) {
           callback();
         };
       }
 
+      // Verify sender authentication for this request
       req.verify(auth || req.params.user, function verify() {
         db.get(req.params.user, function get(err, user) {
+          
+          // Database error
           if (err) {
             return res.error(err);
           }
 
-          // Assert user is not deleted
-          if (user !== null && user.key === null) {
-            return res.sign(410, 'User was deleted');
-          }
-
-          // Assert user exists
+          // Assert the user object exists (error 404)
           if (user === null && req.method !== 'POST') {
             return res.sign(404, 'User not found');
           }
 
-          // Assert box exists
+          // Assert the user is not deleted (error 410)
+          if (user !== null && user.key === null) {
+            return res.sign(410, 'User was deleted');
+          }
+
+          // Assert the box object exists (error 404)
           if (user !== null && req.params.box) {
             if (!user.box[req.params.box] && req.method !== 'POST') {
               return res.sign(404, 'Box not found');
             }
           }
 
-          var body = callback(user);
-
-          // Send response
-          if (typeof body === 'string') {
-            api.respond(req, res, user, body);
-          }
+          // Handle request
+          callback(user);
         });
       });
     },
 
     /**
-     * Stores changes and sends a response.
+     * Persists an user and returns a response.
      *
      * @param {Object} request
      * @param {Object} response
-     * @param {Object} the user
+     * @param {Object} user
      * @param {String} response body
      */
     respond: function respond(req, res, user, body) {
       db.set(req.params.user, user, function set(err) {
         if (err) {
-          res.error(err);
+          return res.error(err);
         } else if (body) {
-          res.sign(200, body);
+          return res.sign(200, body);
         } else {
-          res.sign(204);
+          return res.sign(204);
         }
       })
     }
   };
 
   /**
-   * Creates an user.
+   * Creates an new user with the given public key.
+   *
+   * Authentication:
+   *
+   *   Signed request
+   *   Signed response
    */
   app.post('/1/:user', function create(req, res) {
     api.request(req, res, function request(user) {
 
-      // Assert user name is allowed
-      if (!new RegExp(config.allow).test(req.params.user)) {
-        return res.sign(403, 'User name restricted');
+      // Assert the user name is allowed (error 403)
+      if (!new RegExp(allow).test(req.params.user)) {
+        return res.sign(403, 'User name not allowed');
       }
 
-      // Assert user does not exist
+      // Assert the user does not already exist (error 409)
       if (user !== null) {
         return res.sign(409, 'User already exists');
       }
 
-      // Assert key is a public key
+      // Assert the given key is a public key (error 400)
       if (req.body.key.indexOf('PUBLIC KEY') < 0) {
-        return res.sign(400, 'Public key invalid');
+        return res.sign(400, 'User key invalid');
       }
 
-      // Create the new user object
+      // New user object
       user = {
         key: req.body.key,
-        max: config.quota,
+        max: quota,
         box: {
           box: []
         }
       };
 
-      api.respond(req, res, user, 'User created');
+      return api.respond(req, res, user, 'User created');
     }, req.body.key);
   });
 
   /**
-   * Deletes an user.
+   * Disables an existing user.
+   *
+   * Authentication:
+   *
+   *   Signed request
+   *   Signed response
    */
-  app.delete('/1/:user', function erase(req, res) {
+  app.delete('/1/:user', function disable(req, res) {
     api.request(req, res, function request(user) {
+
+      // Zeroing all data, so the user exists but is invalidated
       user.key = user.max = user.box = null;
 
-      return 'User deleted';
+      return api.respond(req, res, user, 'User deleted');
     });
   });
 
   /**
-   * Gets the public key of an user.
+   * Returns the public key of an user (non persisting).
+   *
+   * Authentication:
+   *
+   *   No verification
+   *   Signed response
    */
   app.get('/1/:user/key', function key(req, res) {
     api.request(req, res, function request(user) {
-      res.sign(200, user.key);
+      return res.sign(200, user.key);
     }, false);
   });
 
   /**
-   * Lists all box names.
+   * Returns the list of all user boxes (non persisting).
+   *
+   * Authentication:
+   *
+   *   Signed request
+   *   Signed response
    */
   app.get('/1/:user/list', function list(req, res) {
     api.request(req, res, function request(user) {
-      res.sign(200, Object.keys(user.box).sort());
+      return res.sign(200, Object.keys(user.box).sort());
     });
   });
 
   /**
-   * Creates a new box.
+   * Creates a new user box.
+   *
+   * Authentication:
+   *
+   *   Signed request
+   *   Signed response
    */
   app.post('/1/:user/:box?', function create(req, res) {
     api.request(req, res, function request(user) {
 
-      // Assert user is within quota
+      // Assert the user is within its quota (error 413)
       if (JSON.stringify(user).length >= user.max) {
         return res.sign(413, 'User reached quota');
       }
 
-      // Assert box name is allowed
+      // Assert the box name is not reserved (error 403)
       if (BOXES.indexOf(req.params.box) >= 0) {
-        return res.sign(403, 'Box name restricted');
+        return res.sign(403, 'Box name reserved');
       }
 
-      // Assert box does not exist
+      // Assert the box does not already exist (error 409)
       if (req.params.box in user.box) {
         return res.sign(409, 'Box already exists');
       }
 
-      // Create user box
+      // Create new user box
       user.box[req.params.box] = [];
 
-      return 'Box created';
+      return api.respond(req, res, user, 'Box created');
     });
   });
 
   /**
-   * Deletes a box.
+   * Deletes an existing box.
+   *
+   * Authentication:
+   *
+   *   Signed request
+   *   Signed response
    */
-  app.delete('/1/:user/:box?', function erase(req, res) {
+  app.delete('/1/:user/:box?', function disable(req, res) {
     api.request(req, res, function request(user) {
 
-      // Assert box name is allowed
+      // Assert the box name is not reserved (error 403)
       if (BOXES.indexOf(req.params.box) >= 0) {
-        return res.sign(403, 'Box name restricted');
+        return res.sign(403, 'Box name reserved');
       }
 
       // Delete user box
       delete user.box[req.params.box];
 
-      return 'Box deleted';
+      return api.respond(req, res, user, 'Box deleted');
     });
   });
 
   /**
-   * Pushes a message into a box.
+   * Pushes a new message into a box.
+   *
+   * Authentication:
+   *
+   *   Signed request by sender
+   *   Signed response
    */
   app.put('/1/:user/:box?', function push(req, res) {
     api.request(req, res, function request(user) {
 
-      // Assert user is within quota
+      // Assert the user is within its quota (error 413)
       if (JSON.stringify(user).length >= user.max) {
         return res.sign(413, 'User reached quota');
       }
@@ -242,18 +282,26 @@ module.exports = function Pssst(app, db, config) {
       // Push message onto the box
       user.box[req.params.box].push(req.body);
 
-      return 'Message sent';
+      return api.respond(req, res, user, 'Message send');
     }, req.body.head.user);
   });
 
   /**
    * Pulls a message from a box.
+   *
+   * Authentication:
+   *
+   *   Signed request
+   *   Signed response
    */
   app.get('/1/:user/:box?', function pull(req, res) {
     api.request(req, res, function request(user) {
-      api.respond(req, res, user, user.box[req.params.box].shift());
+      var message = user.box[req.params.box].shift();
+
+      return api.respond(req, res, user, message);
     });
   });
 
+  // Return instance
   return this;
 }

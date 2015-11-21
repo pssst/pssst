@@ -105,7 +105,7 @@ try {
       // Print usage
       default:
         console.log([
-          'Usage: node start [option]',
+          'Usage: node index [option]',
           '',
           '  -l --license   Shows license',
           '  -v --version   Shows version',
