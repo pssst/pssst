@@ -3,6 +3,7 @@
 * Added support for IE 8 to GUI
 * Added READMEs to sources
 * Added GUI theme bootstrap-flat
+* Added GUI responsive overrides
 * Added GUI moment.js locale
 * Fixed GUI HTML validation
 * Fixes server usage text
@@ -12,7 +13,8 @@
 * Changed README.md
 * Changed Node.js version
 * Updated Bower versions
-* Renamed server some files
+* Updated NPM versions
+* Renamed some server files
 * Refactored project structure
 * Refactored documentation
 * Refactored server app

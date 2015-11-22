@@ -53,18 +53,17 @@ define(['js/pssst.api.js'], function (api) {
           if (!err) {
             callback(val);
           } else {
+
             // Unlock login dialog
             if (method === 'setup') {
               $('#user-create span').removeClass('fa-spin fa-spinner');
               $('#user-create span').addClass('fa-user');
               $('#login-dialog button').prop('disabled', false);
-              return;
             }
 
             // Shake login dialog
             if (method === 'login') {
               callback(null);
-              return;
             }
 
             // General error handling
