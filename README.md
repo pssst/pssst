@@ -23,7 +23,7 @@ Please use `pssst --help` for a full list of available commands.
 
 API
 ---
-Our full [API](/docs/api/api.md) documentation can be found under `docs/api/`.
+Our full [API](/doc/api/api.md) documentation can be found under `doc/api/`.
 
 CVE
 ---

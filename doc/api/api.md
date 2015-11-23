@@ -6,7 +6,7 @@ body. The only field required by the server is `head.user`. All clients are
 requested to send an unique `user-agent` header per implementation.
 
 > A [RAML](http://raml.org) specification of the [API](api.raml) is available
-> under `docs/api/api.raml`.
+> under `doc/api/api.raml`.
 
 Reference Implementation
 ------------------------
@@ -46,7 +46,7 @@ separately. This is limit is hard coded by the Redis database and may change
 in future releases. Only messages not yet pulled by the user will count to
 this limit.
 
-> To lower the used default quota at the time of the user creation, the 
+> To lower the used default quota at the time of the user creation, the
 > `quota` config setting in the `src/server/config.json` file can be used.
 
 Cryptography
@@ -122,7 +122,7 @@ using the SHA-1 hash. If they do not match, the client must terminate
 immediately.
 
 For further information about the used cryptographical methods, please consult
-the [RFCs](/docs/rfc) listed in the appendix, which can be found in `docs/rfc`
+the [RFCs](/doc/rfc) listed in the appendix, which can be found in `doc/rfc`
 directory.
 
 Server Actions
