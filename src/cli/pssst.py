@@ -51,7 +51,7 @@ except ImportError:
     sys.exit("Requires PyCrypto (https://github.com/dlitz/pycrypto)")
 
 
-__all__, __version__ = ["Pssst"], "1.0.0"
+__all__, __version__ = ["Pssst"], "1.0.1"
 
 
 def _encode64(data): # Utility shortcut
@@ -315,7 +315,7 @@ class Pssst:
         in fingerprint.
 
         """
-        FINGERPRINT, GRACE = "cdd39bed344c7a812ded0655047778e367de15db", 30
+        FINGERPRINT, GRACE = "8d697285952227706d8a8e5fa8e4deb297753022", 30
 
         config = os.path.join(os.path.expanduser("~"), ".pssst")
 

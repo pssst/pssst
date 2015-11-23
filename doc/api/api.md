@@ -114,7 +114,7 @@ processing.
 
 The public key of our reference API has the following SHA-1 fingerprint:
 
-`cd:d3:9b:ed:34:4c:7a:81:2d:ed:06:55:04:77:78:e3:67:de:15:db`
+`8d:69:72:85:95:22:27:70:6d:8a:8e:5f:a8:e4:de:b2:97:75:30:22`
 
 If a client connects to the reference APIs stable branch, it is required to
 match the APIs delivered public key in PEM format against this fingerprint
