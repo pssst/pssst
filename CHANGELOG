@@ -1,5 +1,45 @@
+1.0.0
+* Release (stable)
+
+0.2.44
+* Added Python requirement files
+* Added support for IE 8 to GUI
+* Added nvm to Travis CI script
+* Added READMEs to sources
+* Added GUI theme bootstrap-flat
+* Added GUI responsive overrides
+* Added GUI moment.js locale
+* Fixed GUI HTML validation
+* Fixes server usage text
+* Fixed typo in comment
+* Fixed Travis-CI script
+* Moved server shell to scripts
+* Changed CLI unit tests
+* Changed GUI layout
+* Changed README.md
+* Changed ursa to node-rsa
+* Updated Bower versions
+* Updated NPM versions
+* Updated Node.js to LTS version
+* Updated Travis CI Node.js version
+* Updated Travis CI format
+* Renamed some server files
+* Renamed some project folders
+* Refactored project structure
+* Refactored documentation
+* Refactored server app
+* Refactored GUI layout
+* Refactored GUI logic
+
+0.2.43
+* Added all relevant RFC documents
+* Moved documentation to doc folder
+* Changed server sample config
+* Changed limit to quota
+* Changed README.md
+
 0.2.42
-* Added API RAML specification 
+* Added API RAML specification
 * Added more Python versions to Travis CI
 * Fixed padding specification to PKCS#7
 * Fixed padding encoding bug

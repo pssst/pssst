@@ -1,0 +1,5 @@
+.cache/
+*.pyc
+*.pyd
+*.pyo
+env

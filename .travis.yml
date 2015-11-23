@@ -1,15 +1,17 @@
 language: python
 branches:
   only:
-    - develop
     - master
+    - develop
 python:
-  - "2.7"
-  - "3.3"
   - "3.4"
+  - "3.3"
+  - "2.7"
 node_js:
-  - "0.10"
+  - "4.2"
+  - "4.1"
   - "0.12"
+  - "0.10"
   - "iojs"
 services:
   - redis-server
@@ -18,10 +20,13 @@ install:
 before_script:
   - echo 'http://localhost:62421' > ~/.pssst
   - export PYTHON=`which python2`
-  - cd server
+  - cd src/server
+  - nvm install 4.2
+  - nvm use 4.2
   - npm install
-  - node start &
-  - cd ..
-  - sleep 10
+  - npm start &
+  - cd ../..
+  - sleep 30
 script:
-  - python app/cli/pssst_test.py
+  - python src/cli/pssst_test.py
+sudo: false

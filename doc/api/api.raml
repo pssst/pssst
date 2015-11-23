@@ -1,0 +1,177 @@
+#%RAML 0.8
+title: Pssst API
+baseUri: https://api.pssst.name/{version}
+version: 1
+mediaType: application/text
+securedBy: [x-content-hash]
+securitySchemes:
+  - customHeader:
+      description: Authentication header
+      type: x-content-hash
+      descriptedBy:
+        headers:
+          content-hash:
+            displayName: Content hash
+            description: Timestamp; Signed base64 encoded hash of the body
+            type: string
+            required: true
+            minLength: 696
+            maxLength: 696
+            example: |
+              1234567890; ABCDEFGHIJKLMNOPQRSTUVWXYZ...
+/{user}:
+  displayName: User
+  description: A specific user
+  uriParameters:
+    user:
+      displayName: User
+      type: string
+  post:
+    description: This method will create this user
+    body:
+      application/json:
+        schema: |
+          {
+            "$schema": "http://json-schema.org/schema",
+            "properties": {
+              "key": {
+                "required": true,
+                "type": "string"
+              }
+            },
+            "required": true,
+            "type": "object"
+          }
+    responses:
+      200:
+        body:
+          application/text:
+            User created
+  delete:
+    description: This method will disable this user
+    responses:
+      200:
+        body:
+          application/text:
+            User disabled
+  /key
+    displayName: Key
+    description: Public key
+    get:
+      description: This method will return this users public key
+      responses:
+        200:
+          body:
+            application/text
+  /list
+    displayName: List
+    description: Alphabetical list of boxes
+    get:
+      description: This method will return a list of this users boxes
+      responses:
+        200:
+          body:
+            application/json:
+              schema: |
+                [
+                  "$schema": "http://json-schema.org/schema",
+                  "required": true,
+                  "type": "array"
+                ]
+  /{box}:
+    displayName: Box
+    description: A specific box
+    uriParameters:
+      box:
+        displayName: Box
+        type: string
+    get:
+      description: This method will pull a message
+      responses:
+        200:
+          body:
+            application/json:
+              schema: |
+                {
+                  "$schema": "http://json-schema.org/schema",
+                  "properties": {
+                    "head": {
+                      "user": {
+                        "required": true,
+                        "type": "string"
+                      },
+                      "nonce": {
+                        "required": true,
+                        "type": "string"
+                      },
+                      "required": true,
+                      "type": "object"
+                    },
+                    "body": {
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": true,
+                  "type": "object"
+                }
+        404:
+          body:
+            application/json:
+              schema: |
+                {
+                  "$schema": "http://json-schema.org/schema",
+                  "required": true,
+                  "type": "object"
+                }
+    put:
+      description: This method will push a message
+      body:
+        application/json:
+          schema: |
+            {
+              "$schema": "http://json-schema.org/schema",
+              "properties": {
+                "head": {
+                  "user": {
+                    "required": true,
+                    "type": "string"
+                  },
+                  "nonce": {
+                    "required": true,
+                    "type": "string"
+                  },
+                  "time": {
+                    "required": true,
+                    "type": integer
+                  },
+                  "required": true,
+                  "type": "object"
+                },
+                "body": {
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "required": true,
+              "type": "object"
+            }
+      responses:
+        200:
+          body:
+            application/text:
+              Message pushed
+    post:
+      description: This method will created this box
+      responses:
+        200:
+          body:
+            application/text:
+              Box created
+    delete:
+      description: This method will delete this box
+      responses:
+        200:
+          body:
+            application/text:
+              Box deleted
