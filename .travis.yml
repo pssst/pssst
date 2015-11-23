@@ -18,12 +18,13 @@ services:
 install:
   - "pip install pycrypto requests"
 before_script:
+  - node --version
   - echo 'http://localhost:62421' > ~/.pssst
   - export PYTHON=`which python2`
   - cd src/server
   - npm install
   - npm start &
   - cd ../..
-  - sleep 10
+  - sleep 30
 script:
   - python src/cli/pssst_test.py

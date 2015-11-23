@@ -8,6 +8,7 @@
 * Fixed GUI HTML validation
 * Fixes server usage text
 * Fixed typo in comment
+* Fixed Travis-CI script
 * Moved server shell to scripts
 * Changed CLI unit tests
 * Changed GUI layout
