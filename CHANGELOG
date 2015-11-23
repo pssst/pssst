@@ -7,10 +7,12 @@
 * Added GUI moment.js locale
 * Fixed GUI HTML validation
 * Fixes server usage text
+* Fixed typo in comment
 * Moved server shell to scripts
 * Changed CLI unit tests
 * Changed GUI layout
 * Changed README.md
+* Changed ursa to node-rsa
 * Changed Node.js version
 * Updated Bower versions
 * Updated NPM versions

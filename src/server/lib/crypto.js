@@ -22,53 +22,46 @@ module.exports = function Crypto() {
 
   // Required imports
   var fs = require('fs');
-  var ursa = require('ursa');
+  var rsa = require('node-rsa');
   var crypto = require('crypto');
 
   // Required constants
   var GRACE = 30;
 
-  var BINARY = 'base64';
-  var ENCODING = 'utf8';
-
   var RSA_SIZE = 2048;
   var RSA_HASH = 'sha256';
+  var RSA_FORMAT = 'pkcs1';
+  var RSA_SCHEME = 'pkcs1-sha256';
+
+  var ENCODING = 'base64';
 
   var ID_RSA = __dirname + '/../id_rsa';
   var ID_PUB = __dirname + '/../www/key';
 
-  // Generate reasonable strong RSA keys
+  // Generate a reasonable strong RSA key
   if (!fs.existsSync(ID_RSA) || !fs.existsSync(ID_PUB)) {
-    var key = ursa.generatePrivateKey(RSA_SIZE);
+    var key = new rsa({b: RSA_SIZE});
 
-    fs.writeFileSync(ID_RSA, key.toPrivatePem(ENCODING));
-    fs.writeFileSync(ID_PUB, key.toPublicPem(ENCODING));
+    fs.writeFileSync(ID_RSA, key.exportKey('private'));
+    fs.writeFileSync(ID_PUB, key.exportKey('public'));
   }
 
-  // Server key bundle
-  var key = {
-    private: ursa.createPrivateKey(
-      fs.readFileSync(ID_RSA, {encoding: ENCODING}), undefined, ENCODING
-    ),
+  // Load private server key
+  var key = new rsa(fs.readFileSync(ID_RSA), RSA_FORMAT, RSA_SCHEME);
 
-    public: ursa.createPublicKey(
-      fs.readFileSync(ID_PUB, {encoding: ENCODING}), ENCODING
-    )
-  };
-
-  // Assert the private key is valid
-  if (!ursa.isPrivateKey(key.private)){
-    throw new Error('Private key invalid');
+  // Assert the key has a private part
+  if (!key.isPrivate()){
+    throw new Error('Key has no private part');
   }
 
-  // Assert the public key is valid
-  if (!ursa.isPublicKey(key.public)) {
-    throw new Error('Public key invalid');
+  // Assert the key has a public part
+  if (!key.isPublic()) {
+    throw new Error('Key has no public part');
   }
 
-  // Assert the key bundle matches
-  if (!ursa.matchingPublicKeys(key.private, key.public)) {
-    throw new Error('Key bundle invalid');
+  // Assert the key size is big enough
+  if (key.getKeySize() < RSA_SIZE) {
+    throw new Error('Key size too small');
   }
 
   /**
@@ -87,7 +80,7 @@ module.exports = function Crypto() {
 
     return {
       timestamp: timestamp,
-      signature: hmac.digest(BINARY)
+      signature: hmac.digest(ENCODING)
     };
   };
 
@@ -112,11 +105,10 @@ module.exports = function Crypto() {
     }
 
     var hmac = createHMAC(data);
-    var priv = key.private;
 
     return {
       timestamp: hmac.timestamp,
-      signature: priv.hashAndSign(RSA_HASH, hmac.signature, BINARY, BINARY)
+      signature: key.sign(hmac.signature, ENCODING, ENCODING)
     };
   };
 
@@ -139,12 +131,11 @@ module.exports = function Crypto() {
     // Assert the timestamp is within grace time
     if (Math.abs(time - now()) <= GRACE) {
       var hmac = createHMAC(data, time);
-      var pub = ursa.createPublicKey(pem, ENCODING);
 
       try {
-        return pub.hashAndVerify(RSA_HASH, hmac.signature, sig, BINARY);
+        return new rsa(pem).verify(hmac.signature, sig, ENCODING, ENCODING);
       } catch (err) {
-        return false; // Possiblly an OpenSSL error
+        return false; // Possibly an OpenSSL error
       }
     }
 
