@@ -1,6 +1,6 @@
 .\" Manpage for pssst.
 .\" Contact hello@pssst.name to correct errors or typos.
-.TH man 1 "November 2014" "Pssst" "Pssst Manual"
+.TH man 1 "November 2015" "Pssst" "Pssst Manual"
 .SH NAME
 pssst \- Pssst CLI
 .SH SYNOPSIS
