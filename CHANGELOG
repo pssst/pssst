@@ -13,9 +13,10 @@
 * Changed GUI layout
 * Changed README.md
 * Changed ursa to node-rsa
-* Changed Node.js version
 * Updated Bower versions
 * Updated NPM versions
+* Updated Node.js version
+* Updated Travis CI Node.js version
 * Renamed some server files
 * Renamed some project folders
 * Refactored project structure
