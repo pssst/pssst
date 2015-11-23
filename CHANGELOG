@@ -1,6 +1,7 @@
 0.2.44
 * Added Python requirement files
 * Added support for IE 8 to GUI
+* Added nvm to Travis CI script
 * Added READMEs to sources
 * Added GUI theme bootstrap-flat
 * Added GUI responsive overrides

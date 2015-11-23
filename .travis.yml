@@ -18,6 +18,7 @@ services:
 install:
   - "pip install pycrypto requests"
 before_script:
+  - nvm use 5.1
   - node --version
   - echo 'http://localhost:62421' > ~/.pssst
   - export PYTHON=`which python2`
