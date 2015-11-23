@@ -33,7 +33,7 @@ module.exports = function Server(app, config, callback) {
 
   // Required libraries
   var info = require('../package.json');
-  var pssst = require('../app/pssst_1.js');
+  var pssst = require('../app/pssst1.js');
   var redis = require('../lib/redis.js');
   var crypto = require('../lib/crypto.js');
 
