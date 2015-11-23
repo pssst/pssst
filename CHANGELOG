@@ -19,6 +19,7 @@
 * Updated NPM versions
 * Updated Node.js version
 * Updated Travis CI Node.js version
+* Updated Travis CI format
 * Renamed some server files
 * Renamed some project folders
 * Refactored project structure
