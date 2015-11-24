@@ -2,8 +2,6 @@ CLI
 ===
 Pssst command line interface.
 
-Usage
------
 ```
 $ pssst [option|command] [username:password] [receiver message...]
 ```
