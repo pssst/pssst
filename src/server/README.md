@@ -2,8 +2,6 @@ Server
 ======
 Pssst server.
 
-Usage
------
 ```
 $ npm start [option]
 ```
