@@ -14,10 +14,8 @@ $ curl -s https://get.pssst.name | bash
 
 **How to use**
 ```
-$ pssst push me you "Hello"
+$ pssst push me world "Hello"
 ```
-
-Please use `pssst --help` for a full list of available commands.
 
 API
 ---
