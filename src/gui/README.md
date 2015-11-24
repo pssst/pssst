@@ -2,8 +2,6 @@ GUI
 ===
 Pssst HTML user interface.
 
-Usage
------
 ```
 $ pssst-gui [option|port]
 ```
