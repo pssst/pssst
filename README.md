@@ -31,12 +31,7 @@ No security advisories are known as of today.
 
 License
 -------
-Copyright (C) 2013-2015  Christian & Christian  <hello@pssst.name>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Licensed under the terms of the [GPLv3 License](LICENSE).
 
 ----------
 Created by
