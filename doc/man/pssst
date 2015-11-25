@@ -44,7 +44,7 @@ Configuration file. See
 .I README.md
 for further details.
 .RE
-.I ~/.pssst.<username>
+.I ~/.pssst.<user>
 .RS
 User specific data including private and public keys.
 .RE
