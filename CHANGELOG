@@ -1,5 +1,8 @@
-1.0.1
+1.0.2
+* Fixed API RAML specification
 * Fixed Node.js requirement
+
+1.0.1
 * Some minor documentation improvments
 * Updated the servers key fingerprint
 
