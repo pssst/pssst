@@ -22,7 +22,7 @@ Install
 -------
 At least [required](packages.json):
 
-* Node.js 0.12
+* Node.js 4.2
 * A Redis database instance
 
 > We also have built-in support for Heroku and all Redis database add-ons.
