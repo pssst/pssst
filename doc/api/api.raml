@@ -19,6 +19,33 @@ securitySchemes:
             maxLength: 696
             example: |
               1234567890; ABCDEFGHIJKLMNOPQRSTUVWXYZ...
+/
+  displayName: Version
+  description: Server version
+  get:
+    description: This method will return the server version
+    responses:
+      200:
+        body:
+          application/text
+/key
+  displayName: Key
+  description: Server public key
+  get:
+    description: This method will return the servers public key
+    responses:
+      200:
+        body:
+          application/text
+/time
+  displayName: Time
+  description: Server current time
+  get:
+    description: This method will return the servers current time
+    responses:
+      200:
+        body:
+          application/text
 /{user}:
   displayName: User
   description: A specific user
@@ -96,11 +123,15 @@ securitySchemes:
                   "$schema": "http://json-schema.org/schema",
                   "properties": {
                     "head": {
-                      "user": {
+                      "nonce": {
                         "required": true,
                         "type": "string"
                       },
-                      "nonce": {
+                      "time": {
+                        "required": true,
+                        "type": integer
+                      },
+                      "user": {
                         "required": true,
                         "type": "string"
                       },
@@ -133,17 +164,13 @@ securitySchemes:
               "$schema": "http://json-schema.org/schema",
               "properties": {
                 "head": {
-                  "user": {
-                    "required": true,
-                    "type": "string"
-                  },
                   "nonce": {
                     "required": true,
                     "type": "string"
                   },
-                  "time": {
+                  "user": {
                     "required": true,
-                    "type": integer
+                    "type": "string"
                   },
                   "required": true,
                   "type": "object"
