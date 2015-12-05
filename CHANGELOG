@@ -1,4 +1,5 @@
 1.0.1
+* Fixed Node.js requirement
 * Some minor documentation improvments
 * Updated the servers key fingerprint
 
