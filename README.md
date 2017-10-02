@@ -9,7 +9,7 @@ services by our self, but we provide you with the tools to start your own
 service. These tools build upon open-source software and use strong end-to-end
 encryption.
 ```
-$ pssst push me you "Hello"
+$ pssst push sender receiver "Hello"
 ```
 
 API
