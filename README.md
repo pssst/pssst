@@ -2,19 +2,14 @@
 
 Pssst [![](https://travis-ci.org/pssst/pssst.svg)](https://travis-ci.org/pssst/pssst)
 =====
+> PLEASE NOTE, THAT THIS PROJECT IS NO LONGER ACTIVELY MAINTAINED
+
 Pssst is a simple and secure way to exchange information. We do not provide
 services by our self, but we provide you with the tools to start your own
 service. These tools build upon open-source software and use strong end-to-end
 encryption.
-
-**How to get**
 ```
-$ curl -s https://get.pssst.name | bash
-```
-
-**How to use**
-```
-$ pssst push me world "Hello"
+$ pssst push me you "Hello"
 ```
 
 API
